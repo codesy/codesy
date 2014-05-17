@@ -2,9 +2,14 @@ Django==1.6.2
 South==0.8.4
 dj-database-url==0.3.0
 dj-static==0.0.5
+django-allauth==0.16.1
 django-toolbelt==0.0.1
 gunicorn==18.0
+oauthlib==0.6.1
 psycopg2==2.5.2
 pystache==0.5.3
+python-openid==2.2.5
+requests==2.3.0
+requests-oauthlib==0.4.0
 static==1.0.2
 wsgiref==0.1.2
