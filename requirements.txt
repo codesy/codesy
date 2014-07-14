@@ -4,6 +4,7 @@ dj-database-url==0.3.0
 dj-static==0.0.5
 django-allauth==0.16.1
 django-toolbelt==0.0.1
+djangorestframework==2.3.13
 gunicorn==18.0
 oauthlib==0.6.1
 psycopg2==2.5.2
