@@ -26,16 +26,16 @@
 
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav navbar-right">
-            {% if request.user.is_authenticated %}
-            <li><img src="{{ gravatar_url }}"/><a href="/accounts/logout/" class="pull-right">Logout</a></li>
-            {% else %}
-              <li><a href="/accounts/login/" class="pull-right">Login</a></li>
-            {% endif %}
           </ul>
         </div>
       </div>
     </nav>
-    <h1>Hello{% if request.user.is_authenticated %}, {{ request.user.username }}{% endif %}!</h1>
+    {% if request.user.is_authenticated %}
+      <h1>Hello, <img src="{{ gravatar_url }}"/>{{ request.user.username }}!</h1>
+      <a href="/accounts/logout/">Sign out</a>
+    {% else %}
+    <a class="btn btn-default" href="/accounts/github/login/?process=login"><img width="32" height="32" src="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" /> Sign in with <b>GitHub</b></a>
+    {% endif %}
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="//cdn.jsdelivr.net/jquery/2.1.1/jquery.min.js"></script>
