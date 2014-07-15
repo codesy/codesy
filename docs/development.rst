@@ -30,7 +30,7 @@ Development
 
                 https://codesy.io/ (prod)
 
-                https://whatsdeployed.herokuapp.com/?owner=codesy&repo=codesy&name[]=Dev&url[]=http://codesy-dev.herokuapp.com/media/revision.txt&name[]=Stage&url[]=http://codesy-stage.herokuapp.com/media/revision.txt&name[]=Prod&url[]=https://codesy.io/media/revision.txt (What's Deployed)
+                https://whatsdeployed.paas.allizom.org/?owner=codesy&repo=codesy&name[]=Dev&url[]=https://codesy-dev.herokuapp.com/revision.txt&name[]=Stage&url[]=https://codesy-stage.herokuapp.com/revision.txt&name[]=Prod&url[]=https://codesyio/revision.txt (What's Deployed)
 
 
 Requirements
