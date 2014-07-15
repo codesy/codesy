@@ -11,9 +11,10 @@ addons:
     postgresql: "9.3"
 
 env:
-    - DATABASE_URL=postgres://postgres@localhost:5432/codesy
-    - DJANGO_SECRET_KEY=ht)u5#+5k)d*whz)yso6$lu$x^-2_roc40-671j^9by0r-fd@0
-    - DJANGO_DEBUG=True
+    global:
+        - DATABASE_URL=postgres://postgres@localhost:5432/codesy
+        - DJANGO_SECRET_KEY=terrible-awful-secret-only-for-travis
+        - DJANGO_DEBUG=True
 
 before_script:
     - psql -c 'create database codesy;' -U postgres
