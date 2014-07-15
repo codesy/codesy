@@ -1,3 +1,4 @@
 *.pyc
 staticfiles
 _build
+.env
