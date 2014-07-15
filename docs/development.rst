@@ -23,7 +23,7 @@ Development
 :Documentation: http://codesy.readthedocs.org/
 :Issues:        https://github.com/codesy/codesy/issues
 :IRC:           irc://irc.freenode.net/codesy
-:Mailing list:  https://groups.google.com/forum/#!forum/codesy.dev
+:Mailing list:  https://groups.google.com/forum/#!forum/codesy-dev
 :Servers:       https://codesy-dev.herokuapp.com/ (dev)
 
                 https://codesy-stage.herokuapp.com/ (stage)
