@@ -1,12 +1,23 @@
-Overview
-========
+Development
+===========
 
-This is the code for codesy's API backend, which combines:
+The code for codesy's API backend combines:
 
-* `GitHub <https://github.com/>`_ Authentication (via `django-allauth <https://github.com/pennersr/django-allauth>`_)
-* `Balanced Payments <http://balancedpayments.com/>`_ (via `balanced-python <https://github.com/balanced/balanced-python>`_)
-* codesy variation of `Nate Oostendorp's <http://oostendorp.net/>`_ "`Concurrent Sealed Bid Auction`_" system
+* `GitHub`_ Authentication (via `django-allauth`_)
+* `Balanced`_ payments (via `balanced-python`_)
+* codesy variation of `Nate Oostendorp`_'s "`Concurrent Sealed Bid Auction`_"
+  system and `CodePatron`_ concept.
 
+.. _GitHub: https://github.com/
+.. _django-allauth: https://github.com/pennersr/django-allauth
+.. _Balanced: http://balancedpayments.com/
+.. _balanced-python: https://github.com/balanced/balanced-python
+.. _Nate Oostendorp: http://oostendorp.net/
+.. _Concurrent Sealed Bid Auction: https://docs.google.com/document/d/1dKYFRTUU6FsX6V4PtWILwN3jkzxiQtbyFQXG75AA4jU/preview
+.. _CodePatron: https://docs.google.com/document/d/1fdTM7WqGzUtAN8Hd3aRfXR1mHcAG-WsH6JSwxOqcGqY/preview
+
+Resources
+---------
 .. image:: https://travis-ci.org/codesy/codesy.png?branch=master
    :target: https://travis-ci.org/codesy/codesy
    :alt: Travis-CI Build Status
@@ -14,9 +25,6 @@ This is the code for codesy's API backend, which combines:
 .. image:: https://requires.io/github/codesy/codesy/requirements.png?branch=master
    :target: https://requires.io/github/codesy/codesy/requirements/?branch=master
    :alt: Requirements Status
-
-Development
-===========
 
 :Code:          https://github.com/codesy/codesy
 :License:       AGPLv3; see LICENSE file
@@ -34,16 +42,17 @@ Development
 
 
 Requirements
-============
+------------
 
 * `python`_
 * (suggested) `foreman`_
 * (suggested) `autoenv`_
 
-Getting Started
-===============
 
-codesy's API backend is designed to be run on `heroku <https://www.heroku.com/>`_, so you can also run it locally with `foreman`_:
+Get Started
+-----------
+
+codesy's API backend is designed to be run on `heroku`_, so you can also run it locally with `foreman`_:
 
 #. Clone::
 
@@ -77,22 +86,27 @@ codesy's API backend is designed to be run on `heroku <https://www.heroku.com/>`
 .. _python: https://www.python.org/
 .. _foreman: https://github.com/ddollar/foreman
 .. _autoenv: https://github.com/kennethreitz/autoenv
-.. _Concurrent Sealed Bid Auction: https://docs.google.com/document/d/1dKYFRTUU6FsX6V4PtWILwN3jkzxiQtbyFQXG75AA4jU/preview
 .. _ReadTheDocs: http://codesy.readthedocs.org/en/latest/development.html
 
-Running the Tests
-=================
-
-A great way to check that everything really is working is to run the test
-suite.
+Run the Tests
+-------------
 
 Running the test suite is easy::
 
     ./manage.py test -s --noinput --logging-clear-handlers
 
+Deploy
+------
+
+TODO: Fill in deployment steps for `heroku`_
+
 What to work on
-===============
+---------------
+
+We have `Issues`_.
 
 If you are an active codesy user, we love getting pull requests that "`scratch your own itch`_" and help the entire codesy community.
 
 .. _scratch your own itch: https://gettingreal.37signals.com/ch02_Whats_Your_Problem.php
+.. _heroku: https://www.heroku.com/
+.. _Issues: https://github.com/codesy/codesy/issues

@@ -6,13 +6,16 @@
 Welcome to codesy's documentation!
 ==================================
 
+`codesy <http://codesy.io>`_ is a pay-what-you-want market for the open source community to encourage
+coders to fix important bugs.
+
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
-`codesy <http://codesy.io>`_ is a pay-what-you-want market for the open source community to encourage
-coders to fix important bugs.
+   development
+
 
 
 Indices and tables
