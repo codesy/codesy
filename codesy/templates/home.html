@@ -2,9 +2,13 @@
 
 {% block content %}
     {% if request.user.is_authenticated %}
-      <h1>Hello, <img src="{{ gravatar_url }}"/>{{ request.user.username }}!</h1>
-      <a href="/accounts/logout/">Sign out</a>
+    <h1>1. <strong>Welcome</strong> <img src="{{ gravatar_url }}"/> {{ request.user.username }}!</h1>
     {% else %}
-    <a class="btn btn-default" href="/accounts/github/login/?process=login"><img width="32" height="32" src="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" /> Sign in with <b>GitHub</b></a>
+    <h1>1. <a href="/accounts/github/login/?process=login">Sign in with <img width="32" height="32" src="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" /><b>GitHub</b></a></h1>
     {% endif %}
+    <h1>2. <a href="#">Add funds</a> to your account.</h1>
+    <h1>3. That's it. Happy bidding.</h1>
+{% if request.user.is_authenticated %}
+<a href="/accounts/logout/">Sign out</a>
+{% endif %}
 {% endblock %}
