@@ -4,13 +4,14 @@ Development
 The code for codesy's API backend combines:
 
 * `GitHub`_ Authentication (via `django-allauth`_)
-* `Balanced`_ payments (via `balanced-python`_)
+* `Braintree`_ payments (via `braintree python library`_)
 * codesy variation of `Nate Oostendorp`_'s "`Concurrent Sealed Bid Auction`_"
   system and `CodePatron`_ concept.
 
 .. _GitHub: https://github.com/
 .. _django-allauth: https://github.com/pennersr/django-allauth
-.. _Balanced: http://balancedpayments.com/
+.. _Braintree: https://www.braintreepayments.com/
+.. _braintree python library: https://developers.braintreepayments.com/javascript+python
 .. _balanced-python: https://github.com/balanced/balanced-python
 .. _Nate Oostendorp: http://oostendorp.net/
 .. _Concurrent Sealed Bid Auction: https://docs.google.com/document/d/1dKYFRTUU6FsX6V4PtWILwN3jkzxiQtbyFQXG75AA4jU/preview
