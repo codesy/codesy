@@ -17,6 +17,9 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 class BidViewSet(viewsets.ModelViewSet):
     """
     API endpoint for bids.
+    TODO: Receive POST from braintree form and:
+        1. braintree.Transaction.sale()
+        2. Create bid object
     """
     queryset = Bid.objects.all()
     serializer_class = BidSerializer

@@ -1,12 +1,21 @@
 import hashlib
 import os
 
+import braintree
+
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 
 
-# Create your views here.
+BRAINTREE_CONFIG = {
+    'merchant_id': os.environ.get('BRAINTREE_MERCHANT_ID', ''),
+    'public_key': os.environ.get('BRAINTREE_PUBLIC_KEY', ''),
+    'private_key': os.environ.get('BRAINTREE_PRIVATE_KEY', '')
+}
+braintree.Configuration.configure(braintree.Environment.Sandbox,
+                                  **BRAINTREE_CONFIG)
+
 def home(request):
     gravatar_url = ''
     if request.user.is_authenticated():
@@ -23,3 +32,11 @@ def home(request):
 def revision(request):
     return HttpResponse(os.environ.get('COMMIT_HASH', ''),
                         content_type='text/plain')
+
+
+def client_token(request):
+    if request.user.is_authenticated():
+        client_token = braintree.ClientToken.generate({
+            # "customer_id": request.user.id
+        })
+    return HttpResponse(client_token, content_type='text/plain')
