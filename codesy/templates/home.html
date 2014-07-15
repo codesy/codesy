@@ -3,12 +3,26 @@
 {% block content %}
     {% if request.user.is_authenticated %}
     <h1>1. <strong>Welcome</strong> <img src="{{ gravatar_url }}"/> {{ request.user.username }}!</h1>
+    <h1>2. Add funds to your account.</h1>
+<form id="checkout" method="post" action="/checkout">
+    <div id="dropin"></div>
+    <input type="submit" value="Pay $10">
+</form>
     {% else %}
     <h1>1. <a href="/accounts/github/login/?process=login">Sign in with <img width="32" height="32" src="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" /><b>GitHub</b></a></h1>
+    <h1>2. Add funds to your account.</h1>
     {% endif %}
-    <h1>2. <a href="#">Add funds</a> to your account.</h1>
     <h1>3. That's it. Happy bidding.</h1>
 {% if request.user.is_authenticated %}
 <a href="/accounts/logout/">Sign out</a>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="https://js.braintreegateway.com/v2/braintree.js"></script>
+<script>
+    braintree.setup("eyJ2ZXJzaW9uIjoxLCJhdXRob3JpemF0aW9uRmluZ2VycHJpbnQiOiIxNzc3OGRkNDlkNjlmZDFiY2FkMTA3ZmViZmVkMWZjMjE2ZTU5ZmVmMDA3ZTZkNmNmYTdhMGIzZWUzOWUyOTJjfGNyZWF0ZWRfYXQ9MjAxNC0wNy0xNVQwNTo0NjozNi40NzA2MzkwNDcrMDAwMFx1MDAyNm1lcmNoYW50X2lkPWRjcHNweTJicndkanIzcW5cdTAwMjZwdWJsaWNfa2V5PTl3d3J6cWszdnIzdDRuYzgiLCJjaGFsbGVuZ2VzIjpbImN2diJdLCJjbGllbnRBcGlVcmwiOiJodHRwczovL2FwaS5zYW5kYm94LmJyYWludHJlZWdhdGV3YXkuY29tOjQ0My9tZXJjaGFudHMvZGNwc3B5MmJyd2RqcjNxbi9jbGllbnRfYXBpIiwiYXNzZXRzVXJsIjoiaHR0cHM6Ly9hc3NldHMuYnJhaW50cmVlZ2F0ZXdheS5jb20iLCJhdXRoVXJsIjoiaHR0cHM6Ly9hdXRoLnZlbm1vLnNhbmRib3guYnJhaW50cmVlZ2F0ZXdheS5jb20iLCJwYXltZW50QXBwU2NoZW1lcyI6W10sInRocmVlRFNlY3VyZUVuYWJsZWQiOmZhbHNlLCJwYXlwYWxFbmFibGVkIjp0cnVlLCJwYXlwYWwiOnsiZGlzcGxheU5hbWUiOiJBY21lIFdpZGdldHMsIEx0ZC4gKFNhbmRib3gpIiwiY2xpZW50SWQiOm51bGwsInByaXZhY3lVcmwiOiJodHRwOi8vZXhhbXBsZS5jb20vcHAiLCJ1c2VyQWdyZWVtZW50VXJsIjoiaHR0cDovL2V4YW1wbGUuY29tL3RvcyIsImJhc2VVcmwiOiJodHRwczovL2Fzc2V0cy5icmFpbnRyZWVnYXRld2F5LmNvbSIsImFzc2V0c1VybCI6Imh0dHBzOi8vY2hlY2tvdXQucGF5cGFsLmNvbSIsImRpcmVjdEJhc2VVcmwiOm51bGwsImFsbG93SHR0cCI6dHJ1ZSwiZW52aXJvbm1lbnROb05ldHdvcmsiOnRydWUsImVudmlyb25tZW50Ijoib2ZmbGluZSJ9fQ==", 'dropin', {
+          container: 'checkout'
+      });
+</script>
 {% endblock %}
