@@ -1,5 +1,7 @@
 import hashlib
+import os
 
+from django.http import HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 
@@ -16,3 +18,8 @@ def home(request):
                               {'gravatar_url': gravatar_url},
                               RequestContext(request)
                              )
+
+
+def revision(request):
+    return HttpResponse(os.environ.get('COMMIT_HASH', ''),
+                        content_type='text/plain')

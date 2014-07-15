@@ -7,6 +7,7 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^blog/', include('blog.urls')),
 
+    url(r'^revision.txt$', 'codesy.views.revision', name='revision'),
     url(r'^$', 'codesy.views.home', name='home'),
     url(r'^accounts/', include('allauth.urls')),
     url(r'^admin/', include(admin.site.urls)),
