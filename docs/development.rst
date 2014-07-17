@@ -17,6 +17,7 @@ The code for codesy's API backend combines:
 .. _Concurrent Sealed Bid Auction: https://docs.google.com/document/d/1dKYFRTUU6FsX6V4PtWILwN3jkzxiQtbyFQXG75AA4jU/preview
 .. _CodePatron: https://docs.google.com/document/d/1fdTM7WqGzUtAN8Hd3aRfXR1mHcAG-WsH6JSwxOqcGqY/preview
 
+
 Resources
 ---------
 .. image:: https://travis-ci.org/codesy/codesy.png?branch=master
@@ -89,6 +90,7 @@ codesy's API backend is designed to be run on `heroku`_, so you can also run it 
 .. _autoenv: https://github.com/kennethreitz/autoenv
 .. _ReadTheDocs: http://codesy.readthedocs.org/en/latest/development.html
 
+
 Run the Tests
 -------------
 
@@ -96,10 +98,6 @@ Running the test suite is easy::
 
     ./manage.py test -s --noinput --logging-clear-handlers
 
-Deploy
-------
-
-TODO: Fill in deployment steps for `heroku`_
 
 What to work on
 ---------------
@@ -111,3 +109,18 @@ If you are an active codesy user, we love getting pull requests that "`scratch y
 .. _scratch your own itch: https://gettingreal.37signals.com/ch02_Whats_Your_Problem.php
 .. _heroku: https://www.heroku.com/
 .. _Issues: https://github.com/codesy/codesy/issues
+
+
+Tips
+----
+
+We have some useful git hooks. After you clone, link them all::
+
+    rm -rf .git/hooks
+    ln -s git-hooks .git/hooks
+
+
+Deploy
+------
+
+TODO: Fill in deployment steps for `heroku`_
