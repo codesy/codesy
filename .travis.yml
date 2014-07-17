@@ -22,6 +22,12 @@ before_script:
 script:
     - python manage.py test
 
+deploy:
+    provider: heroku
+    app: codesy-dev
+    api_key:
+        secure: cFXVUU3C3RJkuXG/7aJzkCdl31fnmyP1zKCmCy80ciRSfEKlvxHjUNbOKXtkM7qqErvh9ga+lOkrlM5g2FllWNS1JLX6X2yzlAS407Y/yUf7AHmgzhcZzG5s2ToxpMews0Y+vxEsZMjRSxXGWs06G5F+0md4iE2fA8X6fLotwp4=
+
 notifications:
     irc:
         channels:
