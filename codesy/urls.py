@@ -8,6 +8,8 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^revision.txt$', 'codesy.views.revision', name='revision'),
+    url(r'^braintree_token$', 'codesy.views.braintree_token', name='braintree_token'),
+    url(r'^accounts/(\w+)/deposit', 'codesy.views.deposit', name='deposit'),
     url(r'^$', 'codesy.views.home', name='home'),
     url(r'^accounts/', include('allauth.urls')),
     url(r'^admin/', include(admin.site.urls)),

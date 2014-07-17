@@ -16,6 +16,11 @@
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+    <style>
+      ul { padding: 0; }
+      .navbar { margin: 0; }
+    </style>
   </head>
   <body>
     <nav class="navbar navbar-default" role="navigation">
@@ -36,5 +41,7 @@
     <script src="//cdn.jsdelivr.net/jquery/2.1.1/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+    {% block scripts %}{%endblock %}
   </body>
 </html>
