@@ -103,6 +103,7 @@ for GitHub:
 * Name: codesy-local
 * Client id: c040becacd90c91a935a
 * Secret key: 08c3da1421bb280e6fa5f61c05afd0c3128a2f9f
+* Sites: example.com -> Chosen sites
 
 Now you can sign in with GitHub at http://127.0.0.1:5000. Still more ...
 
