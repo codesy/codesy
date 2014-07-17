@@ -2,3 +2,5 @@
 staticfiles
 _build
 .env
+env
+codesy.sqlite

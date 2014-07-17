@@ -88,6 +88,8 @@ SOCIALACCOUNT_PROVIDERS = {
         'SCOPE': ['email',],
     }
 }
+ACCOUNT_EMAIL_VERIFICATION = os.environ.get('ACCOUNT_EMAIL_VERIFICATION',
+                                            'optional')
 
 ROOT_URLCONF = 'codesy.urls'
 

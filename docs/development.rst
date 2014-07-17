@@ -67,16 +67,16 @@ codesy's API backend is designed to be run on `heroku`_, so you can also run it 
 
 #. Install requirements::
 
-    pip install -r requirements.txt
+    pip install -r codesy/requirements.txt
 
 #. Copy, configure, & export codesy environment variables (easier with `autoenv`_)::
 
-    mv codesy/.env-dist codesy/.env
+    cp codesy/.env-dist codesy/.env
     vim codesy/.env
     cd codesy
     source .env
 
-#. Create DB tables::
+#. Create DB tables (be sure to create a superuser)::
 
     ./manage.py syncdb
     ./manage.py migrate
@@ -85,11 +85,39 @@ codesy's API backend is designed to be run on `heroku`_, so you can also run it 
 
     foreman start
 
+#. http://127.0.0.1:5000 works, but there's more to do ...
+
 .. _python: https://www.python.org/
 .. _foreman: https://github.com/ddollar/foreman
-.. _autoenv: https://github.com/kennethreitz/autoenv
 .. _ReadTheDocs: http://codesy.readthedocs.org/en/latest/development.html
 
+
+Enable GitHub Auth
+------------------
+
+To enable GitHub authentication, you can use our codesy-local OAuth app.
+`Add a django-allauth social app <http://127.0.0.1:5000/admin/socialaccount/socialapp/add/>`_
+for GitHub:
+
+* Provider: GitHub
+* Name: codesy-local
+* Client id: c040becacd90c91a935a
+* Secret key: 08c3da1421bb280e6fa5f61c05afd0c3128a2f9f
+
+Now you can sign in with GitHub at http://127.0.0.1:5000. Still more ...
+
+Enable Payments Sandbox
+-----------------------
+
+To enable a BrainTree sandbox so you can work with payments:
+
+#. `Sign up for a BrainTree Sandbox <https://www.braintreepayments.com/get-started>`_
+
+#. Put your Merchant ID, Public Key, and Private Key into the `.env` file
+
+#. Source the `.env` file to export codesy environment variables (again, easier with `autoenv`_)::
+
+    source .env
 
 Run the Tests
 -------------
@@ -107,7 +135,6 @@ We have `Issues`_.
 If you are an active codesy user, we love getting pull requests that "`scratch your own itch`_" and help the entire codesy community.
 
 .. _scratch your own itch: https://gettingreal.37signals.com/ch02_Whats_Your_Problem.php
-.. _heroku: https://www.heroku.com/
 .. _Issues: https://github.com/codesy/codesy/issues
 
 
@@ -124,3 +151,6 @@ Deploy
 ------
 
 TODO: Fill in deployment steps for `heroku`_
+
+.. _heroku: https://www.heroku.com/
+.. _autoenv: https://github.com/kennethreitz/autoenv
