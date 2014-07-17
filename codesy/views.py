@@ -3,9 +3,10 @@ import os
 
 import braintree
 
+from django.contrib import messages
 from django.http import HttpResponse
 from django.template import RequestContext
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 
 
 BRAINTREE_CONFIG = {
@@ -34,9 +35,25 @@ def revision(request):
                         content_type='text/plain')
 
 
-def client_token(request):
+def braintree_token(request):
     if request.user.is_authenticated():
-        client_token = braintree.ClientToken.generate({
+        braintree_token = braintree.ClientToken.generate({
             # "customer_id": request.user.id
         })
-    return HttpResponse(client_token, content_type='text/plain')
+    return HttpResponse(braintree_token, content_type='text/plain')
+
+
+def deposit(request, username):
+    if request.method == "POST":
+        amount = request.POST["amount"]
+        nonce = request.POST["payment_method_nonce"]
+        result = braintree.Transaction.sale({
+            "amount": amount,
+            "payment_method_nonce": nonce
+        })
+        if result.is_success:
+            messages.success(request, "Deposited %s. Transaction ID: %s" %
+                             (amount, result.transaction.id))
+        else:
+            messages.error(request, "Error: %s" % result.message)
+        return redirect('home')

@@ -1,18 +1,28 @@
 {% extends "base.html" %}
 
 {% block content %}
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
     {% if request.user.is_authenticated %}
-    <h1>1. <strong>Welcome</strong> <img src="{{ gravatar_url }}"/> {{ request.user.username }}!</h1>
-    <h1>2. Add funds to your account.</h1>
-<form id="checkout" method="post" action="/checkout">
-    <div id="dropin"></div>
-    <input type="submit" value="Pay $10">
-</form>
+        <h1>1. Hi <img src="{{ gravatar_url }}"/> {{ request.user.username }}!</h1>
+        <h1>2. Add funds to your account.</h1>
+        <form id="deposit" method="post" action="/accounts/{{ request.user.username }}/deposit">
+            {% csrf_token %}
+            <div id="dropin"></div>
+            <input type="text" name="amount" id="amount" />
+            <input type="submit" value="Deposit">
+        </form>
     {% else %}
     <h1>1. <a href="/accounts/github/login/?process=login">Sign in with <img width="32" height="32" src="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" /><b>GitHub</b></a></h1>
     <h1>2. Add funds to your account.</h1>
     {% endif %}
-    <h1>3. That's it. Happy bidding.</h1>
+    <h1>3. Install the browser Add-on. Happy bidding!</h1>
 {% if request.user.is_authenticated %}
 <a href="/accounts/logout/">Sign out</a>
 {% endif %}
@@ -21,11 +31,11 @@
 {% block scripts %}
 {% if request.user.is_authenticated %}
 <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
-{% url 'client_token' as client_token_url %}
+{% url 'braintree_token' as braintree_token_url %}
 <script>
-    $.get("{{ client_token_url }}", function(data){
+    $.get("{{ braintree_token_url }}", function(data){
     braintree.setup(data, 'dropin', {
-          container: 'checkout'
+          container: 'dropin'
       });
   });
 </script>
