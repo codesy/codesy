@@ -54,7 +54,7 @@ Requirements
 Get Started
 -----------
 
-codesy's API backend is configured to run on `heroku`_, so you can start easily with `foreman`_:
+codesy's API backend tries to be very slim, so starting should be easy:
 
 #. `Clone`_::
 
@@ -80,7 +80,11 @@ codesy's API backend is configured to run on `heroku`_, so you can start easily 
     ./manage.py syncdb
     ./manage.py migrate
 
-#. Start the django app via `foreman`_::
+#. Start the django app, via plain `runserver`_::
+
+    ./manage.py runserver 0.0.0.0:5000
+
+   or via `foreman`_::
 
     foreman start
 
@@ -94,6 +98,7 @@ codesy's API backend is configured to run on `heroku`_, so you can start easily 
 .. _config: http://12factor.net/config
 .. _Sync: https://docs.djangoproject.com/en/1.6/ref/django-admin/#syncdb
 .. _migrate: http://south.readthedocs.org/en/latest/commands.html#migrate
+.. _runserver: https://docs.djangoproject.com/en/dev/ref/django-admin/#django-admin-runserver
 
 
 Enable GitHub Auth
