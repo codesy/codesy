@@ -96,10 +96,10 @@ codesy's API backend tries to be very slim, so starting should be easy:
 .. _virtual environment: http://docs.python-guide.org/en/latest/dev/virtualenvs/
 .. _Install requirements: http://pip.readthedocs.org/en/latest/user_guide.html#requirements-files
 .. _config: http://12factor.net/config
-.. _Sync: https://docs.djangoproject.com/en/1.6/ref/django-admin/#syncdb
-.. _migrate: http://south.readthedocs.org/en/latest/commands.html#migrate
 .. _runserver: https://docs.djangoproject.com/en/dev/ref/django-admin/#django-admin-runserver
 
+
+.. _Enable GitHub Auth:
 
 Enable GitHub Auth
 ------------------
@@ -118,6 +118,8 @@ Now you can sign in with GitHub at http://127.0.0.1:5000. Still more ...
 
 .. _Add a django-allauth social app: http://127.0.0.1:5000/admin/socialaccount/socialapp/add/
 
+.. _Enable Payments:
+
 Enable Payments Sandbox
 -----------------------
 
@@ -131,6 +133,8 @@ To enable a BrainTree sandbox so you can work with payments:
 #. Source the `.env` file to export codesy environment variables (again, automated by `autoenv`_)::
 
     source .env
+
+Now you can deposit (fake) funds at http://127.0.0.1:5000
 
 Run the Tests
 -------------
@@ -152,6 +156,60 @@ If you are an active codesy user, we love getting pull requests that
 .. _Issues: https://github.com/codesy/codesy/issues
 
 
+Deploy
+------
+
+codesy is designed to run on `heroku`_, so you can easily deploy your changes
+to your own heroku app with `heroku toolbelt`_.
+
+#. `Create a heroku remote`_::
+
+    heroku apps:create codesy-<username>
+
+#. `Generate`_ and set dev environment variables for heroku::
+
+    heroku config:set DJANGO_SECRET_KEY="<key>"
+    heroku config:set DJANGO_DEBUG=True
+    heroku config:set ACCOUNT_EMAIL_VERIFICATION=none
+
+#. `Sync`_ and `migrate`_ DB tables (be sure to create a superuser)::
+
+    heroku run python manage.py syncdb
+    heroku run python manage.py migrate
+
+#. Create `your own GitHub App`_.
+
+    * Application name: codesy-username
+    * Homepage URL: https://codesy-username/herokuapp.com/
+    * Application description: username's codesy
+    * Authorization callback URL: https://codesy-username.herokuapp.com/accounts/github/login/callback/
+
+   .. note:: You must use `https`
+
+#. `Enable GitHub Auth`_ as above, using your own GitHub App credentials
+
+#. `Enable Payments`_ as above, using heroku environment variables::
+
+    heroku config:set BRAINTREE_MERCHANT_ID=""
+    heroku config:set BRAINTREE_PUBLIC_KEY=""
+    heroku config:set BRAINTREE_PRIVATE_KEY=""
+
+#. That's it. https://codesy-username.herokuapp.com/ should work.
+
+
+.. _heroku toolbelt: https://toolbelt.heroku.com/
+.. _Create a heroku remote: https://devcenter.heroku.com/articles/git#creating-a-heroku-remote
+.. _Generate: http://www.miniwebtool.com/django-secret-key-generator/
+.. _your own GitHub App: https://github.com/settings/applications/new
+
+
+.. _Sync: https://docs.djangoproject.com/en/1.6/ref/django-admin/#syncdb
+.. _migrate: http://south.readthedocs.org/en/latest/commands.html#migrate
+.. _heroku: https://www.heroku.com/
+.. _autoenv: https://github.com/kennethreitz/autoenv
+.. _git hooks: http://git-scm.com/book/en/Customizing-Git-Git-Hooks
+
+
 Tips
 ----
 
@@ -159,13 +217,3 @@ We have some useful `git hooks`_. After you clone, link them all::
 
     rm -rf .git/hooks
     ln -s git-hooks .git/hooks
-
-
-Deploy
-------
-
-TODO: Fill in deployment steps for `heroku`_
-
-.. _heroku: https://www.heroku.com/
-.. _autoenv: https://github.com/kennethreitz/autoenv
-.. _git hooks: http://git-scm.com/book/en/Customizing-Git-Git-Hooks
