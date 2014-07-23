@@ -12,7 +12,6 @@ The code for codesy's API backend combines:
 .. _django-allauth: https://github.com/pennersr/django-allauth
 .. _Braintree: https://www.braintreepayments.com/
 .. _braintree python library: https://developers.braintreepayments.com/javascript+python
-.. _balanced-python: https://github.com/balanced/balanced-python
 .. _Nate Oostendorp: http://oostendorp.net/
 .. _Concurrent Sealed Bid Auction: https://docs.google.com/document/d/1dKYFRTUU6FsX6V4PtWILwN3jkzxiQtbyFQXG75AA4jU/preview
 .. _CodePatron: https://docs.google.com/document/d/1fdTM7WqGzUtAN8Hd3aRfXR1mHcAG-WsH6JSwxOqcGqY/preview
@@ -29,7 +28,8 @@ Resources
    :alt: Requirements Status
 
 :Code:          https://github.com/codesy/codesy
-:License:       AGPLv3; see LICENSE file
+:License:       AGPLv3; see `LICENSE file
+                <https://github.com/codesy/codesy/blob/master/LICENSE>`_
 :Documentation: http://codesy.readthedocs.org/
 :Issues:        https://github.com/codesy/codesy/issues
 :IRC:           irc://irc.freenode.net/codesy
@@ -40,7 +40,7 @@ Resources
 
                 https://codesy.io/ (prod)
 
-                https://whatsdeployed.paas.allizom.org/?owner=codesy&repo=codesy&name[]=Dev&url[]=https://codesy-dev.herokuapp.com/revision.txt&name[]=Stage&url[]=https://codesy-stage.herokuapp.com/revision.txt&name[]=Prod&url[]=https://codesyio/revision.txt (What's Deployed)
+                https://whatsdeployed.paas.allizom.org/?owner=codesy&repo=codesy&name[]=Dev&url[]=https://codesy-dev.herokuapp.com/revision.txt&name[]=Stage&url[]=https://codesy-stage.herokuapp.com/revision.txt (What's Deployed)
 
 
 Requirements
@@ -54,29 +54,28 @@ Requirements
 Get Started
 -----------
 
-codesy's API backend is designed to be run on `heroku`_, so you can also run it locally with `foreman`_:
+codesy's API backend is configured to run on `heroku`_, so you can start easily with `foreman`_:
 
-#. Clone::
+#. `Clone`_::
 
     git clone git@github.com:codesy/codesy.git
-
-#. Create and activate virtual environment::
-
-    virtualenv codesy/env
-    source codesy/env/bin/activate
-
-#. Install requirements::
-
-    pip install -r codesy/requirements.txt
-
-#. Copy, configure, & export codesy environment variables (easier with `autoenv`_)::
-
-    cp codesy/.env-dist codesy/.env
-    vim codesy/.env
     cd codesy
+
+#. Create and activate `virtual environment`_::
+
+    virtualenv env
+    source env/bin/activate
+
+#. `Install requirements`_::
+
+    pip install -r requirements.txt
+
+#. Copy & source `config`_ environment (`autoenv`_ automates this when you change directories)::
+
+    cp .env-dist .env
     source .env
 
-#. Create DB tables (be sure to create a superuser)::
+#. `Sync`_ and `migrate`_ DB tables (be sure to create a superuser)::
 
     ./manage.py syncdb
     ./manage.py migrate
@@ -85,19 +84,24 @@ codesy's API backend is designed to be run on `heroku`_, so you can also run it 
 
     foreman start
 
-#. http://127.0.0.1:5000 works, but there's more to do ...
+#. Yay! http://127.0.0.1:5000 works, but there's more to do ...
 
 .. _python: https://www.python.org/
 .. _foreman: https://github.com/ddollar/foreman
-.. _ReadTheDocs: http://codesy.readthedocs.org/en/latest/development.html
+.. _Clone: http://git-scm.com/book/en/Git-Basics-Getting-a-Git-Repository#Cloning-an-Existing-Repository
+.. _virtual environment: http://docs.python-guide.org/en/latest/dev/virtualenvs/
+.. _Install requirements: http://pip.readthedocs.org/en/latest/user_guide.html#requirements-files
+.. _config: http://12factor.net/config
+.. _Sync: https://docs.djangoproject.com/en/1.6/ref/django-admin/#syncdb
+.. _migrate: http://south.readthedocs.org/en/latest/commands.html#migrate
 
 
 Enable GitHub Auth
 ------------------
 
 To enable GitHub authentication, you can use our codesy-local OAuth app.
-`Add a django-allauth social app <http://127.0.0.1:5000/admin/socialaccount/socialapp/add/>`_
-for GitHub:
+
+`Add a django-allauth social app`_ for GitHub:
 
 * Provider: GitHub
 * Name: codesy-local
@@ -107,6 +111,8 @@ for GitHub:
 
 Now you can sign in with GitHub at http://127.0.0.1:5000. Still more ...
 
+.. _Add a django-allauth social app: http://127.0.0.1:5000/admin/socialaccount/socialapp/add/
+
 Enable Payments Sandbox
 -----------------------
 
@@ -114,9 +120,10 @@ To enable a BrainTree sandbox so you can work with payments:
 
 #. `Sign up for a BrainTree Sandbox <https://www.braintreepayments.com/get-started>`_
 
-#. Put your Merchant ID, Public Key, and Private Key into the `.env` file
+#. Put your Merchant ID, Public Key, and Private Key into your `.env` file
+   (copied from `.env-dist <https://github.com/codesy/codesy/blob/master/.env-dist>`_)
 
-#. Source the `.env` file to export codesy environment variables (again, easier with `autoenv`_)::
+#. Source the `.env` file to export codesy environment variables (again, automated by `autoenv`_)::
 
     source .env
 
@@ -133,7 +140,8 @@ What to work on
 
 We have `Issues`_.
 
-If you are an active codesy user, we love getting pull requests that "`scratch your own itch`_" and help the entire codesy community.
+If you are an active codesy user, we love getting pull requests that 
+"`scratch your own itch`_" and help the entire codesy community.
 
 .. _scratch your own itch: https://gettingreal.37signals.com/ch02_Whats_Your_Problem.php
 .. _Issues: https://github.com/codesy/codesy/issues
@@ -142,7 +150,7 @@ If you are an active codesy user, we love getting pull requests that "`scratch y
 Tips
 ----
 
-We have some useful git hooks. After you clone, link them all::
+We have some useful `git hooks`_. After you clone, link them all::
 
     rm -rf .git/hooks
     ln -s git-hooks .git/hooks
@@ -155,3 +163,4 @@ TODO: Fill in deployment steps for `heroku`_
 
 .. _heroku: https://www.heroku.com/
 .. _autoenv: https://github.com/kennethreitz/autoenv
+.. _git hooks: http://git-scm.com/book/en/Customizing-Git-Git-Hooks
