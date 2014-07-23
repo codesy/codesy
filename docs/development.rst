@@ -172,6 +172,10 @@ to your own heroku app with `heroku toolbelt`_.
     heroku config:set DJANGO_DEBUG=True
     heroku config:set ACCOUNT_EMAIL_VERIFICATION=none
 
+#. Push code to the heroku remote::
+
+    git push heroku master
+
 #. `Sync`_ and `migrate`_ DB tables (be sure to create a superuser)::
 
     heroku run python manage.py syncdb
