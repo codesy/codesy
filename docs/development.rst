@@ -75,9 +75,12 @@ codesy's API backend tries to be very slim, so starting should be easy:
     cp .env-dist .env
     source .env
 
-#. `Sync`_ and `migrate`_ DB tables (be sure to create a superuser)::
+#. `Sync`_ first DB tables (be sure to create a superuser)::
 
     ./manage.py syncdb
+
+#. `migrate`_ remaining DB tables::
+
     ./manage.py migrate
 
 #. Start the django app, via plain `runserver`_::
@@ -166,9 +169,12 @@ to your own heroku app with `heroku toolbelt`_.
 
     heroku apps:create codesy-<username>
 
-#. `Generate`_ and set dev environment variables for heroku::
+#. Set a ``DJANGO_SECRET_KEY`` for heroku::
 
-    heroku config:set DJANGO_SECRET_KEY="<key>"
+    heroku config:set DJANGO_SECRET_KEY="username-birthdate"
+
+#. Set a couple more environment variables for heroku::
+
     heroku config:set DJANGO_DEBUG=True
     heroku config:set ACCOUNT_EMAIL_VERIFICATION=none
 
@@ -176,12 +182,15 @@ to your own heroku app with `heroku toolbelt`_.
 
     git push heroku master
 
-#. `Sync`_ and `migrate`_ DB tables (be sure to create a superuser)::
+#. `Sync`_ first DB tables (be sure to create a superuser)::
 
     heroku run python manage.py syncdb
+
+#. `migrate`_ remaining DB tables::
+
     heroku run python manage.py migrate
 
-#. Create `your own GitHub App`_.
+#. To enable GitHub sign-ins on your heroku domain, use the following settings to `register your own GitHub App`_
 
     * Application name: codesy-username
     * Homepage URL: https://codesy-username/herokuapp.com/
@@ -190,7 +199,10 @@ to your own heroku app with `heroku toolbelt`_.
 
    .. note:: You must use `https`
 
-#. `Enable GitHub Auth`_ as above, using your own GitHub App credentials
+#. Now go to https://codesy-username.herokuapp.com/admin/socialaccount/socialapp/add/
+   to `enable GitHub Auth`_ on *your heroku domain*, using *your* new GitHub App Client ID and Secret
+
+   .. note:: Remember to use `https`
 
 #. `Enable Payments`_ as above, using heroku environment variables::
 
@@ -204,7 +216,7 @@ to your own heroku app with `heroku toolbelt`_.
 .. _heroku toolbelt: https://toolbelt.heroku.com/
 .. _Create a heroku remote: https://devcenter.heroku.com/articles/git#creating-a-heroku-remote
 .. _Generate: http://www.miniwebtool.com/django-secret-key-generator/
-.. _your own GitHub App: https://github.com/settings/applications/new
+.. _register your own GitHub App: https://github.com/settings/applications/new
 
 
 .. _Sync: https://docs.djangoproject.com/en/1.6/ref/django-admin/#syncdb
