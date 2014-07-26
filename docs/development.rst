@@ -137,7 +137,8 @@ To enable a BrainTree sandbox so you can work with payments:
 
     source .env
 
-Now you can deposit (fake) funds at http://127.0.0.1:5000
+Now you can deposit (fake) funds at http://127.0.0.1:5000 with credit card 4111
+1111 1111 1111.
 
 Run the Tests
 -------------
