@@ -1,13 +1,24 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
 {% block content %}
-    {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-        <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+
+      <div class="jumbotron">
+          <p>
+          codesy is a pay-what-you-want market<br/>
+          for the open source community<br/>
+          to encourage coders to fix important bugs.
+          </p>
+      {% if not firstrun %}
+        <p>
+        <img src="{% static "img/chrome.png" %}" width="32" height="32"/> <a id="chrome-install-button" class="btn btn-lg btn-success" onclick="chrome.webstore.install()" role="button">Add to Chrome</a>
+        <img src="{% static "img/firefox.png" %}" width="32" height="32"/> <a class="btn btn-lg btn-success" href="codesy.xpi" role="button">Add to Firefox</a>
+        </p>
+      {% endif %}
+      </div>
+
+
+
 
     {% if request.user.is_authenticated %}
         <h1>1. Hi <img src="{{ gravatar_url }}"/> {{ request.user.username }}!</h1>
@@ -26,6 +37,26 @@
 {% if request.user.is_authenticated %}
 <a href="/accounts/logout/">Sign out</a>
 {% endif %}
+
+
+        <p>every day, <strong>millions</strong> of us coders work around bugs in open-source software. codesy helps us all get our real work done by <strong>boosting incentives</strong> to fix those bugs.</p>
+
+        <h4>How it works</h4>
+        <p>Add codesy to your browser and bid on the bugs you care about.
+        <p>We add everyone's bids up until they match an asking price, then notify the matching coder to fix the bug and collect their earnings.</p>
+        <p><a href="{% url "how_it_works" %}">Learn more</a></p>
+
+        <h4>Frequently Asked Questions</h4>
+        <p>Codesy is an innovative platform for incentivizing open-source software development, so we get lots of questions about it. Visit our <a href="{% url "faq" %}">FAQ</a> to get answers to yours.</p>
+
+
+        <ul>
+        <li><a href="http://signup.codesy.io/">Sign up to get email updates from us</a></li>
+        <li><a href="http://groovecoder.wufoo.com/forms/funding-bugfixes-for-opensource-software/" target="_new">Take our developer survey</a></li>
+        <li><a href="https://www.surveymonkey.com/s/DFNXPC5" target="_new">Take our business customer survey</a></li>
+        <li><a href="https://github.com/codesy">Fork us on GitHub</a></li>
+        </ul>
+
 {% endblock %}
 
 {% block scripts %}

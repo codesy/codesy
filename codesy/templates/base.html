@@ -1,3 +1,4 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -5,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% if request.user.is_authenticated %}{{ request.user.username }} | {% endif %}codesy.io</title>
+    <link rel="shortcut icon" href="{% static "img/favicon.png" %}">
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
@@ -24,18 +26,26 @@
   </head>
   <body>
     <nav class="navbar navbar-default" role="navigation">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="#">codesy.io</a>
-        </div>
-
-        <div class="collapse navbar-collapse">
-          <ul class="nav navbar-nav navbar-right">
-          </ul>
-        </div>
-      </div>
+    <a href="/"><img src="{% static "img/codesy_300dpi_323x80.png" %}" width="161" height="40"/></a>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="{% url "how_it_works" %}">How it works</a></li>
+        <li><a href="{% url "faq" %}">Frequently Asked Questions</a></li>
+      </ul>
     </nav>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
     {% block content %}{% endblock %}
+
+    <div class="footer">
+      <p><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a> by codesy.io llc</p>
+      <p>Git Logo by <a href="https://twitter.com/jasonlong">Jason Long</a> is licensed under the <a href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0 Unported License.</a></p>
+    </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="//cdn.jsdelivr.net/jquery/2.1.1/jquery.min.js"></script>

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+
+  <img src="{% static "img/screenshot.png" %}" style="border: 1px solid #ccc" />
+  <ol>
+    <li>Add codesy to your browser.
+    <li>When you visit a bug, you'll see a codesy form with two questions:
+    <ul>
+      <li>How much will you offer for a fix?</li>
+      <li>How much do you ask to fix it yourself?</li>
+    </ul>
+    <li>Bid your amounts.</li>
+  </ol>
+  <p>We'll combine all the offers until they match an asking price, then notify the matching coder to fix the bug and collect their earnings.</p>
+  <p>See our <a href="{% url "faq" %}">Frequently Asked Questions</a> for more.</p>
+
+{% endblock %}
