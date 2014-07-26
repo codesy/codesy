@@ -5,7 +5,7 @@ dj-static==0.0.6
 django-allauth==0.17.0
 django-toolbelt==0.0.1
 djangorestframework==2.3.14
-gunicorn==19.0.0
+gunicorn==19.1.0
 oauthlib==0.6.3
 psycopg2==2.5.3
 pystache==0.5.4
