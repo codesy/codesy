@@ -26,7 +26,7 @@ deploy:
     provider: heroku
     app: codesy-dev
     api_key:
-        secure: cFXVUU3C3RJkuXG/7aJzkCdl31fnmyP1zKCmCy80ciRSfEKlvxHjUNbOKXtkM7qqErvh9ga+lOkrlM5g2FllWNS1JLX6X2yzlAS407Y/yUf7AHmgzhcZzG5s2ToxpMews0Y+vxEsZMjRSxXGWs06G5F+0md4iE2fA8X6fLotwp4=
+        secure: "E4RIDpJCwxI7oW7En2CeCOmw/X13DV2ePM0RWoknBgvvnmoMKYhMjdisk8FQWzVWKM9rjkHTyn8hBbzAqtTzf5xttB4wxtlOs4444W3RKGP4g/G+IIe4EtxzLc5zqPcsMefRtSMABPbVTHP0tqjYWtX7nuutYPv1/a3gyoF2Aw0="
 
 after_deploy:
     - heroku config:set COMMIT_HASH=$TRAVIS_COMMIT --app codesy-dev
