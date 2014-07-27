@@ -1,1 +1,1 @@
-web: gunicorn codesy.wsgi
+web: newrelic-admin run-program gunicorn codesy.wsgi
