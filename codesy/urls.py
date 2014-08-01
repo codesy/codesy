@@ -6,17 +6,27 @@ from django.views.generic import TemplateView
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    # Special view for whats-deployed app
     url(r'^revision.txt$', 'codesy.views.revision', name='revision'),
-    url(r'^braintree_token$', 'codesy.views.braintree_token', name='braintree_token'),
-    url(r'^accounts/(\w+)/deposit', 'codesy.views.deposit', name='deposit'),
+
+    # Home page
     url(r'^$', 'codesy.views.home', name='home'),
+
+    # Static explanation pages
     url(r'^how-it-works$',
         TemplateView.as_view(template_name="how_it_works.html"),
         name='how_it_works'),
     url(r'^faq$', TemplateView.as_view(template_name="faq.html"), name='faq'),
 
+    #allauth
     url(r'^accounts/', include('allauth.urls')),
+
+    #admin site
     url(r'^admin/', include(admin.site.urls)),
 
+    # API docs
+    url(r'^docs/', include('rest_framework_swagger.urls')),
+
+    #auctions API
     url(r'^', include('auctions.urls'))
 )

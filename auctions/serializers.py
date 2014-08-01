@@ -1,15 +1,15 @@
-from django.contrib.auth.models import User
-
 from rest_framework import serializers
 
-from .models import Bid
+from .models import Bid, Profile
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class ProfileSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = User
-        fields = ('username', 'url')
-        read_only_fields = ('username',)
+        model = Profile
+        fields = ('user', 'balanced_card_href', 'balanced_bank_account_href')
+        read_only_fields = ('user',)
+        write_only_fields = ('balanced_card_href',
+                             'balanced_bank_account_href')
 
 
 class BidSerializer(serializers.HyperlinkedModelSerializer):

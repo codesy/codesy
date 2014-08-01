@@ -45,7 +45,8 @@ THIRD_PARTY_APPS = (
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
-    'rest_framework'
+    'rest_framework',
+    'rest_framework_swagger'
 )
 
 LOCAL_APPS = (
@@ -144,7 +145,10 @@ STATICFILES_DIRS = (
 SITE_ID = 1
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAdminUser',),
+    'DEFAULT_AUTHENTICATION_CLASSES':
+        ('rest_framework.authentication.SessionAuthentication',),
+    'DEFAULT_PERMISSION_CLASSES':
+        ('rest_framework.permissions.IsAuthenticated',),
     'PAGINATE_BY': 10
 }
 

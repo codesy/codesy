@@ -1,28 +1,30 @@
-from django.contrib.auth.models import User
-
 from rest_framework import viewsets
 
-from .models import Bid
-from .serializers import UserSerializer, BidSerializer
+from .models import Bid, Profile
+from .serializers import BidSerializer, ProfileSerializer
 
 
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
+class ProfileViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for users.
+    API endpoint for profiles.
     """
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+    model = Profile
+    serializer_class = ProfileSerializer
+
+    def get_queryset(self):
+        return Profile.objects.filter(user=self.request.user)
 
 
 class BidViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for bids.
-    TODO: Receive POST from braintree form and:
-        1. braintree.Transaction.sale()
-        2. Create bid object
+    API endpoint for bids. Users can create, update, retrieve, and delete only
+    their own bids.
     """
-    queryset = Bid.objects.all()
+    model = Bid
     serializer_class = BidSerializer
 
     def pre_save(self, obj):
         obj.user = self.request.user
+
+    def get_queryset(self):
+        return Bid.objects.filter(user=self.request.user)

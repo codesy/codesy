@@ -22,12 +22,31 @@
 
     {% if request.user.is_authenticated %}
         <h1>1. Hi <img src="{{ gravatar_url }}"/> {{ request.user.username }}!</h1>
-        <h1>2. Add funds to your account.</h1>
-        <form id="deposit" method="post" action="/accounts/{{ request.user.username }}/deposit">
-            {% csrf_token %}
-            <div id="dropin"></div>
-            <input type="text" name="amount" id="amount" />
-            <input type="submit" value="Deposit">
+        <h1>2. Connect a card to your account.</h1>
+        <form role="form">
+          <div>
+            <label>Name on Card</label>
+            <input type="text" id="cc-name" autocomplete="off" placeholder="John Doe" />
+          </div>
+          <div>
+            <label>Card Number</label>
+            <input type="text" id="cc-number" autocomplete="off" placeholder="4111111111111111" maxlength="16" />
+          </div>
+          <div>
+            <label>Expiration</label>
+            <input type="text" id="cc-ex-month" autocomplete="off" placeholder="01" maxlength="2" />
+            <input type="text" id="cc-ex-year" autocomplete="off" placeholder="2013" maxlength="4" />
+          </div>
+          <div>
+            <label>Card Verification Code (CVV)</label>
+            <input type="text" id="ex-cvv" autocomplete="off" placeholder="453" maxlength="4" />
+          </div>
+          <div>
+            <label>Postal Code</label>
+            <input type="text" id="ex-postal-code" autocomplete="off" placeholder="453" />
+          </div>
+
+          <a id="cc-submit">Tokenize</a>
         </form>
     {% else %}
     <h1>1. <a href="/accounts/github/login/?process=login">Sign in with <img width="32" height="32" src="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" /><b>GitHub</b></a></h1>
@@ -61,14 +80,51 @@
 
 {% block scripts %}
 {% if request.user.is_authenticated %}
-<script src="https://js.braintreegateway.com/v2/braintree.js"></script>
+<script type="text/javascript" src="https://js.balancedpayments.com/1.1/balanced.js"></script>
 {% url 'braintree_token' as braintree_token_url %}
 <script>
-    $.get("{{ braintree_token_url }}", function(data){
-    braintree.setup(data, 'dropin', {
-          container: 'dropin'
-      });
-  });
+function handleResponse(response) {
+  console.log("handleResponse");
+  console.log(response);
+  if (response.status_code === 201) {
+    var fundingInstrument = response.cards != null ? response.cards[0] : response.bank_accounts[0];
+    // Call your backend
+    console.log("fundingInstrument: " + fundingInstrument);
+    /*
+    jQuery.post("/", {
+      uri: fundingInstrument.href
+    }, function(r) {
+      // Check your backend response
+      if (r.status === 201) {
+        // Your successful logic here from backend ruby
+      } else {
+      // Your failure logic here from backend ruby
+      }
+    });
+    */
+  } else {
+    console.log("error");
+    // Failed to tokenize, your error logic here
+  }
+}
+
+$('#cc-submit').click(function (e) {
+  e.preventDefault();
+
+  var payload = {
+    name: $('#cc-name').val(),
+    number: $('#cc-number').val(),
+    expiration_month: $('#cc-ex-month').val(),
+    expiration_year: $('#cc-ex-year').val(),
+    cvv: $('#ex-cvv').val(),
+    address: {
+      postal_code: $('#ex-postal-code').val()
+    }
+  };
+
+  // Create credit card
+  balanced.card.create(payload, handleResponse);
+});
 </script>
 {% endif %}
 {% endblock %}

@@ -4,8 +4,8 @@ from . import views
 
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
 router.register(r'bids', views.BidViewSet)
+router.register(r'profiles', views.ProfileViewSet)
 
 urlpatterns = patterns('',
     url(r'^', include(router.urls)),
