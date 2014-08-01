@@ -1,3 +1,4 @@
+from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework import viewsets
 
 from .models import Bid, Profile
@@ -22,6 +23,10 @@ class BidViewSet(viewsets.ModelViewSet):
     """
     model = Bid
     serializer_class = BidSerializer
+    renderer_classes = (TemplateHTMLRenderer,)
+    template_name = "bid.html"
+    lookup_field = 'url'
+    lookup_url_kwarg = 'url'
 
     def pre_save(self, obj):
         obj.user = self.request.user
