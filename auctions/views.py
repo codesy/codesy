@@ -1,4 +1,3 @@
-from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework import viewsets
 
 from .models import Bid, Profile
@@ -18,18 +17,18 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
 class BidViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for bids. Users can create, update, retrieve, and delete only
-    their own bids.
+    API endpoint for bids. Users can only list, create, retrieve, update, or delete their own bids.
     """
+    # TODO: configure bid.html template for retrieve action
     model = Bid
     serializer_class = BidSerializer
-    renderer_classes = (TemplateHTMLRenderer,)
-    template_name = "bid.html"
-    lookup_field = 'url'
-    lookup_url_kwarg = 'url'
 
     def pre_save(self, obj):
+        # TODO: charge the user's credit card via balanced
         obj.user = self.request.user
 
     def get_queryset(self):
-        return Bid.objects.filter(user=self.request.user)
+        bids = Bid.objects.filter(user=self.request.user)
+        url = self.request.QUERY_PARAMS.get('url') or False
+        bids = bids.filter(url=url) if url else bids
+        return bids
