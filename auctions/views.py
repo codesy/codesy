@@ -1,3 +1,4 @@
+from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework import viewsets
 
 from .models import Bid, Profile
@@ -18,8 +19,11 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class BidViewSet(viewsets.ModelViewSet):
     """
     API endpoint for bids. Users can only list, create, retrieve, update, or delete their own bids.
+
+    Requests for /bids/?url= with Accept: text/html will receive the HTML form for updating or deleting the user's bid.
+
+    url -- url of an OSS issue or bug
     """
-    # TODO: configure bid.html template for retrieve action
     model = Bid
     serializer_class = BidSerializer
 
@@ -32,3 +36,10 @@ class BidViewSet(viewsets.ModelViewSet):
         url = self.request.QUERY_PARAMS.get('url') or False
         bids = bids.filter(url=url) if url else bids
         return bids
+
+    def list(self, request, *args, **kwargs):
+        resp = super(BidViewSet, self).list(request, *args, **kwargs)
+        if self.request.QUERY_PARAMS.get('url', False):
+            self.renderer_classes = (TemplateHTMLRenderer,)
+            resp.template_name = "bid.html"
+        return resp
