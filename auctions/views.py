@@ -1,11 +1,15 @@
+from django.shortcuts import get_object_or_404
+
 from rest_framework.renderers import TemplateHTMLRenderer
-from rest_framework import viewsets
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
 from .models import Bid, Profile
 from .serializers import BidSerializer, ProfileSerializer
 
 
-class ProfileViewSet(viewsets.ModelViewSet):
+class ProfileViewSet(ModelViewSet):
     """
     API endpoint for profiles.
     """
@@ -16,13 +20,9 @@ class ProfileViewSet(viewsets.ModelViewSet):
         return Profile.objects.filter(user=self.request.user)
 
 
-class BidViewSet(viewsets.ModelViewSet):
+class BidViewSet(ModelViewSet):
     """
     API endpoint for bids. Users can only list, create, retrieve, update, or delete their own bids.
-
-    Requests for /bids/?url= with Accept: text/html will receive the HTML form for updating or deleting the user's bid.
-
-    url -- url of an OSS issue or bug
     """
     model = Bid
     serializer_class = BidSerializer
@@ -32,14 +32,21 @@ class BidViewSet(viewsets.ModelViewSet):
         obj.user = self.request.user
 
     def get_queryset(self):
-        bids = Bid.objects.filter(user=self.request.user)
-        url = self.request.QUERY_PARAMS.get('url') or False
-        bids = bids.filter(url=url) if url else bids
-        return bids
+        return Bid.objects.filter(user=self.request.user)
 
-    def list(self, request, *args, **kwargs):
-        resp = super(BidViewSet, self).list(request, *args, **kwargs)
-        if self.request.QUERY_PARAMS.get('url', False):
-            self.renderer_classes = (TemplateHTMLRenderer,)
-            resp.template_name = "bid.html"
-        return resp
+
+class GetBid(APIView):
+    """
+    API endpoint for a single bid form.
+
+    Requests for /bid/?url= will receive the HTML form for creating a bid (if none exists) or updating the user's existing bid.
+
+    url -- url of an OSS issue or bug
+    """
+    renderer_classes = (TemplateHTMLRenderer,)
+
+    def get(self, request, format=None):
+        bid = get_object_or_404(Bid,
+                                user=self.request.user,
+                                url=self.request.QUERY_PARAMS.get('url'))
+        return Response({'bid': bid}, template_name='bid.html')
