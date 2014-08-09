@@ -9,8 +9,12 @@ router = routers.DefaultRouter()
 router.register(r'bids', views.BidViewSet)
 router.register(r'profiles', views.ProfileViewSet)
 
-urlpatterns = patterns('',
+single_bid_patterns = patterns('',
     url(r'^bid/', views.GetBid.as_view()),
+)
+
+urlpatterns = patterns('',
+    url(r'^', include(single_bid_patterns, namespace="single_bid")),
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 )

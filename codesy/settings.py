@@ -152,6 +152,10 @@ REST_FRAMEWORK = {
     'PAGINATE_BY': 10
 }
 
+SWAGGER_SETTINGS = {
+    'exclude_namespaces': ['single_bid',]
+}
+
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_USER = os.environ.get('SENDGRID_USERNAME')
 EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_PASSWORD')
