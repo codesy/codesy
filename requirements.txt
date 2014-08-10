@@ -16,4 +16,3 @@ requests==2.3.0
 requests-oauthlib==0.4.1
 static==1.0.2
 wsgiref==0.1.2
-braintree==3.1.1
