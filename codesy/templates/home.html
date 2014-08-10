@@ -39,14 +39,10 @@
           </div>
           <div>
             <label>Card Verification Code (CVV)</label>
-            <input type="text" id="ex-cvv" autocomplete="off" placeholder="453" maxlength="4" />
-          </div>
-          <div>
-            <label>Postal Code</label>
-            <input type="text" id="ex-postal-code" autocomplete="off" placeholder="453" />
+            <input type="text" id="ex-cvv" autocomplete="off" placeholder="123" maxlength="4" />
           </div>
 
-          <a id="cc-submit">Tokenize</a>
+          <button id="cc-submit">Tokenize</button>
         </form>
     {% else %}
     <h1>1. <a href="/accounts/github/login/?process=login">Sign in with <img width="32" height="32" src="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" /><b>GitHub</b></a></h1>
@@ -81,30 +77,34 @@
 {% block scripts %}
 {% if request.user.is_authenticated %}
 <script type="text/javascript" src="https://js.balancedpayments.com/1.1/balanced.js"></script>
-{% url 'braintree_token' as braintree_token_url %}
 <script>
 function handleResponse(response) {
-  console.log("handleResponse");
-  console.log(response);
   if (response.status_code === 201) {
-    var fundingInstrument = response.cards != null ? response.cards[0] : response.bank_accounts[0];
-    // Call your backend
-    console.log("fundingInstrument: " + fundingInstrument);
-    /*
-    jQuery.post("/", {
-      uri: fundingInstrument.href
-    }, function(r) {
-      // Check your backend response
-      if (r.status === 201) {
-        // Your successful logic here from backend ruby
-      } else {
-      // Your failure logic here from backend ruby
-      }
+    var card_href, bank_href = null;
+    if (response.cards != null) {
+        card_href = response.cards[0].href;
+    }
+    if (response.bank_accounts != null) {
+        bank_href = response.bank_accounts[0].href;
+    }
+    console.log("card_href: " + card_href);
+    console.log("bank_href: " + bank_href);
+    $.ajax({
+      type: "PUT",
+      url: "/profiles/{{ request.user.profile.id }}/",
+      data: {
+        balanced_card_href: card_href,
+        balanced_bank_account_href: bank_href
+      },
+      success: function(data, status, jqXHR) {
+        console.log("Updated profile");
+      },
+      failure: function() {
+        console.error("Error updating profile");
+      },
     });
-    */
   } else {
-    console.log("error");
-    // Failed to tokenize, your error logic here
+    console.error("Balanced failed to tokenize.");
   }
 }
 
