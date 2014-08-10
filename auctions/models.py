@@ -5,8 +5,8 @@ from django.dispatch import receiver
 
 class Profile(models.Model):
     user = models.OneToOneField(User)
-    balanced_card_href = models.CharField(max_length=100)
-    balanced_bank_account_href = models.CharField(max_length=100)
+    balanced_card_href = models.CharField(max_length=100, blank=True)
+    balanced_bank_account_href = models.CharField(max_length=100, blank=True)
 
 
 class Bid(models.Model):
