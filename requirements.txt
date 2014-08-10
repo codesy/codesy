@@ -4,6 +4,7 @@ dj-database-url==0.3.0
 dj-static==0.0.6
 django-allauth==0.17.0
 django-toolbelt==0.0.1
+django-rest-swagger==0.1.14
 djangorestframework==2.3.14
 gunicorn==19.1.0
 newrelic==2.22.1.20
@@ -15,4 +16,3 @@ requests==2.3.0
 requests-oauthlib==0.4.1
 static==1.0.2
 wsgiref==0.1.2
-braintree==3.1.1

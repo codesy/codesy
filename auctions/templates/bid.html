@@ -1,0 +1,11 @@
+<form action="/bids/" method="post" data-selector=".discussion-sidebar" data-container="">
+  {% csrf_token %}
+  <input name="url" type="hidden" value="{{ bid.url }}"></input>
+  <p>
+  <input name="ask" type="text" placeholder="ask" value="{{ bid.ask }}"></input>
+  </p>
+  <p>
+  <input name="offer" type="text" placeholder="offer" value="{{ bid.offer }}"></input>
+  </p>
+  <input type="submit" value="Bid" />
+</form>

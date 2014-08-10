@@ -1,28 +1,52 @@
-from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 
-from rest_framework import viewsets
+from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
-from .models import Bid
-from .serializers import UserSerializer, BidSerializer
+from .models import Bid, Profile
+from .serializers import BidSerializer, ProfileSerializer
 
 
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
+class ProfileViewSet(ModelViewSet):
     """
-    API endpoint for users.
+    API endpoint for profiles.
     """
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+    model = Profile
+    serializer_class = ProfileSerializer
+
+    def get_queryset(self):
+        return Profile.objects.filter(user=self.request.user)
 
 
-class BidViewSet(viewsets.ModelViewSet):
+class BidViewSet(ModelViewSet):
     """
-    API endpoint for bids.
-    TODO: Receive POST from braintree form and:
-        1. braintree.Transaction.sale()
-        2. Create bid object
+    API endpoint for bids. Users can only list, create, retrieve, update, or delete their own bids.
     """
-    queryset = Bid.objects.all()
+    model = Bid
     serializer_class = BidSerializer
 
     def pre_save(self, obj):
+        # TODO: charge the user's credit card via balanced
         obj.user = self.request.user
+
+    def get_queryset(self):
+        return Bid.objects.filter(user=self.request.user)
+
+
+class GetBid(APIView):
+    """
+    API endpoint for a single bid form.
+
+    Requests for /bid/?url= will receive the HTML form for creating a bid (if none exists) or updating the user's existing bid.
+
+    url -- url of an OSS issue or bug
+    """
+    renderer_classes = (TemplateHTMLRenderer,)
+
+    def get(self, request, format=None):
+        bid = get_object_or_404(Bid,
+                                user=self.request.user,
+                                url=self.request.QUERY_PARAMS.get('url'))
+        return Response({'bid': bid}, template_name='bid.html')

@@ -4,14 +4,13 @@ Development
 The code for codesy's API backend combines:
 
 * `GitHub`_ Authentication (via `django-allauth`_)
-* `Braintree`_ payments (via `braintree python library`_)
+* `Balanced`_ payments (via `balanced.js`_)
 * codesy variation of `Nate Oostendorp`_'s "`Concurrent Sealed Bid Auction`_"
   system and `CodePatron`_ concept.
 
 .. _GitHub: https://github.com/
 .. _django-allauth: https://github.com/pennersr/django-allauth
-.. _Braintree: https://www.braintreepayments.com/
-.. _braintree python library: https://developers.braintreepayments.com/javascript+python
+.. _Balanced: https://www.balancedpayments.com/
 .. _Nate Oostendorp: http://oostendorp.net/
 .. _Concurrent Sealed Bid Auction: https://docs.google.com/document/d/1dKYFRTUU6FsX6V4PtWILwN3jkzxiQtbyFQXG75AA4jU/preview
 .. _CodePatron: https://docs.google.com/document/d/1fdTM7WqGzUtAN8Hd3aRfXR1mHcAG-WsH6JSwxOqcGqY/preview
@@ -123,22 +122,17 @@ Now you can sign in with GitHub at http://127.0.0.1:5000. Still more ...
 
 .. _Enable Payments:
 
-Enable Payments Sandbox
------------------------
+Balanced Payments
+-----------------
 
-To enable a BrainTree sandbox so you can work with payments:
+In `balanced.js`_ 1.1, you don't need to configure your own test marketplace.
+`balanced.js`_ is pre-configured to use their public test marketplace.
 
-#. `Sign up for a BrainTree Sandbox <https://www.braintreepayments.com/get-started>`_
+So, you can use their `test credit card numbers`_ and `test bank accounts`_.
 
-#. Put your Merchant ID, Public Key, and Private Key into your `.env` file
-   (copied from `.env-dist <https://github.com/codesy/codesy/blob/master/.env-dist>`_)
+.. _test credit card numbers: https://docs.balancedpayments.com/1.1/overview/resources/#test-credit-card-numbers
+.. _test bank accounts: https://docs.balancedpayments.com/1.1/overview/resources/#test-bank-account-numbers
 
-#. Source the `.env` file to export codesy environment variables (again, automated by `autoenv`_)::
-
-    source .env
-
-Now you can deposit (fake) funds at http://127.0.0.1:5000 with credit card 4111
-1111 1111 1111.
 
 Run the Tests
 -------------
@@ -153,11 +147,11 @@ What to work on
 
 We have `Issues`_.
 
-If you are an active codesy user, we love getting pull requests that 
+If you are an active codesy user, we love getting pull requests that
 "`scratch your own itch`_" and help the entire codesy community.
 
-.. _scratch your own itch: https://gettingreal.37signals.com/ch02_Whats_Your_Problem.php
 .. _Issues: https://github.com/codesy/codesy/issues
+.. _scratch your own itch: https://gettingreal.37signals.com/ch02_Whats_Your_Problem.php
 
 
 Deploy
@@ -166,11 +160,11 @@ Deploy
 codesy is designed to run on `heroku`_, so you can easily deploy your changes
 to your own heroku app with `heroku toolbelt`_.
 
-#. `Create a heroku remote`_::
+#. `Create a heroku remote`_. We strongly suggest naming it codesy-`username`::
 
-    heroku apps:create codesy-<username>
+    heroku apps:create codesy-username
 
-#. Set a ``DJANGO_SECRET_KEY`` for heroku::
+#. Set a ``DJANGO_SECRET_KEY`` on heroku that's unique to you.::
 
     heroku config:set DJANGO_SECRET_KEY="username-birthdate"
 
@@ -191,7 +185,8 @@ to your own heroku app with `heroku toolbelt`_.
 
     heroku run python manage.py migrate
 
-#. To enable GitHub sign-ins on your heroku domain, use the following settings to `register your own GitHub App`_
+#. To enable GitHub sign-ins on your heroku domain, use the following settings
+   to `register your own GitHub App`_:
 
     * Application name: codesy-username
     * Homepage URL: https://codesy-username/herokuapp.com/
@@ -205,26 +200,12 @@ to your own heroku app with `heroku toolbelt`_.
 
    .. note:: Remember to use `https`
 
-#. `Enable Payments`_ as above, using heroku environment variables::
-
-    heroku config:set BRAINTREE_MERCHANT_ID=""
-    heroku config:set BRAINTREE_PUBLIC_KEY=""
-    heroku config:set BRAINTREE_PRIVATE_KEY=""
-
 #. That's it. https://codesy-username.herokuapp.com/ should work.
 
 
 .. _heroku toolbelt: https://toolbelt.heroku.com/
 .. _Create a heroku remote: https://devcenter.heroku.com/articles/git#creating-a-heroku-remote
-.. _Generate: http://www.miniwebtool.com/django-secret-key-generator/
 .. _register your own GitHub App: https://github.com/settings/applications/new
-
-
-.. _Sync: https://docs.djangoproject.com/en/1.6/ref/django-admin/#syncdb
-.. _migrate: http://south.readthedocs.org/en/latest/commands.html#migrate
-.. _heroku: https://www.heroku.com/
-.. _autoenv: https://github.com/kennethreitz/autoenv
-.. _git hooks: http://git-scm.com/book/en/Customizing-Git-Git-Hooks
 
 
 Tips
@@ -234,3 +215,12 @@ We have some useful `git hooks`_. After you clone, link them all::
 
     rm -rf .git/hooks
     ln -s git-hooks .git/hooks
+
+
+
+.. _Sync: https://docs.djangoproject.com/en/1.6/ref/django-admin/#syncdb
+.. _migrate: http://south.readthedocs.org/en/latest/commands.html#migrate
+.. _heroku: https://www.heroku.com/
+.. _autoenv: https://github.com/kennethreitz/autoenv
+.. _git hooks: http://git-scm.com/book/en/Customizing-Git-Git-Hooks
+.. _balanced.js: https://github.com/balanced/balanced-js
