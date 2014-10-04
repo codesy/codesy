@@ -2,8 +2,8 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
 
-
-admin.autodiscover()
+admin.site.site_header = u'Codesy administration'
+admin.site.site_title = u'Codesy site admin'
 
 urlpatterns = patterns('',
     # Special view for whats-deployed app

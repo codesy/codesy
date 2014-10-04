@@ -1,5 +1,4 @@
-Django==1.6.5
-South==1.0
+Django==1.7
 dj-database-url==0.3.0
 dj-static==0.0.6
 django-allauth==0.17.0

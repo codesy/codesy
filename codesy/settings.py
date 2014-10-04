@@ -40,7 +40,6 @@ DEFAULT_APPS = (
 )
 
 THIRD_PARTY_APPS = (
-    'south',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -156,6 +155,8 @@ SWAGGER_SETTINGS = {
     'exclude_namespaces': ['single_bid',]
 }
 
+EMAIL_BACKEND = os.environ.get(
+    'EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_USER = os.environ.get('SENDGRID_USERNAME')
 EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_PASSWORD')
