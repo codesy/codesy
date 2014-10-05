@@ -49,6 +49,7 @@ THIRD_PARTY_APPS = (
 )
 
 LOCAL_APPS = (
+    'codesy.base',
     'auctions',
 )
 
@@ -88,6 +89,7 @@ SOCIALACCOUNT_PROVIDERS = {
         'SCOPE': ['email',],
     }
 }
+AUTH_USER_MODEL = 'base.User'
 ACCOUNT_EMAIL_VERIFICATION = os.environ.get('ACCOUNT_EMAIL_VERIFICATION',
                                             'optional')
 
