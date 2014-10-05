@@ -74,13 +74,13 @@ codesy's API backend tries to be very slim, so starting should be easy:
     cp .env-dist .env
     source .env
 
-#. `Sync`_ first DB tables (be sure to create a superuser)::
-
-    ./manage.py syncdb
-
-#. `migrate`_ remaining DB tables::
+#. `Migrate`_ first DB tables ::
 
     ./manage.py migrate
+
+#. Create a superuser::
+
+   ./manage.py createsuperuser
 
 #. Start the django app, via plain `runserver`_::
 
@@ -218,8 +218,7 @@ We have some useful `git hooks`_. After you clone, link them all::
 
 
 
-.. _Sync: https://docs.djangoproject.com/en/1.6/ref/django-admin/#syncdb
-.. _migrate: http://south.readthedocs.org/en/latest/commands.html#migrate
+.. _Migrate: https://docs.djangoproject.com/en/1.7/topics/migrations/
 .. _heroku: https://www.heroku.com/
 .. _autoenv: https://github.com/kennethreitz/autoenv
 .. _git hooks: http://git-scm.com/book/en/Customizing-Git-Git-Hooks
