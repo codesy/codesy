@@ -1,14 +1,6 @@
 from rest_framework import serializers
 
-from .models import Bid, Profile
-
-
-class ProfileSerializer(serializers.HyperlinkedModelSerializer):
-    user = serializers.Field(source='user')
-
-    class Meta:
-        model = Profile
-        fields = ('url', 'balanced_card_href', 'balanced_bank_account_href',)
+from .models import Bid
 
 
 class BidSerializer(serializers.HyperlinkedModelSerializer):

@@ -7,7 +7,6 @@ from . import views
 
 router = routers.DefaultRouter()
 router.register(r'bids', views.BidViewSet)
-router.register(r'profiles', views.ProfileViewSet)
 
 single_bid_patterns = patterns('',
     url(r'^bid/', views.GetBid.as_view()),
