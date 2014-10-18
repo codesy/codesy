@@ -5,19 +5,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Bid, Profile
-from .serializers import BidSerializer, ProfileSerializer
-
-
-class ProfileViewSet(ModelViewSet):
-    """
-    API endpoint for profiles.
-    """
-    model = Profile
-    serializer_class = ProfileSerializer
-
-    def get_queryset(self):
-        return Profile.objects.filter(user=self.request.user)
+from .models import Bid
+from .serializers import BidSerializer
 
 
 class BidViewSet(ModelViewSet):
