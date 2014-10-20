@@ -74,7 +74,7 @@ codesy's API backend tries to be very slim, so starting should be easy:
     cp .env-dist .env
     source .env
 
-#. `Migrate`_ first DB tables ::
+#. `Migrate`_ DB tables ::
 
     ./manage.py migrate
 
@@ -177,13 +177,13 @@ to your own heroku app with `heroku toolbelt`_.
 
     git push heroku master
 
-#. `Sync`_ first DB tables (be sure to create a superuser)::
-
-    heroku run python manage.py syncdb
-
-#. `migrate`_ remaining DB tables::
+#. `Migrate`_ DB tables::
 
     heroku run python manage.py migrate
+
+#. Create a superuser::
+
+    heroku run python manage.py createsuperuser
 
 #. To enable GitHub sign-ins on your heroku domain, use the following settings
    to `register your own GitHub App`_:
