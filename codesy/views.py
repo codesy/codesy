@@ -1,10 +1,25 @@
 import hashlib
 import os
 
-from django.contrib import messages
 from django.http import HttpResponse
+from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.shortcuts import render_to_response, redirect
+
+from rest_framework.viewsets import ModelViewSet
+
+from .base.models import User
+from .serializers import UserSerializer
+
+
+class UserViewSet(ModelViewSet):
+    """
+    API endpoint for bids. Users can only list, create, retrieve, update, or delete their own bids.
+    """
+    model = User
+    serializer_class = UserSerializer
+
+    def get_object(self, qs=None):
+        return self.request.user
 
 
 def home(request):
