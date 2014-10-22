@@ -1,0 +1,9 @@
+[run]
+branch = True
+include = ./*
+omit = */migrations/*
+
+[report]
+omit =
+    .env/*
+    */migrations/*
