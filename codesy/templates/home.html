@@ -81,8 +81,8 @@ function handleResponse(response) {
     console.log("card_href: " + card_href);
     console.log("bank_href: " + bank_href);
     $.ajax({
-      type: "PUT",
-      url: "/profiles/{{ request.user.profile.id }}/",
+      method: "PATCH",
+      url: "/users/{{ request.user.id }}/",
       beforeSend: function(xhr, settings) {
           if (!this.crossDomain) {
               xhr.setRequestHeader("X-CSRFToken", $.cookie("csrftoken"));
@@ -93,10 +93,10 @@ function handleResponse(response) {
         balanced_bank_account_href: bank_href
       },
       success: function(data, status, jqXHR) {
-        console.log("Updated profile");
+        console.log("Updated user.");
       },
       failure: function() {
-        console.error("Error updating profile");
+        console.error("Error updating user.");
       },
     });
   } else {
