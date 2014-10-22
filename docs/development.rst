@@ -84,7 +84,7 @@ codesy's API backend tries to be very slim, so starting should be easy:
 
 #. Start the django app, via plain `runserver`_::
 
-    ./manage.py runserver 0.0.0.0:5000
+    ./manage.py runserver 127.0.0.1:5000
 
    or via `foreman`_::
 
@@ -116,19 +116,18 @@ To enable GitHub authentication, you can use our codesy-local OAuth app.
 * Secret key: 08c3da1421bb280e6fa5f61c05afd0c3128a2f9f
 * Sites: example.com -> Chosen sites
 
-Now you can sign in with GitHub at http://127.0.0.1:5000. Still more ...
+Now you can sign in with GitHub at http://127.0.0.1:5000.
 
 .. _Add a django-allauth social app: http://127.0.0.1:5000/admin/socialaccount/socialapp/add/
 
 .. _Enable Payments:
 
-Balanced Payments
------------------
+Payments
+--------
 
-In `balanced.js`_ 1.1, you don't need to configure your own test marketplace.
-`balanced.js`_ is pre-configured to use their public test marketplace.
-
-So, you can use their `test credit card numbers`_ and `test bank accounts`_.
+codesy is pre-configured to use the `balanced.js`_ test marketplace. So, you
+can use the `test credit card numbers`_ and `test bank accounts`_ from the
+balanced docs.
 
 .. _test credit card numbers: https://docs.balancedpayments.com/1.1/overview/resources/#test-credit-card-numbers
 .. _test bank accounts: https://docs.balancedpayments.com/1.1/overview/resources/#test-bank-account-numbers
@@ -189,7 +188,7 @@ to your own heroku app with `heroku toolbelt`_.
    to `register your own GitHub App`_:
 
     * Application name: codesy-username
-    * Homepage URL: https://codesy-username/herokuapp.com/
+    * Homepage URL: https://codesy-username.herokuapp.com/
     * Application description: username's codesy
     * Authorization callback URL: https://codesy-username.herokuapp.com/accounts/github/login/callback/
 
@@ -206,16 +205,6 @@ to your own heroku app with `heroku toolbelt`_.
 .. _heroku toolbelt: https://toolbelt.heroku.com/
 .. _Create a heroku remote: https://devcenter.heroku.com/articles/git#creating-a-heroku-remote
 .. _register your own GitHub App: https://github.com/settings/applications/new
-
-
-Tips
-----
-
-We have some useful `git hooks`_. After you clone, link them all::
-
-    rm -rf .git/hooks
-    ln -s git-hooks .git/hooks
-
 
 
 .. _Migrate: https://docs.djangoproject.com/en/1.7/topics/migrations/
