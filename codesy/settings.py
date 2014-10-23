@@ -86,7 +86,7 @@ LOGIN_REDIRECT_URL = '/'
 SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_PROVIDERS = {
     'github': {
-        'SCOPE': ['email'],
+        'SCOPE': ['user:email'],
     }
 }
 AUTH_USER_MODEL = 'base.User'
