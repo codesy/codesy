@@ -40,7 +40,7 @@ class BidViewSetTest(TestCase):
 
         qs = self.viewset.get_queryset()
 
-        self.assertSequenceEqual(qs, [bid1, bid4, bid5])
+        self.assertSequenceEqual(qs.order_by('id'), [bid1, bid4, bid5])
 
 
 class GetBidTest(TestCase):
