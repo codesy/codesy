@@ -15,4 +15,3 @@ requests==2.4.3
 requests-oauthlib==0.4.2
 static==1.1.1
 wsgiref==0.1.2
-django-nose==1.2

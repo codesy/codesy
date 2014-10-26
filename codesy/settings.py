@@ -44,7 +44,6 @@ THIRD_PARTY_APPS = (
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
-    'django_nose',
     'rest_framework',
     'rest_framework_swagger'
 )
@@ -146,7 +145,8 @@ STATICFILES_DIRS = (
 
 SITE_ID = 1
 
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+TEST_RUNNER = os.environ.get(
+    'TEST_RUNNER', 'django.test.runner.DiscoverRunner')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES':

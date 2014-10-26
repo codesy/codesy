@@ -10,6 +10,7 @@ env:
         - DATABASE_URL=postgres://postgres@localhost:5432/codesy
         - DJANGO_SECRET_KEY=terrible-awful-secret-only-for-travis
         - DJANGO_DEBUG=True
+        - TEST_RUNNER="django_nose.NoseTestSuiteRunner"
 before_script:
     - psql -c 'create database codesy;' -U postgres
 script:
