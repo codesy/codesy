@@ -5,3 +5,4 @@ _build
 .env
 env
 codesy.sqlite
+.coverage

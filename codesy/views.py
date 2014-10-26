@@ -2,9 +2,7 @@ import hashlib
 import os
 
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
-from django.template import RequestContext
-
+from django.views.generic import TemplateView
 from rest_framework.viewsets import ModelViewSet
 
 from .base.models import User
@@ -13,7 +11,8 @@ from .serializers import UserSerializer
 
 class UserViewSet(ModelViewSet):
     """
-    API endpoint for bids. Users can only list, create, retrieve, update, or delete their own bids.
+    API endpoint for bids. Users can only list, create, retrieve,
+    update, or delete their own bids.
     """
     model = User
     serializer_class = UserSerializer
@@ -22,20 +21,20 @@ class UserViewSet(ModelViewSet):
         return self.request.user
 
 
-def home(request):
-    gravatar_url = ''
-    if request.user.is_authenticated():
-        gravatar_url = "http://www.gravatar.com/avatar/{}?s=40".format(
-            hashlib.md5(request.user.email).hexdigest()
-        )
+class Home(TemplateView):
+    template_name = 'home.html'
 
-    firstrun = "firstrun" in request.GET or False
+    def get_context_data(self, **kwargs):
+        ctx = super(Home, self).get_context_data(**kwargs)
+        ctx['gravatar_url'] = self.get_gravatar_url()
+        return ctx
 
-    return render_to_response("home.html",
-                              {'gravatar_url': gravatar_url,
-                               'firstrun': firstrun},
-                              RequestContext(request)
-                             )
+    def get_gravatar_url(self):
+        email_hash = ''
+        if self.request.user.is_authenticated():
+            email_hash = hashlib.md5(self.request.user.email).hexdigest()
+        return "http://www.gravatar.com/avatar/{}?s=40".format(
+            email_hash)
 
 
 def revision(request):

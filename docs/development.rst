@@ -135,6 +135,9 @@ balanced docs.
 
 Run the Tests
 -------------
+Install test requirements::
+
+    pip install -r requirements-test.txt
 
 Running the test suite is easy::
 

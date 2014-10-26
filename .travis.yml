@@ -1,39 +1,33 @@
 language: python
-
 python:
-    - "2.7"
-
+    - '2.7'
 install:
-    - pip install -r requirements.txt
-
+    - pip install -r requirements.txt -r requirements-test.txt
 addons:
-    postgresql: "9.3"
-
+    postgresql: '9.3'
 env:
     global:
         - DATABASE_URL=postgres://postgres@localhost:5432/codesy
         - DJANGO_SECRET_KEY=terrible-awful-secret-only-for-travis
         - DJANGO_DEBUG=True
-
+        - TEST_RUNNER="django_nose.NoseTestSuiteRunner"
 before_script:
     - psql -c 'create database codesy;' -U postgres
-
 script:
     - python manage.py test
-
 deploy:
     provider: heroku
     app: codesy-dev
     api_key:
-        secure: "E4RIDpJCwxI7oW7En2CeCOmw/X13DV2ePM0RWoknBgvvnmoMKYhMjdisk8FQWzVWKM9rjkHTyn8hBbzAqtTzf5xttB4wxtlOs4444W3RKGP4g/G+IIe4EtxzLc5zqPcsMefRtSMABPbVTHP0tqjYWtX7nuutYPv1/a3gyoF2Aw0="
-
+        secure: E4RIDpJCwxI7oW7En2CeCOmw/X13DV2ePM0RWoknBgvvnmoMKYhMjdisk8FQWzVWKM9rjkHTyn8hBbzAqtTzf5xttB4wxtlOs4444W3RKGP4g/G+IIe4EtxzLc5zqPcsMefRtSMABPbVTHP0tqjYWtX7nuutYPv1/a3gyoF2Aw0=
 after_deploy:
     - heroku config:set COMMIT_HASH=$TRAVIS_COMMIT --app codesy-dev
-
 notifications:
     irc:
         channels:
-            - "irc.freenode.net#codesy"
+            - irc.freenode.net#codesy
         on_success: always
         on_failure: always
         use_notice: true
+    slack:
+        secure: CL19UpqHzCcV9ttYNWpcDvcI7ymrnjxcu+VdQStDco5D8cSmGgcDYaWL1XrHbtrD5fKiaiirJf8lprh2ywh9nwOrGgjE3pqWJ0etcYntzwTkEEK7MpVG5tjN+QGP4SdwlPpXwkRO8x3WtrNvTU87Uqq6omvX+bXVSXAtAI565Yc=

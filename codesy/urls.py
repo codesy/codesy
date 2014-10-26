@@ -12,12 +12,13 @@ admin.site.site_title = u'Codesy site admin'
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     # Special view for whats-deployed app
     url(r'^revision.txt$', 'codesy.views.revision', name='revision'),
 
     # Home page
-    url(r'^$', 'codesy.views.home', name='home'),
+    url(r'^$', views.Home.as_view(), name='home'),
 
     # Static explanation pages
     url(r'^how-it-works$',
@@ -25,10 +26,10 @@ urlpatterns = patterns('',
         name='how_it_works'),
     url(r'^faq$', TemplateView.as_view(template_name="faq.html"), name='faq'),
 
-    #allauth
+    # allauth
     url(r'^accounts/', include('allauth.urls')),
 
-    #admin site
+    # admin site
     url(r'^admin/', include(admin.site.urls)),
 
     # API docs

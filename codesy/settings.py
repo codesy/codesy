@@ -86,7 +86,7 @@ LOGIN_REDIRECT_URL = '/'
 SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_PROVIDERS = {
     'github': {
-        'SCOPE': ['email',],
+        'SCOPE': ['email'],
     }
 }
 AUTH_USER_MODEL = 'base.User'
@@ -110,7 +110,7 @@ DATABASES = {
 
 # Parse database configuration from $DATABASE_URL
 import dj_database_url
-DATABASES['default'] =  dj_database_url.config()
+DATABASES['default'] = dj_database_url.config()
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
@@ -140,10 +140,13 @@ STATIC_ROOT = 'staticfiles'
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-        os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'static'),
 )
 
 SITE_ID = 1
+
+TEST_RUNNER = os.environ.get(
+    'TEST_RUNNER', 'django.test.runner.DiscoverRunner')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES':
@@ -154,7 +157,7 @@ REST_FRAMEWORK = {
 }
 
 SWAGGER_SETTINGS = {
-    'exclude_namespaces': ['single_bid',]
+    'exclude_namespaces': ['single_bid']
 }
 
 EMAIL_BACKEND = os.environ.get(
