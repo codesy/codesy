@@ -21,9 +21,12 @@ class User(AbstractUser):
 def add_email_from_signup(sender, request, user, **kwargs):
     params = {'access_token': kwargs['sociallogin'].token}
     email_data = requests.get(EMAIL_URL, params=params).json()
-    for email_address in email_data:
-        if (email_address.get('verified', False) and
-                email_address.get('primary', False)):
-            user.email = email_address['email']
-            user.save()
-            break
+    if email_data:
+        verified_emails = [e for e in email_data if e['verified']]
+        if not verified_emails:
+            return None
+        sorted_emails = sorted(verified_emails,
+                               key=lambda e: (e['primary'], e['verified']),
+                               reverse=True)
+        user.email = sorted_emails[0]['email']
+        user.save(update_fields=['email'])
