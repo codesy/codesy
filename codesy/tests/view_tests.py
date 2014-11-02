@@ -1,10 +1,17 @@
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from model_mommy import mommy
 import fudge
 
 from codesy import base, serializers, views
+
+
+class AuthViewTest(TestCase):
+    def test_allauth_signup_disabled(self):
+        resp = self.client.get(reverse("account_signup"))
+        self.assertContains(resp, 'Sign Up Closed')
 
 
 class UserViewSetTest(TestCase):
