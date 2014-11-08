@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# flake8: noqa
 #
 # codesy documentation build configuration file, created by
 # sphinx-quickstart on Sun May 18 11:17:00 2014.

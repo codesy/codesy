@@ -2,3 +2,4 @@ django-nose==1.2
 model_mommy==1.2.2
 fudge==1.0.3
 coverage==3.7.1
+flake8
