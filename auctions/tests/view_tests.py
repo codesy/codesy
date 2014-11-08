@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.http import Http404
 from django.test import TestCase
 from model_mommy import mommy
 import fudge
@@ -54,23 +53,26 @@ class GetBidTest(TestCase):
             (rest_framework.renderers.TemplateHTMLRenderer,))
 
     @fudge.patch('auctions.views.Response')
-    def test_get(self, mock_resp):
+    def test_get_existant_bid(self, mock_resp):
         user = mommy.make(settings.AUTH_USER_MODEL)
-        bid = mommy.make(
-            'auctions.Bid', user=user, url='http://gh.com/project')
+        url = 'http://gh.com/project'
+        bid = mommy.make('auctions.Bid', user=user, url=url)
         self.view.request = fudge.Fake().has_attr(
-            user=user, QUERY_PARAMS={'url': 'http://gh.com/project'})
+            user=user, QUERY_PARAMS={'url': url})
         mock_resp.expects_call().with_args(
-            {'bid': bid}, template_name='bid.html')
+            {'bid': bid, 'url': url}, template_name='bid.html')
 
         self.view.get(self.view.request)
 
-    def test_get_no_object(self):
+    @fudge.patch('auctions.views.Response')
+    def test_get_nonexistant_bid_assigns_None(self, mock_resp):
         user = mommy.make(settings.AUTH_USER_MODEL)
         other_user = mommy.make(settings.AUTH_USER_MODEL)
-        mommy.make(
-            'auctions.Bid', user=other_user, url='http://gh.com/project')
+        url = 'http://gh.com/project'
+        mommy.make('auctions.Bid', user=other_user, url=url)
         self.view.request = fudge.Fake().has_attr(
-            user=user, QUERY_PARAMS={'url': 'http://gh.com/project'})
+            user=user, QUERY_PARAMS={'url': url})
+        mock_resp.expects_call().with_args(
+            {'bid': None, 'url': url}, template_name='bid.html')
 
-        self.assertRaises(Http404, self.view.get, self.view.request)
+        self.view.get(self.view.request)

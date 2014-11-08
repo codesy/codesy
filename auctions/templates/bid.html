@@ -1,6 +1,12 @@
-<form action="/bids/" method="post" data-selector=".discussion-sidebar" data-container="">
+{% if bid %}
+<form action="{% url 'bid-detail' bid.id %}" method="POST" data-selector=".discussion-sidebar" data-container="">
+  <input name="_method" type="hidden" value="PUT" />
+{% else %}
+<form action="{% url 'bid-list' %}" method="POST" data-selector=".discussion-sidebar" data-container="">
+{% endif %}
+
   {% csrf_token %}
-  <input name="url" type="hidden" value="{{ bid.url }}"></input>
+  <input name="url" type="hidden" value="{{ url }}"></input>
   <p>
   <input name="ask" type="text" placeholder="ask" value="{{ bid.ask }}"></input>
   </p>

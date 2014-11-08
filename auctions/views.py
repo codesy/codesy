@@ -1,5 +1,3 @@
-from django.shortcuts import get_object_or_404
-
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -38,7 +36,9 @@ class GetBid(APIView):
     renderer_classes = (TemplateHTMLRenderer,)
 
     def get(self, request, format=None):
-        bid = get_object_or_404(Bid,
-                                user=self.request.user,
-                                url=self.request.QUERY_PARAMS.get('url'))
-        return Response({'bid': bid}, template_name='bid.html')
+        url=self.request.QUERY_PARAMS.get('url')
+        try:
+            bid = Bid.objects.get(user=self.request.user, url=url)
+        except Bid.DoesNotExist:
+            bid = None
+        return Response({'bid': bid, 'url': url}, template_name='bid.html')
