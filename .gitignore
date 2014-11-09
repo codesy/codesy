@@ -6,3 +6,5 @@ _build
 env
 codesy.sqlite
 .coverage
+.DS_Store
+MANIFEST
