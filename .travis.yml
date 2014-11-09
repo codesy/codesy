@@ -5,7 +5,6 @@ addons:
 
 env:
     - TOXENV=py27 DATABASE_URL=postgres://postgres@localhost:5432/codesy DJANGO_SECRET_KEY=terrible-awful-secret-only-for-travis DJANGO_DEBUG=True TEST_RUNNER="django_nose.NoseTestSuiteRunner"
-    - TOXENV=coverage DATABASE_URL=postgres://postgres@localhost:5432/codesy DJANGO_SECRET_KEY=terrible-awful-secret-only-for-travis DJANGO_DEBUG=True TEST_RUNNER="django_nose.NoseTestSuiteRunner"
     - TOXENV=style
     - TOXENV=docs
 
