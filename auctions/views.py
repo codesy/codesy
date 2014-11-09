@@ -36,7 +36,7 @@ class GetBid(APIView):
     renderer_classes = (TemplateHTMLRenderer,)
 
     def get(self, request, format=None):
-        url=self.request.QUERY_PARAMS.get('url')
+        url = self.request.QUERY_PARAMS.get('url')
         try:
             bid = Bid.objects.get(user=self.request.user, url=url)
         except Bid.DoesNotExist:

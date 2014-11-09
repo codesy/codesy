@@ -10,4 +10,3 @@ class BidSerializer(serializers.HyperlinkedModelSerializer):
         model = Bid
         fields = ('id', 'user', 'url', 'ask', 'offer')
         read_only_fields = ('id',)
-
