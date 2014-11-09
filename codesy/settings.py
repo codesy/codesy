@@ -87,6 +87,7 @@ ACCOUNT_EMAIL_VERIFICATION = os.environ.get('ACCOUNT_EMAIL_VERIFICATION',
                                             'optional')
 AUTH_USER_MODEL = 'base.User'
 LOGIN_REDIRECT_URL = '/'
+SOCIALACCOUNT_ADAPTER = 'codesy.adapters.CodesySocialAccountAdapter'
 SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_PROVIDERS = {
     'github': {

@@ -37,8 +37,8 @@ class SignUpReceiverTest(TestCase):
         self.sender = User
         self.request = RequestFactory()
         self.user = (fudge.Fake('User')
-                        .has_attr(email=None)
-                        .expects('save'))
+                     .has_attr(email=None)
+                     .expects('save'))
         self.kwargs = {'sociallogin': self.sociallogin}
         self.fake_get = fudge.Fake('requests.get')
 
