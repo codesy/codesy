@@ -27,6 +27,10 @@ class AdaptersTest(TestCase):
 
     def test_social_adapter_prohibits_disconnecting_last_account(self):
         account = fudge.Fake()
-        accounts = [account, ]
+        account2 = fudge.Fake()
+        single_account_list = [account, ]
+        multi_account_list = [account, account2]
+        self.csaa.validate_disconnect(account, multi_account_list)
+
         with self.assertRaises(ValidationError):
-            self.csaa.validate_disconnect(account, accounts)
+            self.csaa.validate_disconnect(account, single_account_list)
