@@ -14,7 +14,7 @@ env:
 before_script:
     - psql -c 'create database codesy;' -U postgres
 script:
-    - flake8 . --exclude=.?*,migrations
+    - flake8 .
     - coverage run manage.py test
 after_success:
     - coveralls
