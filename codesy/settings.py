@@ -82,16 +82,18 @@ AUTHENTICATION_BACKENDS = (
 )
 
 # auth and allauth settings
+ACCOUNT_ADAPTER = 'codesy.adapters.CodesyAccountAdapter'
+ACCOUNT_EMAIL_VERIFICATION = os.environ.get('ACCOUNT_EMAIL_VERIFICATION',
+                                            'optional')
+AUTH_USER_MODEL = 'base.User'
 LOGIN_REDIRECT_URL = '/'
+SOCIALACCOUNT_ADAPTER = 'codesy.adapters.CodesySocialAccountAdapter'
 SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_PROVIDERS = {
     'github': {
-        'SCOPE': ['email'],
+        'SCOPE': ['user:email'],
     }
 }
-AUTH_USER_MODEL = 'base.User'
-ACCOUNT_EMAIL_VERIFICATION = os.environ.get('ACCOUNT_EMAIL_VERIFICATION',
-                                            'optional')
 
 ROOT_URLCONF = 'codesy.urls'
 
