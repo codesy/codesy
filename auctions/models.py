@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.db import models
 from django.db.models import Sum
@@ -11,7 +13,7 @@ class Bid(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     url = models.URLField()
     ask = models.DecimalField(max_digits=6, decimal_places=2)
-    ask_match_sent = models.BooleanField(default=False)
+    ask_match_sent = models.DateTimeField(null=True, blank=True)
     offer = models.DecimalField(max_digits=6, decimal_places=2)
 
 
@@ -20,7 +22,7 @@ def notify_matching_askers(sender, instance, **kwargs):
     issue_bids = Bid.objects.filter(url=instance.url).aggregate(Sum('offer'))
     met_asks = (Bid.objects.filter(url=instance.url,
                                    ask__lte=issue_bids['offer__sum'],
-                                   ask_match_sent=False)
+                                   ask_match_sent=None)
                            .exclude(ask__lte=0))
     for bid in met_asks:
         send_mail("[codesy] Your ask for %(ask)d for %(url)s has been met" % (
@@ -29,4 +31,4 @@ def notify_matching_askers(sender, instance, **kwargs):
             settings.DEFAULT_FROM_EMAIL,
             [bid.user.email])
         # use .update to avoid recursive signal processing
-        Bid.objects.filter(id=bid.id).update(ask_match_sent=True)
+        Bid.objects.filter(id=bid.id).update(ask_match_sent=datetime.now())

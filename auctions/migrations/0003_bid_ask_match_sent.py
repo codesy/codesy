@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='bid',
             name='ask_match_sent',
-            field=models.BooleanField(default=False),
+            field=models.DateTimeField(null=True, blank=True),
             preserve_default=True,
         ),
     ]

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import fudge
 
 from django.conf import settings
@@ -49,7 +51,7 @@ class NotifyMatchersReceiverTest(TestCase):
     @fudge.patch('auctions.models.send_mail')
     def test_only_send_mail_to_unsent_matching_askers(self, mock_send_mail):
         user = mommy.make(settings.AUTH_USER_MODEL)
-        self.bid1.ask_match_sent = True
+        self.bid1.ask_match_sent = datetime.now()
         self.bid1.save()
 
         mock_send_mail.expects_call().with_args(
