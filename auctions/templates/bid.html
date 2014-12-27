@@ -1,5 +1,5 @@
 {% if bid %}
-<form action="{% url 'bid-detail' bid.id %}" method="POST" data-selector=".discussion-sidebar" data-container="">
+<form id="codesy_bid_form" action="{% url 'bid-detail' bid.id %}" method="POST" data-selector=".discussion-sidebar" data-container="">
   <input name="_method" type="hidden" value="PUT" />
 {% else %}
 <form action="{% url 'bid-list' %}" method="POST" data-selector=".discussion-sidebar" data-container="">
