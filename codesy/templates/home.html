@@ -25,9 +25,11 @@
                 <h2>1. <a href="/accounts/github/login/?process=login">Sign in with <img width="32" height="32" src="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" /> <b>GitHub</b></a></h2>
             {% endif %}
             </div>
-        {# TODO: if not authenticated, disable this column #}
             <div class="col-md-4">
                 <h2>2. Connect payments</h2>
+                {% if not request.user.is_authenticated %}
+                Sign in to connect a payment method
+                {% else %}
         <form role="form">
           <div>
             <label>Name on Card</label>
@@ -49,6 +51,7 @@
 
           <button id="cc-submit">Tokenize</button>
         </form>
+                {% endif %}
         </div>
         <div class="col-md-4">
             <h2>3. Add to your browser</h2>
