@@ -1,9 +1,9 @@
 {# TODO: switching to jinja with 'set' would eliminate the extra <form> #}
 {% if bid %}
-<form id="codesy_bid_form" action="{% url 'bid-detail' bid.id %}" method="POST" >
+<form id="codesy_bid_form" action="//{{domain}}{% url 'bid-detail' bid.id %}" method="POST" >
   <input name="_method" type="hidden" value="PUT" />
 {% else %}
-<form id="codesy_bid_form" action="{% url 'bid-list' %}" method="POST" >
+<form id="codesy_bid_form" action="//{{domain}}{% url 'bid-list' %}" method="POST" >
 {% endif %}
   {% csrf_token %}
   <input name="url" type="hidden" value="{{ url }}"></input>
