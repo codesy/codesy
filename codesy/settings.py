@@ -44,6 +44,7 @@ THIRD_PARTY_APPS = (
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
+    'mailer',
     'rest_framework',
     'rest_framework_swagger'
 )
