@@ -70,10 +70,9 @@ codesy's API backend tries to be very slim, so starting should be easy:
 
     pip install -r requirements.txt
 
-#. Copy & source `config`_ environment (`autoenv`_ automates this when you change directories)::
+#. Copy `config`_ environment::
 
     cp .env-dist .env
-    source .env
 
 #. `Migrate`_ DB tables ::
 
