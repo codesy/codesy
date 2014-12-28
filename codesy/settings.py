@@ -50,6 +50,7 @@ THIRD_PARTY_APPS = (
     'allauth.socialaccount.providers.github',
     'mailer',
     'rest_framework',
+    'rest_framework.authtoken',
     'rest_framework_swagger'
 )
 
@@ -148,7 +149,8 @@ TEST_RUNNER = config('TEST_RUNNER',
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES':
-        ('rest_framework.authentication.SessionAuthentication',),
+        ('rest_framework.authentication.SessionAuthentication',
+         'rest_framework.authentication.TokenAuthentication'),
     'DEFAULT_PERMISSION_CLASSES':
         ('rest_framework.permissions.IsAuthenticated',),
     'PAGINATE_BY': 10
