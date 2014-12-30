@@ -148,9 +148,10 @@ TEST_RUNNER = config('TEST_RUNNER',
                      default='django.test.runner.DiscoverRunner')
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES':
-        ('rest_framework.authentication.SessionAuthentication',
-         'rest_framework.authentication.TokenAuthentication'),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
     'DEFAULT_PERMISSION_CLASSES':
         ('rest_framework.permissions.IsAuthenticated',),
     'PAGINATE_BY': 10
