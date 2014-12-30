@@ -4,7 +4,7 @@ from .models import Bid
 
 
 class BidSerializer(serializers.HyperlinkedModelSerializer):
-    user = serializers.Field(source='user')
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Bid

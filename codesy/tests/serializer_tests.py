@@ -12,10 +12,10 @@ class UserSerializerTest(TestCase):
         self.assertIsInstance(
             self.serializer,
             rest_framework.serializers.HyperlinkedModelSerializer)
-        self.assertEqual(self.serializer.opts.model, base.models.User)
+        self.assertEqual(self.serializer.Meta.model, base.models.User)
         self.assertEqual(
-            self.serializer.opts.fields,
+            self.serializer.Meta.fields,
             ('id', 'username', 'balanced_card_href',
              'balanced_bank_account_href'))
         self.assertEqual(
-            self.serializer.opts.read_only_fields, ('id', 'username'))
+            self.serializer.Meta.read_only_fields, ('id', 'username'))

@@ -14,16 +14,15 @@ class BidViewSet(ModelViewSet):
     API endpoint for bids. Users can only list, create, retrieve, update, or
     delete their own bids.
     """
-    model = Bid
+    queryset = Bid.objects.all()
     serializer_class = BidSerializer
 
     def pre_save(self, obj):
-        # TODO: charge the user's credit card via balanced
+        # TODO: authorize the user's credit card via balanced
         obj.user = self.request.user
 
     def get_queryset(self):
-        qs = super(BidViewSet, self).get_queryset()
-        return qs.filter(user=self.request.user)
+        return self.queryset.filter(user=self.request.user)
 
 
 class GetBid(APIView):
