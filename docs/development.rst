@@ -133,6 +133,25 @@ balanced docs.
 .. _test credit card numbers: https://docs.balancedpayments.com/1.1/overview/resources/#test-credit-card-numbers
 .. _test bank accounts: https://docs.balancedpayments.com/1.1/overview/resources/#test-bank-account-numbers
 
+Run https
+---------
+
+The codesy browser extensions contain content scripts that run on https://
+sites and request HTML from the API. So, to enable the browser extensions to
+use your local codesy server, you can install and run stunnel in front of
+Django and set the extension domain to https://127.0.0.1.
+
+#. `Install stunnel`_ for your OS (E.g., on Mac OS ``brew install stunnel``).
+
+#. Generate local cert and key file for stunnel::
+
+    openssl req -new -x509 -days 9999 -nodes -out stunnel.pem -keyout stunnel.pem
+
+#. Run stunnel::
+
+    sudo stunnel stunnel.conf
+
+.. _Install stunnel: https://duckduckgo.com/?q=install+stunnel
 
 Run the Tests
 -------------
