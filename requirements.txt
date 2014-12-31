@@ -1,4 +1,5 @@
 Django==1.7.1
+PyGithub==1.25.2
 dj-database-url==0.3.0
 dj-static==0.0.6
 django-allauth==0.18.0
@@ -11,9 +12,9 @@ newrelic==2.36.0.30
 oauthlib==0.7.1
 psycopg2==2.5.4
 pystache==0.5.4
+python-decouple==2.3
 python-openid==2.2.5
 requests==2.4.3
 requests-oauthlib==0.4.2
 static==1.1.1
 wsgiref==0.1.2
-python-decouple==2.3
