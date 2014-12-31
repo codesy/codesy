@@ -8,3 +8,5 @@ codesy.sqlite
 .coverage
 .DS_Store
 MANIFEST
+stunnel.pem
+docs/html
