@@ -7,9 +7,13 @@ https://docs.djangoproject.com/en/1.6/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.6/ref/settings/
 """
+import os
+
+import dj_database_url
+from decouple import config
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -17,10 +21,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(os.environ.get('DJANGO_DEBUG', ''))
+DEBUG = config('DJANGO_DEBUG', cast=bool)
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -84,8 +88,8 @@ AUTHENTICATION_BACKENDS = (
 
 # auth and allauth settings
 ACCOUNT_ADAPTER = 'codesy.adapters.CodesyAccountAdapter'
-ACCOUNT_EMAIL_VERIFICATION = os.environ.get('ACCOUNT_EMAIL_VERIFICATION',
-                                            'optional')
+ACCOUNT_EMAIL_VERIFICATION = config('ACCOUNT_EMAIL_VERIFICATION',
+                                    default='optional')
 AUTH_USER_MODEL = 'base.User'
 LOGIN_REDIRECT_URL = '/'
 SOCIALACCOUNT_ADAPTER = 'codesy.adapters.CodesySocialAccountAdapter'
@@ -100,20 +104,8 @@ ROOT_URLCONF = 'codesy.urls'
 
 WSGI_APPLICATION = 'codesy.wsgi.application'
 
+DATABASES = {'default': config('DATABASE_URL', cast=dj_database_url.parse)}
 
-# Database
-# https://docs.djangoproject.com/en/1.6/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
-# Parse database configuration from $DATABASE_URL
-import dj_database_url
-DATABASES['default'] = dj_database_url.config()
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
@@ -148,8 +140,8 @@ STATICFILES_DIRS = (
 
 SITE_ID = 1
 
-TEST_RUNNER = os.environ.get(
-    'TEST_RUNNER', 'django.test.runner.DiscoverRunner')
+TEST_RUNNER = config('TEST_RUNNER',
+                     default='django.test.runner.DiscoverRunner')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES':
@@ -163,10 +155,10 @@ SWAGGER_SETTINGS = {
     'exclude_namespaces': ['single_bid']
 }
 
-EMAIL_BACKEND = os.environ.get(
-    'EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_BACKEND = config('EMAIL_BACKEND',
+                       'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = os.environ.get('SENDGRID_USERNAME')
-EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_PASSWORD')
+EMAIL_HOST_USER = config('SENDGRID_USERNAME', default='')
+EMAIL_HOST_PASSWORD = config('SENDGRID_PASSWORD', default='')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
