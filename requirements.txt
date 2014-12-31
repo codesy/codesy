@@ -7,12 +7,12 @@ django-toolbelt==0.0.1
 django-rest-swagger==0.2.0
 djangorestframework==2.4.4
 gunicorn==19.1.1
-newrelic==2.36.0.30
-oauthlib==0.7.1
+newrelic==2.40.0.34
+oauthlib==0.7.2
 psycopg2==2.5.4
 pystache==0.5.4
 python-openid==2.2.5
-requests==2.4.3
+requests==2.5.1
 requests-oauthlib==0.4.2
 static==1.1.1
 wsgiref==0.1.2
