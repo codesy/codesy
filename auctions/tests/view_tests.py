@@ -14,7 +14,7 @@ class BidViewSetTest(TestCase):
     def test_attrs(self):
         self.assertIsInstance(
             self.viewset, rest_framework.viewsets.ModelViewSet)
-        self.assertEqual(self.viewset.model, models.Bid)
+        self.assertEqual(self.viewset.queryset.model, models.Bid)
         self.assertEqual(
             self.viewset.serializer_class, serializers.BidSerializer)
 

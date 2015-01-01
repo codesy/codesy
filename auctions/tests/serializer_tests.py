@@ -12,8 +12,8 @@ class BidSerializerTest(TestCase):
         self.assertIsInstance(
             self.serializer,
             rest_framework.serializers.HyperlinkedModelSerializer)
-        self.assertEqual(self.serializer.opts.model, models.Bid)
+        self.assertEqual(self.serializer.Meta.model, models.Bid)
         self.assertSequenceEqual(
-            self.serializer.opts.fields, ('id', 'user', 'url', 'ask', 'offer'))
+            self.serializer.Meta.fields, ('id', 'user', 'url', 'ask', 'offer'))
         self.assertSequenceEqual(
-            self.serializer.opts.read_only_fields, ('id',))
+            self.serializer.Meta.read_only_fields, ('id',))
