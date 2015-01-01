@@ -1,0 +1,10 @@
+pid=
+
+cert = stunnel/stunnel.pem
+foreground = yes
+output = stunnel.log
+
+[https]
+accept=8443
+connect=5000
+TIMEOUTclose=1

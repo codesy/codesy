@@ -136,21 +136,33 @@ Run https
 ---------
 
 The codesy browser extensions contain content scripts that run on https://
-sites and request HTML from the API. So, to enable the browser extensions to
-use your local codesy server, you can install and run stunnel in front of
-Django and set the extension domain to https://127.0.0.1.
+sites and request HTML from the API. So, to let the browser extensions use your
+local codesy server, you'll need to run the backend over https://.
+
+The `easiest way to run https connections with Django`_ is to run stunnel in
+front of Django on https://127.0.0.1:8443:
+
+#. First, run Django dev server in HTTPS mode on port 5000::
+
+    HTTPS=1 python manage.py runserver 5000
 
 #. `Install stunnel`_ for your OS (E.g., on Mac OS ``brew install stunnel``).
 
 #. Generate local cert and key file for stunnel::
 
-    openssl req -new -x509 -days 9999 -nodes -out stunnel.pem -keyout stunnel.pem
+    openssl req -new -x509 -days 9999 -nodes -out stunnel/stunnel.pem -keyout stunnel/stunnel.pem
 
-#. Run stunnel::
+#. Run stunnel with the included ``dev_https`` config which proxies
+   https://127.0.0.1:8443 to Django on http://127.0.0.1:5000::
 
-    sudo stunnel stunnel.conf
+    stunnel stunnel/dev_https
+
+#. Go to https://127.0.0.1:8443 to confirm the certificate exception.
+
+#. Change the browser extension code to use https://127.0.0.1:8443
 
 .. _Install stunnel: https://duckduckgo.com/?q=install+stunnel
+.. _easiest way to run https connections with Django: http://stackoverflow.com/a/8025645/571420
 
 Run the Tests
 -------------
