@@ -50,6 +50,7 @@ THIRD_PARTY_APPS = (
     'allauth.socialaccount.providers.github',
     'mailer',
     'rest_framework',
+    'rest_framework.authtoken',
     'rest_framework_swagger'
 )
 
@@ -147,8 +148,10 @@ TEST_RUNNER = config('TEST_RUNNER',
                      default='django.test.runner.DiscoverRunner')
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES':
-        ('rest_framework.authentication.SessionAuthentication',),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
     'DEFAULT_PERMISSION_CLASSES':
         ('rest_framework.permissions.IsAuthenticated',),
     'PAGINATE_BY': 10

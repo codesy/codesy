@@ -20,7 +20,16 @@
         <div class="row">
             <div class="col-md-4">
             {% if request.user.is_authenticated %}
-                <h2>1. Hi <img src="{{ gravatar_url }}"/> {{ request.user.username }}</h2> <a href="/accounts/logout/">Sign out</a>
+                <h2>1. Hi <img src="{{ gravatar_url }}"/> {{ request.user.username }}</h2>
+                <p>
+                    <label for="api_token">API Token:</label>
+                </p>
+                <p>
+                    <input id="api_token_pass" class="api_token" type="password" name="api_token_pass" value="{{ request.user.auth_token }}"/>
+                    <input id="api_token_text" class="api_token" type="text" name="api_token" value="{{ request.user.auth_token }}"/>
+                    <input id="toggle_token_button" type="button" value="Toggle"/>
+                </p>
+                <a href="/accounts/logout/">Sign out</a>
             {% else %}
                 <h2>1. <a href="/accounts/github/login/?process=login">Sign in with <img width="32" height="32" src="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" /> <b>GitHub</b></a></h2>
             {% endif %}
@@ -72,6 +81,11 @@
 {% if request.user.is_authenticated %}
 <script type="text/javascript" src="https://js.balancedpayments.com/1.1/balanced.js"></script>
 <script>
+$("#api_token_text").hide();
+$("#toggle_token_button").click(function (e) {
+  $('input.api_token').toggle();
+});
+
 function handleResponse(response) {
   if (response.status_code === 201) {
     var card_href, bank_href = null;
