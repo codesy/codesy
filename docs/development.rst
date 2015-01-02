@@ -34,13 +34,11 @@ Resources
 :Issues:        https://github.com/codesy/codesy/issues
 :IRC:           irc://irc.freenode.net/codesy
 :Mailing list:  https://groups.google.com/forum/#!forum/codesy-dev
-:Servers:       https://codesy-dev.herokuapp.com/ (dev)
+:Servers:       https://codesy-stage.herokuapp.com/ (stage)
 
-                https://codesy-stage.herokuapp.com/ (stage)
+                https://api.codesy.io/ (prod)
 
-                https://codesy.io/ (prod)
-
-                https://whatsdeployed.paas.allizom.org/?owner=codesy&repo=codesy&name[]=Dev&url[]=https://codesy-dev.herokuapp.com/revision.txt&name[]=Stage&url[]=https://codesy-stage.herokuapp.com/revision.txt (What's Deployed)
+                `Next production push <https://github.com/codesy/codesy/compare/master...production>`_
 
 
 Requirements
@@ -190,8 +188,8 @@ If you are an active codesy user, we love getting pull requests that
 .. _scratch your own itch: https://gettingreal.37signals.com/ch02_Whats_Your_Problem.php
 
 
-Deploy
-------
+Deploy your own
+---------------
 
 codesy is designed to run on `heroku`_, so you can easily deploy your changes
 to your own heroku app with `heroku toolbelt`_.
@@ -239,11 +237,26 @@ to your own heroku app with `heroku toolbelt`_.
 
 #. That's it. https://codesy-username.herokuapp.com/ should work.
 
+Deploying to production
+-----------------------
+
+We use `Travis CI for continuous deployment to Heroku`_. `Our .travis.yml`_
+defines the flow:
+
+#. Commits to ``master`` are tested `on Travis`_.
+
+#. If/when the build passes, the code is automatically deployed to
+   https://codesy-stage.herokuapp.com
+
+#. To deploy changes to production, a repo owner pushes a commit (usually
+   ``master``) to the ``production`` branch on GitHub.
 
 .. _heroku toolbelt: https://toolbelt.heroku.com/
 .. _Create a heroku remote: https://devcenter.heroku.com/articles/git#creating-a-heroku-remote
 .. _register your own GitHub App: https://github.com/settings/applications/new
-
+.. _Travis CI for continuous deployment to Heroku: http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/
+.. _Our .travis.yml: https://github.com/codesy/codesy/blob/master/.travis.yml
+.. _on Travis: https://travis-ci.org/codesy/codesy
 
 .. _Migrate: https://docs.djangoproject.com/en/1.7/topics/migrations/
 .. _heroku: https://www.heroku.com/

@@ -23,6 +23,7 @@ deploy:
         production: codesy
     api_key:
         secure: b6WURzF4yg8pDwfxPnVmSY9KabxfqJeqTlfbVahLGUU8U/g5U616tQVM68dptrskRk+UKzqPCi5AwWwxOBAuKwtGXvOLTVnJbnEQhAH3HUoWtmhQN1gq0OiVobEDFJBaJo+TWlUAakWRfnQNwffjy9WwLfac8cFaSCwTrH+6qPc=
+    run: "python manage.py migrate"
 
 after_deploy:
     - heroku config:set COMMIT_HASH=$TRAVIS_COMMIT --app codesy-dev
