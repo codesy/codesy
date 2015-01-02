@@ -204,10 +204,11 @@ to your own heroku app with `heroku toolbelt`_.
 
     heroku config:set DJANGO_SECRET_KEY="username-birthdate"
 
-#. Set a couple more environment variables for heroku::
+#. Set other required environment variables for heroku::
 
     heroku config:set DJANGO_DEBUG=True
     heroku config:set ACCOUNT_EMAIL_VERIFICATION=none
+    heroku config:set ACCOUNT_DEFAULT_HTTP_PROTOCOL='https'
 
 #. Push code to the heroku remote::
 
