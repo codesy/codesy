@@ -91,6 +91,9 @@ ACCOUNT_ADAPTER = 'codesy.adapters.CodesyAccountAdapter'
 ACCOUNT_EMAIL_VERIFICATION = config('ACCOUNT_EMAIL_VERIFICATION',
                                     default='optional')
 AUTH_USER_MODEL = 'base.User'
+# OAuth2View uses this for the callback_url protocol
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = config(
+    'ACCOUNT_DEFAULT_HTTP_PROTOCOL', 'http')
 LOGIN_REDIRECT_URL = '/'
 SOCIALACCOUNT_ADAPTER = 'codesy.adapters.CodesySocialAccountAdapter'
 SOCIALACCOUNT_QUERY_EMAIL = True
