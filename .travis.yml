@@ -18,9 +18,9 @@ script: tox
 
 deploy:
     provider: heroku
-    app: codesy-dev
+    app: codesy-stage
     api_key:
-        secure: E4RIDpJCwxI7oW7En2CeCOmw/X13DV2ePM0RWoknBgvvnmoMKYhMjdisk8FQWzVWKM9rjkHTyn8hBbzAqtTzf5xttB4wxtlOs4444W3RKGP4g/G+IIe4EtxzLc5zqPcsMefRtSMABPbVTHP0tqjYWtX7nuutYPv1/a3gyoF2Aw0=
+        secure: b6WURzF4yg8pDwfxPnVmSY9KabxfqJeqTlfbVahLGUU8U/g5U616tQVM68dptrskRk+UKzqPCi5AwWwxOBAuKwtGXvOLTVnJbnEQhAH3HUoWtmhQN1gq0OiVobEDFJBaJo+TWlUAakWRfnQNwffjy9WwLfac8cFaSCwTrH+6qPc=
 
 after_deploy:
     - heroku config:set COMMIT_HASH=$TRAVIS_COMMIT --app codesy-dev
