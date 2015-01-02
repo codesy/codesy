@@ -38,7 +38,7 @@ Resources
 
                 https://api.codesy.io/ (prod)
 
-                `Next production push <https://github.com/codesy/codesy/compare/master...production>`_
+                `Next production push <https://github.com/codesy/codesy/compare/production...master>`_
 
 
 Requirements

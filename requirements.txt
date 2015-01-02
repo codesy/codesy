@@ -5,7 +5,7 @@ dj-static==0.0.6
 django-allauth==0.18.0
 django-mailer==0.1.0
 django-toolbelt==0.0.1
-django-rest-swagger==0.2.6
+django-rest-swagger==0.2.7
 djangorestframework==3.0.2
 gunicorn==19.1.1
 newrelic==2.40.0.34
