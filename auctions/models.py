@@ -13,9 +13,14 @@ class Bid(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     url = models.URLField()
     issue = models.ForeignKey('Issue', null=True)
-    ask = models.DecimalField(max_digits=6, decimal_places=2)
+    ask = models.DecimalField(max_digits=6, decimal_places=2, blank=True,
+                              default=0)
     ask_match_sent = models.DateTimeField(null=True, blank=True)
-    offer = models.DecimalField(max_digits=6, decimal_places=2)
+    offer = models.DecimalField(max_digits=6, decimal_places=2, blank=True,
+                                default=0)
+
+    class Meta:
+        unique_together = (("user", "url"),)
 
 
 @receiver(post_save, sender=Bid)
