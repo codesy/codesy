@@ -17,6 +17,9 @@ class Bid(models.Model):
     ask_match_sent = models.DateTimeField(null=True, blank=True)
     offer = models.DecimalField(max_digits=6, decimal_places=2)
 
+    class Meta:
+        unique_together = (("user", "url"),)
+
 
 @receiver(post_save, sender=Bid)
 def notify_matching_askers(sender, instance, **kwargs):
