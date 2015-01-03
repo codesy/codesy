@@ -38,7 +38,7 @@ Resources
 
                 https://api.codesy.io/ (prod)
 
-                `Next production push <https://github.com/codesy/codesy/compare/production...master>`_
+                `Request the next deployment`_
 
 
 Requirements
@@ -248,8 +248,11 @@ defines the flow:
 #. If/when the build passes, the code is automatically deployed to
    https://codesy-stage.herokuapp.com
 
-#. To deploy changes to production, a repo owner pushes a commit (usually
-   ``master``) to the ``production`` branch on GitHub.
+#. To deploy changes to production, a repo owner pushes a commit to the
+   ``production`` branch on GitHub.
+
+This means a production deployment is as easy as a Pull Request. Click here to
+`Request the next deployment`_ from master to production.
 
 .. _heroku toolbelt: https://toolbelt.heroku.com/
 .. _Create a heroku remote: https://devcenter.heroku.com/articles/git#creating-a-heroku-remote
@@ -262,3 +265,4 @@ defines the flow:
 .. _heroku: https://www.heroku.com/
 .. _git hooks: http://git-scm.com/book/en/Customizing-Git-Git-Hooks
 .. _balanced.js: https://github.com/balanced/balanced-js
+.. _Request the next deployment: https://github.com/codesy/codesy/compare/production...master?expand=1&title=%5Bdeploy%5D+Request
