@@ -19,58 +19,51 @@
 
         <div class="row">
             <div class="col-md-4">
+                <h2>1. Add to your browser</h2>
+                {# TODO: auto-detect browser and show proper image #}
+                <p>
+                <img src="{% static "img/chrome.png" %}" width="32" height="32"/> <a id="chrome-install-button" class="btn btn-lg btn-success" onclick="chrome.webstore.install()" role="button">Add to Chrome</a>
+                </p>
+                <p>
+                <img src="{% static "img/firefox.png" %}" width="32" height="32"/> <a class="btn btn-lg btn-success" href="codesy.xpi" role="button">Add to Firefox</a>
+                </p>
+            </div>
+            <div class="col-md-4">
             {% if request.user.is_authenticated %}
-                <h2>1. Hi <img src="{{ gravatar_url }}"/> {{ request.user.username }}</h2>
-                <p>
-                    <label for="api_token">API Token:</label>
-                </p>
-                <p>
-                    <input id="api_token_pass" class="api_token" type="password" name="api_token_pass" value="{{ request.user.auth_token }}"/>
-                    <input id="api_token_text" class="api_token" type="text" name="api_token" value="{{ request.user.auth_token }}"/>
-                    <input id="toggle_token_button" type="button" value="Toggle"/>
-                </p>
+                <h2>2. Welcome <img src="{{ gravatar_url }}"/> {{ request.user.username }}</h2>
+                <input id="api_token_pass" type="hidden" name="api_token_pass" value="{{ request.user.auth_token }}"/>
                 <a href="/accounts/logout/">Sign out</a>
             {% else %}
-                <h2>1. <a href="/accounts/github/login/?process=login">Sign in with <img width="32" height="32" src="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" /> <b>GitHub</b></a></h2>
+                <h2>2. <a href="/accounts/github/login/?process=login">Sign in with <img width="32" height="32" src="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" /> <b>GitHub</b></a></h2>
             {% endif %}
             </div>
             <div class="col-md-4">
-                <h2>2. Connect payments</h2>
+                <h2>3. Connect payments</h2>
                 {% if not request.user.is_authenticated %}
                 Sign in to connect a payment method
                 {% else %}
-        <form role="form">
-          <div>
-            <label>Name on Card</label>
-            <input type="text" id="cc-name" autocomplete="off" placeholder="John Doe" />
-          </div>
-          <div>
-            <label>Card Number</label>
-            <input type="text" id="cc-number" autocomplete="off" placeholder="4111111111111111" maxlength="16" />
-          </div>
-          <div>
-            <label>Expiration</label>
-            <input type="text" id="cc-ex-month" autocomplete="off" placeholder="01" maxlength="2" />
-            <input type="text" id="cc-ex-year" autocomplete="off" placeholder="2013" maxlength="4" />
-          </div>
-          <div>
-            <label>Card Verification Code (CVV)</label>
-            <input type="text" id="ex-cvv" autocomplete="off" placeholder="123" maxlength="4" />
-          </div>
+                <form role="form">
+                  <div>
+                    <label>Name on Card</label>
+                    <input type="text" id="cc-name" autocomplete="off" placeholder="John Doe" />
+                  </div>
+                  <div>
+                    <label>Card Number</label>
+                    <input type="text" id="cc-number" autocomplete="off" placeholder="4111111111111111" maxlength="16" />
+                  </div>
+                  <div>
+                    <label>Expiration</label>
+                    <input type="text" id="cc-ex-month" autocomplete="off" placeholder="01" maxlength="2" />
+                    <input type="text" id="cc-ex-year" autocomplete="off" placeholder="2013" maxlength="4" />
+                  </div>
+                  <div>
+                    <label>Card Verification Code (CVV)</label>
+                    <input type="text" id="ex-cvv" autocomplete="off" placeholder="123" maxlength="4" />
+                  </div>
 
-          <button id="cc-submit">Tokenize</button>
-        </form>
+                  <button id="cc-submit">Tokenize</button>
+                </form>
                 {% endif %}
-        </div>
-        <div class="col-md-4">
-            <h2>3. Add to your browser</h2>
-            {# TODO: auto-detect browser and show proper image #}
-            <p>
-            <img src="{% static "img/chrome.png" %}" width="32" height="32"/> <a id="chrome-install-button" class="btn btn-lg btn-success" onclick="chrome.webstore.install()" role="button">Add to Chrome</a>
-            </p>
-            <p>
-            <img src="{% static "img/firefox.png" %}" width="32" height="32"/> <a class="btn btn-lg btn-success" href="codesy.xpi" role="button">Add to Firefox</a>
-            </p>
         </div>
     </div>
 
@@ -81,11 +74,6 @@
 {% if request.user.is_authenticated %}
 <script type="text/javascript" src="https://js.balancedpayments.com/1.1/balanced.js"></script>
 <script>
-$("#api_token_text").hide();
-$("#toggle_token_button").click(function (e) {
-  $('input.api_token').toggle();
-});
-
 function handleResponse(response) {
   if (response.status_code === 201) {
     var card_href, bank_href = null;
