@@ -1,25 +1,24 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
+{% block jumbotron %}
+          <div class="container">
+              <div class="col-md-6">
+                  <h1>codesy.io</h1>
+                  <p>every day, <strong>millions</strong> of us coders work around bugs in open-source software.</p>
+                  <p>codesy is a <strong>pay-what-you-want</strong> market for the open source community where we can tip each other to fix important bugs.</p>
+              </div>
+              <div class="col-md-6">
+                  <iframe width="100%" height="315" src="//www.youtube.com/embed/6gmP4nk0EOE" frameborder="0" allowfullscreen></iframe>
+              </div>
+          </div>
+{% endblock %}
+
 {% block content %}
 
-      <div class="jumbotron">
-        <div class="col-md-6">
-          <p>every day, <strong>millions</strong> of us coders work around bugs in open-source software.</p>
-          <p>
-          codesy is a <strong>pay-what-you-want</strong> market<br/>
-          for the open source community<br/>
-          to encourage coders to fix important bugs.
-          </p>
-        </div>
-        <div class="col-md-6">
-            <img src="{% static "img/codesy-flow.png" %}" width="420" height="315" />
-        </div>
-      </div>
-
         <div class="row">
-            <div class="col-md-4">
-                <h2>1. Add to your browser</h2>
+            <div id="install-step" class="col-md-4">
+                <h2>1. Install. <span class="glyphicon glyphicon-chevron-right"></span></h2>
                 {# TODO: auto-detect browser and show proper image #}
                 <p>
                 <img src="{% static "img/chrome.png" %}" width="32" height="32"/> <a id="chrome-install-button" class="btn btn-lg btn-success" onclick="chrome.webstore.install()" role="button">Add to Chrome</a>
@@ -28,40 +27,41 @@
                 <img src="{% static "img/firefox.png" %}" width="32" height="32"/> <a class="btn btn-lg btn-success" href="codesy.xpi" role="button">Add to Firefox</a>
                 </p>
             </div>
-            <div class="col-md-4">
+            <div id="sign-in-step" class="col-md-4">
             {% if request.user.is_authenticated %}
-                <h2>2. Welcome <img src="{{ gravatar_url }}"/> {{ request.user.username }}</h2>
+                <h2>2. Signed in. <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></h2>
+                <p>Welcome <img src="{{ gravatar_url }}"/> {{ request.user.username }}</p>
                 <input id="api_token_pass" type="hidden" name="api_token_pass" value="{{ request.user.auth_token }}"/>
                 <a href="/accounts/logout/">Sign out</a>
             {% else %}
-                <h2>2. <a href="/accounts/github/login/?process=login">Sign in with <img width="32" height="32" src="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" /> <b>GitHub</b></a></h2>
+            <h2>2. <img width="32" height="32" src="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" /> <a href="/accounts/github/login/?process=login">Sign in.</a> <span class="glyphicon glyphicon-chevron-right"></span></h2>
             {% endif %}
             </div>
-            <div class="col-md-4">
-                <h2>3. Connect payments</h2>
+            <div id="connect-payment-step" class="col-md-4">
+                <h2>3. Connect payments.</h2>
                 {% if not request.user.is_authenticated %}
                 Sign in to connect a payment method
                 {% else %}
-                <form role="form">
-                  <div>
-                    <label>Name on Card</label>
-                    <input type="text" id="cc-name" autocomplete="off" placeholder="John Doe" />
+                <form role="form" class="form-horizontal">
+                  <div class="form-group">
+                    <label for="cc-name">Name on Card</label>
+                    <input type="text" class="form-control" id="cc-name" autocomplete="off" placeholder="John Doe" />
                   </div>
-                  <div>
-                    <label>Card Number</label>
-                    <input type="text" id="cc-number" autocomplete="off" placeholder="4111111111111111" maxlength="16" />
+                  <div class="form-group">
+                    <label for=cc-number">Card Number</label>
+                    <input type="text" class="form-control" id="cc-number" autocomplete="off" placeholder="4111111111111111" maxlength="16" />
                   </div>
-                  <div>
-                    <label>Expiration</label>
-                    <input type="text" id="cc-ex-month" autocomplete="off" placeholder="01" maxlength="2" />
-                    <input type="text" id="cc-ex-year" autocomplete="off" placeholder="2013" maxlength="4" />
+                  <div class="form-group">
+                    <label for="cc-ex-month">Expiration</label>
+                    <input type="text" class="form-control" id="cc-ex-month" autocomplete="off" placeholder="01" maxlength="2" size="2"/>
+                    <input type="text" class="form-control" id="cc-ex-year" autocomplete="off" placeholder="2013" maxlength="4" size="4"/>
                   </div>
-                  <div>
-                    <label>Card Verification Code (CVV)</label>
-                    <input type="text" id="ex-cvv" autocomplete="off" placeholder="123" maxlength="4" />
+                  <div class="form-group">
+                    <label for="ex-cvv">Card Verification Code (CVV)</label>
+                    <input type="text" class="form-control" id="ex-cvv" autocomplete="off" placeholder="123" maxlength="4" size="4"/>
                   </div>
 
-                  <button id="cc-submit">Tokenize</button>
+                  <button id="cc-submit" class="btn btn-success">Authorize &amp; Connect</button>
                 </form>
                 {% endif %}
         </div>
