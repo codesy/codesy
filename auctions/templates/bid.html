@@ -1,13 +1,30 @@
 {# TODO: switching to jinja with 'set' would eliminate the extra <form> #}
+{% load staticfiles %}
+<form class="class="pure-form"" id="codesy_bid_form" action=
+
 {% if bid %}
-<form id="codesy_bid_form" action="//{{domain}}{% url 'bid-detail' bid.id %}" method="POST" >
+"//{{domain}}{% url 'bid-detail' bid.id %}" method="POST" >
   <input name="_method" type="hidden" value="PUT" />
 {% else %}
-<form id="codesy_bid_form" action="//{{domain}}{% url 'bid-list' %}" method="POST" >
+
+"//{{domain}}{% url 'bid-list' %}" method="POST" >
+
 {% endif %}
-  {% csrf_token %}
-  <input name="url" type="hidden" value="{{ url }}"></input>
-  <input name="ask" type="text" placeholder="ask" value="{{ bid.ask }}"></input>
-  <input name="offer" type="text" placeholder="offer" value="{{ bid.offer }}"></input>
-  <input type="submit" value="Bid" />
+   <input name="url" type="hidden" value="{{ url }}"></input>
+   
+  <fieldset>
+    
+<a href="https://api.codesy.io"><img src="https://{{domain}}{% static "img/icon48.png" %}" 
+  target="_blank" width="48" height="40"/></a>
+   <label for="ask"> Ask</label>
+   
+   <input id="ask" name="ask" type="text" placeholder="What you want to fix this." value="{{ bid.ask }}"></input>   
+   
+   <label for="offer">Offer<label>
+   
+    <input name="offer" type="text" placeholder="What you'd pay to have this fixed." value="{{ bid.offer }}"></input>
+
+    <input class="pure-button pure-button-primary" type="submit" value="Bid" />
+
+  </fieldset>
 </form>
