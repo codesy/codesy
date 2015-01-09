@@ -1,20 +1,20 @@
 {# TODO: switching to jinja with 'set' would eliminate the extra <form> #}
 {% load staticfiles %}
-<link rel="stylesheet" href="//{{domain}}{% static "css/styles.css" %}">
+<link rel="stylesheet" href="//{{current_site.domain}}{% static "css/styles.css" %}">
 <link rel="stylesheet" href="//cdn.jsdelivr.net/pure/0.5.0/pure-min.css">
 <div id="codesy_bid" class="pure-g">
    <div class="pure-u-1-8">
-      <a href="https://{{domain}}" target="_blank" width="48" height="48">
-         <img class="pure-img" src="https://{{domain}}{% static "img/icon48.png" %}" />
+      <a href="https://{{current_site.domain}}" target="_blank" width="48" height="48">
+         <img class="pure-img" src="https://{{current_site.domain}}{% static "img/icon48.png" %}" />
       </a>
    </div>
    <div class="pure-u-7-8">
       <form id="codesy_bid_form" class="pure-form pure-g"
          {% if bid %}
-            action = "//{{domain}}{% url 'bid-detail' bid.id %}" method="POST" >
+            action = "//{{current_site.domain}}{% url 'bid-detail' bid.id %}" method="POST" >
             <input name="_method" type="hidden" value="PUT" />
          {% else %}
-            action="//{{domain}}{% url 'bid-list' %}" method="POST" >
+            action="//{{current_site.domain}}{% url 'bid-list' %}" method="POST" >
          {% endif %}
          <input name="url" type="hidden" value="{{ url }}"></input>
          <fieldset>

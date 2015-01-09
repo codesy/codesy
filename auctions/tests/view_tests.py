@@ -60,8 +60,7 @@ class GetBidTest(TestCase):
         self.view.request = fudge.Fake().has_attr(
             user=user, QUERY_PARAMS={'url': url})
         mock_resp.expects_call().with_args(
-            {'bid': bid, 'url': url,
-             'domain': 'example.com'}, template_name='bid.html')
+            {'bid': bid, 'url': url}, template_name='bid.html')
 
         self.view.get(self.view.request)
 
@@ -74,7 +73,6 @@ class GetBidTest(TestCase):
         self.view.request = fudge.Fake().has_attr(
             user=user, QUERY_PARAMS={'url': url})
         mock_resp.expects_call().with_args(
-            {'bid': None, 'url': url,
-             'domain': 'example.com'}, template_name='bid.html')
+            {'bid': None, 'url': url}, template_name='bid.html')
 
         self.view.get(self.view.request)
