@@ -1,46 +1,45 @@
 {# TODO: switching to jinja with 'set' would eliminate the extra <form> #}
 {% load staticfiles %}
-   <div class="pure-g" id="codesy_bid_form">
-      <div class="pure-u-3-24">
-         <a href="https://{{domain}}" target="_blank" width="48" height="40">
-            <img src="https://{{domain}}{% static "img/icon48.png" %}" />
-         </a>
-      </div>
-
-      <div class="pure-u-21-24">
-
-         <form class="pure-form pure-g" action=
-            {% if bid %}
-            "//{{domain}}{% url 'bid-detail' bid.id %}" method="POST" >
-              <input name="_method" type="hidden" value="PUT" />
-            {% else %}
-            "//{{domain}}{% url 'bid-list' %}" method="POST" >
-            {% endif %}
-            <input name="url" type="hidden" value="{{ url }}"></input>
-            <fieldset>
-                <div class="pure-u-2-5">
-                  <label for="ask"> Ask</label>
-                  <input name="ask" 
-                         class="pure-input-rounded " 
-                         type="text"
-                         placeholder="What you'd want." 
-                         value="{{ bid.ask }}">
-                  </input>   
-               </div>
-                <div class="pure-u-2-5">
-
-                  <label for="offer">Offer<label>
-                  <input name="offer" 
-                         type="text" 
-                         class="pure-input-rounded"
-                         placeholder="What you'd pay." 
-                         value="{{ bid.offer }}">
-                      </input>
-                 </div>
-                 <div class="pure-u-1-5">
-                   <input class="pure-button pure-button-primary" type="submit" value="Bid" />
-                 </div>
-            </fieldset>
-         </form>
-      </div>
+<link rel="stylesheet" href="//{{domain}}{% static "css/styles.css" %}">
+<link rel="stylesheet" href="//cdn.jsdelivr.net/pure/0.5.0/pure-min.css">
+<div id="codesy_bid" class="pure-g">
+   <div class="pure-u-1-8">
+      <a href="https://{{domain}}" target="_blank" width="48" height="48">
+         <img class="pure-img" src="https://{{domain}}{% static "img/icon48.png" %}" />
+      </a>
    </div>
+   <div class="pure-u-7-8">
+      <form id="codesy_bid_form" class="pure-form pure-g"
+         {% if bid %}
+            action = "//{{domain}}{% url 'bid-detail' bid.id %}" method="POST" >
+            <input name="_method" type="hidden" value="PUT" />
+         {% else %}
+            action="//{{domain}}{% url 'bid-list' %}" method="POST" >
+         {% endif %}
+         <input name="url" type="hidden" value="{{ url }}"></input>
+         <fieldset>
+             <div class="pure-u-2-5">
+               <label for="ask">Asking</label>
+               <input name="ask"
+                      class="pure-input" 
+                      type="text"
+                      placeholder="What you'd want." 
+                      value="{{ bid.ask }}">
+               </input>   
+            </div>
+             <div class="pure-u-2-5">
+               <label for="offer">Offering</label>
+               <input name="offer"
+                      class="pure-input"
+                      type="text" 
+                      placeholder="What you'd pay." 
+                      value="{{ bid.offer }}">
+               </input>
+              </div>
+              <div class="pure-u-1-5">
+                <input id="submit_bid" class="pure-button pure-button-primary" type="submit" value="Bid" />
+              </div>
+         </fieldset>
+      </form>
+   </div>
+</div>
