@@ -27,6 +27,11 @@
                 <img src="{% static "img/firefox.png" %}" width="32" height="32"/> <a class="btn btn-lg btn-success" href="codesy.xpi" role="button">Add to Firefox</a>
                 </p>
             </div>
+            <div id="installed" class ="col-md-4" hidden="true">
+               <h2>Installed. <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></h2>
+            </div>
+            
+            
             <div id="sign-in-step" class="col-md-4">
             {% if request.user.is_authenticated %}
                 <h2>2. Signed in. <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></h2>
