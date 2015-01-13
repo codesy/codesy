@@ -1,13 +1,45 @@
 {# TODO: switching to jinja with 'set' would eliminate the extra <form> #}
-{% if bid %}
-<form id="codesy_bid_form" action="//{{domain}}{% url 'bid-detail' bid.id %}" method="POST" >
-  <input name="_method" type="hidden" value="PUT" />
-{% else %}
-<form id="codesy_bid_form" action="//{{domain}}{% url 'bid-list' %}" method="POST" >
-{% endif %}
-  {% csrf_token %}
-  <input name="url" type="hidden" value="{{ url }}"></input>
-  <input name="ask" type="text" placeholder="ask" value="{{ bid.ask }}"></input>
-  <input name="offer" type="text" placeholder="offer" value="{{ bid.offer }}"></input>
-  <input type="submit" value="Bid" />
-</form>
+{% load staticfiles %}
+<link rel="stylesheet" href="//{{current_site.domain}}{% static "css/styles.css" %}">
+<link rel="stylesheet" href="//cdn.jsdelivr.net/pure/0.5.0/pure-min.css">
+<div id="codesy_bid" class="pure-g">
+   <div class="pure-u-1-8">
+      <a href="https://{{current_site.domain}}" target="_blank" width="48" height="48">
+         <img class="pure-img" src="https://{{current_site.domain}}{% static "img/icon48.png" %}" />
+      </a>
+   </div>
+   <div class="pure-u-7-8">
+      <form id="codesy_bid_form" class="pure-form pure-g"
+         {% if bid %}
+            action = "//{{current_site.domain}}{% url 'bid-detail' bid.id %}" method="POST" >
+            <input name="_method" type="hidden" value="PUT" />
+         {% else %}
+            action="//{{current_site.domain}}{% url 'bid-list' %}" method="POST" >
+         {% endif %}
+         <input name="url" type="hidden" value="{{ url }}"></input>
+         <fieldset>
+             <div class="pure-u-2-5">
+               <label for="ask">Asking</label>
+               <input name="ask"
+                      class="pure-input" 
+                      type="text"
+                      placeholder="What you'd want." 
+                      value="{{ bid.ask }}">
+               </input>   
+            </div>
+             <div class="pure-u-2-5">
+               <label for="offer">Offering</label>
+               <input name="offer"
+                      class="pure-input"
+                      type="text" 
+                      placeholder="What you'd pay." 
+                      value="{{ bid.offer }}">
+               </input>
+              </div>
+              <div class="pure-u-1-5">
+                <input id="submit_bid" class="pure-button pure-button-primary" type="submit" value="Bid" />
+              </div>
+         </fieldset>
+      </form>
+   </div>
+</div>

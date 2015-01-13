@@ -1,6 +1,37 @@
 .glyphicon-ok {
   color: #5CB85C;
 }
+
 iframe {
   margin-top: 20px;
+}
+
+/* override pure CSS list styling that breaks github lists */
+menu, ol, ul {
+  padding: 0 !important;
+}
+
+div#codesy_bid {
+  position: fixed;
+  bottom: .25em;
+  right: .25em;
+  width:25em;
+  height:5em;
+  border-style:ridge;
+  background: antiquewhite;
+}
+
+#codesy_bid_form fieldset input{
+  width: 10em;
+  heigth: .5em;
+  font-size: 80%;
+}
+
+#codesy_bid_form fieldset label{
+  font-size: 90%;
+}
+
+#codesy_bid_form #submit_bid{
+  width:48px;
+  font-size: 100% ;
 }
