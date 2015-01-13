@@ -1,5 +1,3 @@
-from django.contrib.sites.shortcuts import get_current_site
-
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -37,15 +35,12 @@ class GetBid(APIView):
     renderer_classes = (TemplateHTMLRenderer,)
 
     def get(self, request, format=None):
-        # Pass current domain because the form is rendered on other domains
-        current_site = get_current_site(request)
         url = self.request.QUERY_PARAMS.get('url')
         try:
             bid = Bid.objects.get(user=self.request.user, url=url)
         except Bid.DoesNotExist:
             bid = None
         resp = Response({'bid': bid,
-                         'url': url,
-                         'domain': current_site.domain},
+                         'url': url},
                         template_name='bid.html')
         return resp
