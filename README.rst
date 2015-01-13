@@ -18,6 +18,10 @@ Resources
    :target: https://requires.io/github/codesy/codesy/requirements/?branch=master
    :alt: Requirements Status
 
+.. raw:: html
+
+   <a href="https://github.com/codesy/codesy/compare/production...master?expand=1&title=%5Bdeploy%5D+Request" class="primary button">Request the next deployment</a>
+
 :Code:          https://github.com/codesy/codesy
 :License:       AGPLv3; see `LICENSE file
                 <https://github.com/codesy/codesy/blob/master/LICENSE>`_
@@ -29,8 +33,4 @@ Resources
 
                 https://api.codesy.io/ (prod)
 
-                `Request the next deployment`_
-
 See full development docs on `ReadTheDocs <http://codesy.readthedocs.org/en/latest/development.html>`_.
-
-.. _Request the next deployment: https://github.com/codesy/codesy/compare/production...master?expand=1&title=%5Bdeploy%5D+Request
