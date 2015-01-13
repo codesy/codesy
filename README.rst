@@ -13,10 +13,14 @@ Resources
    :target: https://travis-ci.org/codesy/codesy
    :alt: Travis-CI Build Status
 .. image:: https://coveralls.io/repos/codesy/codesy/badge.png
-    :target: https://coveralls.io/r/codesy/codesy 
+   :target: https://coveralls.io/r/codesy/codesy 
+   :alt: Coverage Status
 .. image:: https://requires.io/github/codesy/codesy/requirements.png?branch=master
    :target: https://requires.io/github/codesy/codesy/requirements/?branch=master
    :alt: Requirements Status
+.. image:: https://raw.githubusercontent.com/codesy/codesy/master/static/img/request-next-deploy.png
+   :target: https://github.com/codesy/codesy/compare/production...master?expand=1&title=%5Bdeploy%5D+Request
+   :alt: Request Next Deploy
 
 :Code:          https://github.com/codesy/codesy
 :License:       AGPLv3; see `LICENSE file
@@ -29,8 +33,4 @@ Resources
 
                 https://api.codesy.io/ (prod)
 
-                `Request the next deployment`_
-
 See full development docs on `ReadTheDocs <http://codesy.readthedocs.org/en/latest/development.html>`_.
-
-.. _Request the next deployment: https://github.com/codesy/codesy/compare/production...master?expand=1&title=%5Bdeploy%5D+Request
