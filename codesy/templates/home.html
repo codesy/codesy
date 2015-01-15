@@ -17,7 +17,7 @@
 {% block content %}
 
         <div class="row">
-            <div id="install-step" class="col-md-4">
+            <div class="install-step col-md-4">
                 <h2>1. Install. <span class="glyphicon glyphicon-chevron-right"></span></h2>
                 {# TODO: auto-detect browser and show proper image #}
                 <p>
@@ -27,47 +27,64 @@
                 <img src="{% static "img/firefox.png" %}" width="32" height="32"/> <a class="btn btn-lg btn-success" href="codesy.xpi" role="button">Add to Firefox</a>
                 </p>
             </div>
-            <div id="installed" class ="col-md-4" hidden="true">
-               <h2>Installed. <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></h2>
+            <div class="installed col-md-4" hidden="true">
+               <h2>1. Installed. <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></h2>
             </div>
             
             
-            <div id="sign-in-step" class="col-md-4">
             {% if request.user.is_authenticated %}
+            <div id="signed-in" class="col-md-4">
                 <h2>2. Signed in. <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></h2>
                 <p>Welcome <img src="{{ gravatar_url }}"/> {{ request.user.username }}</p>
                 <input id="api_token_pass" type="hidden" name="api_token_pass" value="{{ request.user.auth_token }}"/>
                 <a href="/accounts/logout/">Sign out</a>
-            {% else %}
-            <h2>2. <img width="32" height="32" src="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" /> <a href="/accounts/github/login/?process=login">Sign in.</a> <span class="glyphicon glyphicon-chevron-right"></span></h2>
-            {% endif %}
             </div>
+            {% else %}
+            <div id="sign-in-step" class="col-md-4">
+                <div class="install-step">
+                    <h2>2. <img width="32" height="32" src="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" /> <span class="glyphicon glyphicon-chevron-right"></span> Sign in.</h2>
+                    Install to sign in.
+                </div>
+                <div class="installed" hidden="true">
+                    <h2>2. <img width="32" height="32" src="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" /> <a href="/accounts/github/login/?process=login">Sign in.</a> <span class="glyphicon glyphicon-chevron-right"></span></h2>
+                </div>
+            </div>
+            {% endif %}
+
+
             <div id="connect-payment-step" class="col-md-4">
-                <h2>3. Connect payments.</h2>
                 {% if not request.user.is_authenticated %}
+                <h2>3. Connect payments.</h2>
                 Sign in to connect a payment method
                 {% else %}
-                <form role="form" class="form-horizontal">
-                  <div class="form-group">
-                    <label for="cc-name">Name on Card</label>
-                    <input type="text" class="form-control" id="cc-name" autocomplete="off" placeholder="John Doe" />
-                  </div>
-                  <div class="form-group">
-                    <label for=cc-number">Card Number</label>
-                    <input type="text" class="form-control" id="cc-number" autocomplete="off" placeholder="4111111111111111" maxlength="16" />
-                  </div>
-                  <div class="form-group">
-                    <label for="cc-ex-month">Expiration</label>
-                    <input type="text" class="form-control" id="cc-ex-month" autocomplete="off" placeholder="01" maxlength="2" size="2"/>
-                    <input type="text" class="form-control" id="cc-ex-year" autocomplete="off" placeholder="2013" maxlength="4" size="4"/>
-                  </div>
-                  <div class="form-group">
-                    <label for="ex-cvv">Card Verification Code (CVV)</label>
-                    <input type="text" class="form-control" id="ex-cvv" autocomplete="off" placeholder="123" maxlength="4" size="4"/>
-                  </div>
+                    {% if request.user.balanced_card_href %}
+                        <h2>3. Payment connected. <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></h2>
+                        Card on file; happy bidding!
+                        <form role="form" class="form-horizontal" hidden="true">
+                    {% else %}
+                        <h2>3. Connect payments.</h2>
+                        <form role="form" class="form-horizontal">
+                    {% endif %}
+                          <div class="form-group">
+                            <label for="cc-name">Name on Card</label>
+                            <input type="text" class="form-control" id="cc-name" autocomplete="off" placeholder="John Doe" />
+                          </div>
+                          <div class="form-group">
+                            <label for=cc-number">Card Number</label>
+                            <input type="text" class="form-control" id="cc-number" autocomplete="off" placeholder="4111111111111111" maxlength="16" />
+                          </div>
+                          <div class="form-group">
+                            <label for="cc-ex-month">Expiration</label>
+                            <input type="text" class="form-control" id="cc-ex-month" autocomplete="off" placeholder="01" maxlength="2" size="2"/>
+                            <input type="text" class="form-control" id="cc-ex-year" autocomplete="off" placeholder="2013" maxlength="4" size="4"/>
+                          </div>
+                          <div class="form-group">
+                            <label for="ex-cvv">Card Verification Code (CVV)</label>
+                            <input type="text" class="form-control" id="ex-cvv" autocomplete="off" placeholder="123" maxlength="4" size="4"/>
+                          </div>
 
-                  <button id="cc-submit" class="btn btn-success">Authorize &amp; Connect</button>
-                </form>
+                          <button id="cc-submit" class="btn btn-success">Authorize &amp; Connect</button> <span id="refreshing" class="glyphicon glyphicon-refresh spin"></span>
+                        </form>
                 {% endif %}
         </div>
     </div>
@@ -104,18 +121,25 @@ function handleResponse(response) {
       },
       success: function(data, status, jqXHR) {
         console.log("Updated user.");
+        /*
+        document.location.reload();
+        $('#refreshing').hide();
+        */
       },
       failure: function() {
         console.error("Error updating user.");
+        $('#refreshing').hide();
       },
     });
   } else {
     console.error("Balanced failed to tokenize.");
+    $('#refreshing').hide();
   }
 }
 
 $('#cc-submit').click(function (e) {
   e.preventDefault();
+  $('#refreshing').show();
 
   var payload = {
     name: $('#cc-name').val(),
@@ -131,6 +155,8 @@ $('#cc-submit').click(function (e) {
   // Create credit card
   balanced.card.create(payload, handleResponse);
 });
+
+$('#refreshing').hide();
 </script>
 {% endif %}
 {% endblock %}
