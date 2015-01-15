@@ -33,7 +33,7 @@ class Home(TemplateView):
         email_hash = ''
         if self.request.user.is_authenticated():
             email_hash = hashlib.md5(self.request.user.email).hexdigest()
-        return "http://www.gravatar.com/avatar/{}?s=40".format(
+        return "//www.gravatar.com/avatar/{}?s=40".format(
             email_hash)
 
 
