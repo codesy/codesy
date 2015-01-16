@@ -45,14 +45,14 @@ class HomeTest(TestCase):
     @fudge.patch('codesy.views.Home.get_gravatar_url')
     def test_get_context_data(self, mock_get_context, mock_gravatar):
         mock_get_context.expects_call().returns({'super': 'context'})
-        mock_gravatar.expects_call().returns('http://gravatar.com/stuff')
+        mock_gravatar.expects_call().returns('//gravatar.com/stuff')
 
         context = self.view.get_context_data()
 
         self.assertEqual(
             context,
             {'super': 'context',
-             'gravatar_url': 'http://gravatar.com/stuff'})
+             'gravatar_url': '//gravatar.com/stuff'})
 
     def test_get_gravatar_url(self):
         user = mommy.make(settings.AUTH_USER_MODEL, email='fake@email.com')
@@ -62,7 +62,7 @@ class HomeTest(TestCase):
 
         self.assertEqual(
             url,
-            'http://www.gravatar.com/avatar/724f95667e2fbe903ee1b4cffcae3b25'
+            '//www.gravatar.com/avatar/724f95667e2fbe903ee1b4cffcae3b25'
             '?s=40')
 
     def test_get_gravatar_url_anon_user(self):
@@ -71,4 +71,4 @@ class HomeTest(TestCase):
 
         url = self.view.get_gravatar_url()
 
-        self.assertEqual(url, 'http://www.gravatar.com/avatar/?s=40')
+        self.assertEqual(url, '//www.gravatar.com/avatar/?s=40')
