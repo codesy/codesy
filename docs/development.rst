@@ -48,17 +48,18 @@ Requirements
 * `stunnel`_
 
 
-Get Started
------------
+Install Locally
+---------------
 
-codesy's API backend tries to be very slim, so starting should be easy:
+codesy's backend tries to be very slim, so starting should be easy.
+(Especially if you're familiar with Django):
 
-#. `Clone`_::
+#. `Clone`_ and change to the directory::
 
     git clone git@github.com:codesy/codesy.git
     cd codesy
 
-#. Create and activate `virtual environment`_::
+#. Create and activate a `virtual environment`_::
 
     virtualenv env
     source env/bin/activate
@@ -67,7 +68,7 @@ codesy's API backend tries to be very slim, so starting should be easy:
 
     pip install -r requirements.txt
 
-#. Copy `config`_ environment::
+#. Copy `decouple`_ `config`_ env file::
 
     cp .env-dist .env
 
@@ -75,60 +76,55 @@ codesy's API backend tries to be very slim, so starting should be easy:
 
     ./manage.py migrate
 
-#. Create a superuser::
+#. `Create a superuser`_::
 
    ./manage.py createsuperuser
 
-#. Start the django app, via plain `runserver`_::
-
-    ./manage.py runserver 127.0.0.1:5000
-
-#. Yay! http://127.0.0.1:5000 works, but there's more to do ...
 
 .. _python: https://www.python.org/
 .. _stunnel: https://www.stunnel.org/
 .. _Clone: http://git-scm.com/book/en/Git-Basics-Getting-a-Git-Repository#Cloning-an-Existing-Repository
 .. _virtual environment: http://docs.python-guide.org/en/latest/dev/virtualenvs/
 .. _Install requirements: http://pip.readthedocs.org/en/latest/user_guide.html#requirements-files
+.. _decouple: https://pypi.python.org/pypi/python-decouple
 .. _config: http://12factor.net/config
-.. _runserver: https://docs.djangoproject.com/en/dev/ref/django-admin/#django-admin-runserver
+.. _Create a superuser: https://docs.djangoproject.com/en/1.7/ref/django-admin/#django-admin-createsuperuser
 
 
 .. _Run https:
 
-Run https
----------
+Run locally with https
+----------------------
 
-The codesy browser extensions contain content scripts that run on https://
-sites and request HTML from the API. So, you'll need to run the backend over
-https://. The `easiest way to run https connections with Django`_ is to run
-``stunnel`` on https://127.0.0.1:8443 in front of Django:
+The codesy browser extensions contain content scripts that execute on https://
+domains and request resources from the codesy domain. So, you need to run the
+backend over https://. The `easiest way to run https connections with Django`_
+is to run ``stunnel`` on https://127.0.0.1:8443 in front of Django:
 
-#. First, run Django dev server in HTTPS mode on port 5000::
+#. First, `install stunnel`_ for your OS (E.g., on Mac OS ``brew install stunnel``).
 
-    HTTPS=1 python manage.py runserver 127.0.0.1:5000
+#. Run Django dev server **in HTTPS mode** on port 5000::
 
-#. `Install stunnel`_ for your OS (E.g., on Mac OS ``brew install stunnel``).
+    HTTPS=1 ./manage.py runserver 127.0.0.1:5000
 
 #. Generate local cert and key file for stunnel::
 
     openssl req -new -x509 -days 9999 -nodes -out stunnel/stunnel.pem -keyout stunnel/stunnel.pem
 
-#. Run stunnel with the included ``dev_https`` config which proxies
-   https://127.0.0.1:8443 to Django on http://127.0.0.1:5000::
+#. Run stunnel with the included ``dev_https`` config::
 
     stunnel stunnel/dev_https
 
-#. Go to https://127.0.0.1:8443 to confirm the certificate exception.
+#. Go to https://127.0.0.1:8443 and confirm the certificate exception.
 
-Remember to run both ``runserver`` and ``stunnel`` at the same time.
+.. note:: You always need to run both ``runserver`` and ``stunnel``.
 
 Read the `Chrome Extension docs`_ and the `Firefox Add-on docs`_ too learn how
 to configure them to use https://127.0.0.1:8443.
 
 Finally, you'll need to enable GitHub authentication ...
 
-.. _Install stunnel: https://duckduckgo.com/?q=install+stunnel
+.. _install stunnel: https://duckduckgo.com/?q=install+stunnel
 .. _easiest way to run https connections with Django: http://stackoverflow.com/a/8025645/571420
 .. _Chrome Extension docs: https://github.com/codesy/chrome-extension
 .. _Firefox Add-on docs: https://github.com/codesy/firefox-addon
@@ -236,6 +232,9 @@ to your own heroku app with `heroku toolbelt`_.
    .. note:: Remember to use `https`
 
 #. That's it. https://codesy-username.herokuapp.com/ should work.
+
+Read the Chrome Extension docs and the Firefox Add-on docs too learn how to
+configure them to use https://codesy-username.herokuapp.com.
 
 Deploying to production
 -----------------------

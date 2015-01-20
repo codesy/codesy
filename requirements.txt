@@ -1,4 +1,4 @@
-Django==1.7.1
+Django==1.7.3
 PyGithub==1.25.2
 dj-database-url==0.3.0
 dj-static==0.0.6
@@ -9,7 +9,7 @@ django-toolbelt==0.0.1
 django-rest-swagger==0.2.7
 djangorestframework==3.0.2
 gunicorn==19.1.1
-newrelic==2.40.0.34
+newrelic==2.42.0.35
 oauthlib==0.7.2
 psycopg2==2.5.4
 pystache==0.5.4
