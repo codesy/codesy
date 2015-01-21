@@ -166,6 +166,7 @@ SWAGGER_SETTINGS = {
     'exclude_namespaces': ['single_bid']
 }
 
+DEFAULT_FROM_EMAIL = 'notifications@api.codesy.io'
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_USER = config('SENDGRID_USERNAME', default='')
 EMAIL_HOST_PASSWORD = config('SENDGRID_PASSWORD', default='')
