@@ -36,6 +36,8 @@
             <div id="signed-in" class="col-md-4">
                 <h2>2. Signed in. <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></h2>
                 <p>Welcome <img src="{{ gravatar_url }}"/> {{ request.user.username }}</p>
+                <input id="codesy_user_id" type="hidden" name="codesy_user_id" value="{{ request.user.id }}"/>
+                
                 <input id="api_token_pass" type="hidden" name="api_token_pass" value="{{ request.user.auth_token }}"/>
                 <a href="/accounts/logout/">Sign out</a>
             </div>
@@ -60,7 +62,8 @@
                     {% if request.user.balanced_card_href %}
                         <h2>3. Payment connected. <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></h2>
                         Card on file; happy bidding!
-                        <form role="form" class="form-horizontal" hidden="true">
+                        <a id="cc-show" >Change your card info.</a>
+                        <form id="cc-entry" role="form" class="form-horizontal" hidden="true">
                     {% else %}
                         <h2>3. Connect payments.</h2>
                         <form role="form" class="form-horizontal">
@@ -93,66 +96,8 @@
 {% endblock %}
 
 {% block scripts %}
-{% if request.user.is_authenticated %}
-<script type="text/javascript" src="https://js.balancedpayments.com/1.1/balanced.js"></script>
-<script>
-function handleResponse(response) {
-  if (response.status_code === 201) {
-    var card_href, bank_href = null;
-    if (response.cards != null) {
-        card_href = response.cards[0].href;
-    }
-    if (response.bank_accounts != null) {
-        bank_href = response.bank_accounts[0].href;
-    }
-    console.log("card_href: " + card_href);
-    console.log("bank_href: " + bank_href);
-    $.ajax({
-      method: "PATCH",
-      url: "/users/{{ request.user.id }}/",
-      beforeSend: function(xhr, settings) {
-        xhr.setRequestHeader("Authorization", "Token {{ request.user.auth_token }}");
-      },
-      data: {
-        balanced_card_href: card_href,
-        balanced_bank_account_href: bank_href
-      },
-      success: function(data, status, jqXHR) {
-        console.log("Updated user.");
-        document.location.reload();
-        $('#refreshing').hide();
-      },
-      failure: function() {
-        console.error("Error updating user.");
-        $('#refreshing').hide();
-      },
-    });
-  } else {
-    console.error("Balanced failed to tokenize.");
-    $('#refreshing').hide();
-  }
-}
-
-$('#cc-submit').click(function (e) {
-  e.preventDefault();
-  $('#refreshing').show();
-
-  var payload = {
-    name: $('#cc-name').val(),
-    number: $('#cc-number').val(),
-    expiration_month: $('#cc-ex-month').val(),
-    expiration_year: $('#cc-ex-year').val(),
-    cvv: $('#ex-cvv').val(),
-    address: {
-      postal_code: $('#ex-postal-code').val()
-    }
-  };
-
-  // Create credit card
-  balanced.card.create(payload, handleResponse);
-});
-
-$('#refreshing').hide();
-</script>
-{% endif %}
+   {% if request.user.is_authenticated %}
+      <script type="text/javascript" src="https://js.balancedpayments.com/1.1/balanced.js"></script>
+      <script src="{% static "js/app.js" %}" ></script>
+   {% endif %}
 {% endblock %}
