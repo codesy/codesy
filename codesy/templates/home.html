@@ -36,6 +36,8 @@
             <div id="signed-in" class="col-md-4">
                 <h2>2. Signed in. <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></h2>
                 <p>Welcome <img src="{{ gravatar_url }}"/> {{ request.user.username }}</p>
+                <input id="codesy_user_id" type="hidden" name="codesy_user_id" value="{{ request.user.id }}"/>
+                
                 <input id="api_token_pass" type="hidden" name="api_token_pass" value="{{ request.user.auth_token }}"/>
                 <a href="/accounts/logout/">Sign out</a>
             </div>
@@ -94,8 +96,8 @@
 {% endblock %}
 
 {% block scripts %}
-{% if request.user.is_authenticated %}
-<script type="text/javascript" src="https://js.balancedpayments.com/1.1/balanced.js"></script>
-<script src="{% static "js/app.js" %}" ></script>
-{% endif %}
+   {% if request.user.is_authenticated %}
+      <script type="text/javascript" src="https://js.balancedpayments.com/1.1/balanced.js"></script>
+      <script src="{% static "js/app.js" %}" ></script>
+   {% endif %}
 {% endblock %}
