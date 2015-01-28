@@ -1,46 +1,6 @@
 Development
 ===========
 
-The code for codesy's API backend combines:
-
-* `GitHub`_ Authentication (via `django-allauth`_)
-* `Balanced`_ payments (via `balanced.js`_)
-* codesy variation of `Nate Oostendorp`_'s "`Concurrent Sealed Bid Auction`_"
-  system and `CodePatron`_ concept.
-
-.. _GitHub: https://github.com/
-.. _django-allauth: https://github.com/pennersr/django-allauth
-.. _Balanced: https://www.balancedpayments.com/
-.. _Nate Oostendorp: http://oostendorp.net/
-.. _Concurrent Sealed Bid Auction: https://docs.google.com/document/d/1dKYFRTUU6FsX6V4PtWILwN3jkzxiQtbyFQXG75AA4jU/preview
-.. _CodePatron: https://docs.google.com/document/d/1fdTM7WqGzUtAN8Hd3aRfXR1mHcAG-WsH6JSwxOqcGqY/preview
-
-
-Resources
----------
-.. image:: https://travis-ci.org/codesy/codesy.png?branch=master
-   :target: https://travis-ci.org/codesy/codesy
-   :alt: Travis-CI Build Status
-.. image:: https://coveralls.io/repos/codesy/codesy/badge.png
-    :target: https://coveralls.io/r/codesy/codesy 
-.. image:: https://requires.io/github/codesy/codesy/requirements.png?branch=master
-   :target: https://requires.io/github/codesy/codesy/requirements/?branch=master
-   :alt: Requirements Status
-
-:Code:          https://github.com/codesy/codesy
-:License:       AGPLv3; see `LICENSE file
-                <https://github.com/codesy/codesy/blob/master/LICENSE>`_
-:Documentation: http://codesy.readthedocs.org/
-:Issues:        https://github.com/codesy/codesy/issues
-:IRC:           irc://irc.freenode.net/codesy
-:Mailing list:  https://groups.google.com/forum/#!forum/codesy-dev
-:Servers:       https://codesy-stage.herokuapp.com/ (stage)
-
-                https://api.codesy.io/ (prod)
-
-                `Request the next deployment`_
-
-
 Requirements
 ------------
 
@@ -172,6 +132,22 @@ Running the test suite is easy::
     ./manage.py test -s --noinput --logging-clear-handlers
 
 
+Working on Docs
+---------------
+Install dev requirements::
+
+    pip install -r requirements-dev.txt
+
+Building the docs is easy::
+
+    cd docs
+    sphinx-build . html
+
+Read the beautiful docs::
+
+    open html/index.html
+
+
 What to work on
 ---------------
 
@@ -182,86 +158,3 @@ If you are an active codesy user, we love getting pull requests that
 
 .. _Issues: https://github.com/codesy/codesy/issues
 .. _scratch your own itch: https://gettingreal.37signals.com/ch02_Whats_Your_Problem.php
-
-
-Deploy your own
----------------
-
-codesy is designed to run on `heroku`_, so you can easily deploy your changes
-to your own heroku app with `heroku toolbelt`_.
-
-#. `Create a heroku remote`_. We strongly suggest naming it codesy-`username`::
-
-    heroku apps:create codesy-username
-
-#. Set a ``DJANGO_SECRET_KEY`` on heroku that's unique to you.::
-
-    heroku config:set DJANGO_SECRET_KEY="username-birthdate"
-
-#. Set other required environment variables for heroku::
-
-    heroku config:set DJANGO_DEBUG=True
-    heroku config:set ACCOUNT_EMAIL_VERIFICATION=none
-    heroku config:set ACCOUNT_DEFAULT_HTTP_PROTOCOL='https'
-
-#. Push code to the heroku remote::
-
-    git push heroku master
-
-#. `Migrate`_ DB tables::
-
-    heroku run python manage.py migrate
-
-#. Create a superuser::
-
-    heroku run python manage.py createsuperuser
-
-#. To enable GitHub sign-ins on your heroku domain, use the following settings
-   to `register your own GitHub App`_:
-
-    * Application name: codesy-username
-    * Homepage URL: https://codesy-username.herokuapp.com/
-    * Application description: username's codesy
-    * Authorization callback URL: https://codesy-username.herokuapp.com/accounts/github/login/callback/
-
-   .. note:: You must use `https`
-
-#. Now go to https://codesy-username.herokuapp.com/admin/socialaccount/socialapp/add/
-   to `enable GitHub Auth`_ on *your heroku domain*, using *your* new GitHub App Client ID and Secret
-
-   .. note:: Remember to use `https`
-
-#. That's it. https://codesy-username.herokuapp.com/ should work.
-
-Read the Chrome Extension docs and the Firefox Add-on docs too learn how to
-configure them to use https://codesy-username.herokuapp.com.
-
-Deploying to production
------------------------
-
-We use `Travis CI for continuous deployment to Heroku`_. `Our .travis.yml`_
-defines the flow:
-
-#. Commits to ``master`` are tested `on Travis`_.
-
-#. If/when the build passes, the code is automatically deployed to
-   https://codesy-stage.herokuapp.com
-
-#. To deploy changes to production, a repo owner pushes a commit to the
-   ``production`` branch on GitHub.
-
-This means a production deployment is as easy as a Pull Request. Click here to
-`Request the next deployment`_ from master to production.
-
-.. _heroku toolbelt: https://toolbelt.heroku.com/
-.. _Create a heroku remote: https://devcenter.heroku.com/articles/git#creating-a-heroku-remote
-.. _register your own GitHub App: https://github.com/settings/applications/new
-.. _Travis CI for continuous deployment to Heroku: http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/
-.. _Our .travis.yml: https://github.com/codesy/codesy/blob/master/.travis.yml
-.. _on Travis: https://travis-ci.org/codesy/codesy
-
-.. _Migrate: https://docs.djangoproject.com/en/1.7/topics/migrations/
-.. _heroku: https://www.heroku.com/
-.. _git hooks: http://git-scm.com/book/en/Customizing-Git-Git-Hooks
-.. _balanced.js: https://github.com/balanced/balanced-js
-.. _Request the next deployment: https://github.com/codesy/codesy/compare/production...master?expand=1&title=%5Bdeploy%5D+Request
