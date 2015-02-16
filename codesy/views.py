@@ -29,7 +29,7 @@ class Home(TemplateView):
         ctx['gravatar_url'] = self.get_gravatar_url()
         browser = 'unknown'
         if (hasattr(self.request, 'META') and
-            'HTTP_USER_AGENT' in self.request.META):
+                'HTTP_USER_AGENT' in self.request.META):
             browser = self.get_browser()
         ctx['browser'] = browser
         return ctx
