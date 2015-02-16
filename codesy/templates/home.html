@@ -19,25 +19,31 @@
         <div class="row">
             <div class="install-step col-md-4">
                 <h2>1. Install. <span class="glyphicon glyphicon-chevron-right"></span></h2>
-                {# TODO: auto-detect browser and show proper image #}
-                <p>
+                {% if browser == 'chrome' %}
+                <p id="add-to-chrome">
                 <img src="{% static "img/chrome.png" %}" width="32" height="32"/> <a id="chrome-install-button" class="btn btn-lg btn-success" onclick="chrome.webstore.install()" role="button">Add to Chrome</a>
                 </p>
-                <p>
+                {% elif browser == 'firefox' %}
+                <p id="add-to-firefox">
                 <img src="{% static "img/firefox.png" %}" width="32" height="32"/> <a class="btn btn-lg btn-success" href="codesy.xpi" role="button">Add to Firefox</a>
                 </p>
+                {% else %}
+                <p id="unknown-browser">
+                Unknown browser. The codesy widget currently only works with Firefox and Chrome. We want to add it to others soon. Want to help? <a href="https://github.com/codesy">Catch us on GitHub</a>.
+                </p>
+                {% endif %}
             </div>
             <div class="installed col-md-4" hidden="true">
                <h2>1. Installed. <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></h2>
             </div>
-            
-            
+
+
             {% if request.user.is_authenticated %}
             <div id="signed-in" class="col-md-4">
                 <h2>2. Signed in. <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></h2>
                 <p>Welcome <img src="{{ gravatar_url }}"/> {{ request.user.username }}</p>
                 <input id="codesy_user_id" type="hidden" name="codesy_user_id" value="{{ request.user.id }}"/>
-                
+
                 <input id="api_token_pass" type="hidden" name="api_token_pass" value="{{ request.user.auth_token }}"/>
                 <a href="/accounts/logout/">Sign out</a>
             </div>
