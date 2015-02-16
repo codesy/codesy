@@ -36,6 +36,7 @@ class UserViewSetTest(TestCase):
 class HomeTest(TestCase):
     def setUp(self):
         self.view = views.Home()
+        self.view.request = fudge.Fake()
 
     def test_attrs(self):
         self.assertIsInstance(self.view, views.TemplateView)
@@ -52,11 +53,12 @@ class HomeTest(TestCase):
         self.assertEqual(
             context,
             {'super': 'context',
-             'gravatar_url': '//gravatar.com/stuff'})
+             'gravatar_url': '//gravatar.com/stuff',
+             'browser': 'unknown'})
 
     def test_get_gravatar_url(self):
         user = mommy.make(settings.AUTH_USER_MODEL, email='fake@email.com')
-        self.view.request = fudge.Fake().has_attr(user=user)
+        self.view.request.has_attr(user=user)
 
         url = self.view.get_gravatar_url()
 
@@ -67,8 +69,26 @@ class HomeTest(TestCase):
 
     def test_get_gravatar_url_anon_user(self):
         user = AnonymousUser()
-        self.view.request = fudge.Fake().has_attr(user=user)
+        self.view.request.has_attr(user=user)
 
         url = self.view.get_gravatar_url()
 
         self.assertEqual(url, '//www.gravatar.com/avatar/?s=40')
+
+    def test_get_browser(self):
+        self.view.request.has_attr(META={
+            'HTTP_USER_AGENT': 'Mozilla/5.0 '
+            '(Macintosh; Intel Mac OS X 10.10; rv:37.0) '
+            'Gecko/20100101 '
+            'Firefox/37.0'
+        })
+        self.assertEquals('firefox', self.view.get_browser())
+
+        self.view.request.has_attr(META={
+            'HTTP_USER_AGENT': 'Mozilla/5.0 '
+            '(Macintosh; Intel Mac OS X 10_10_2) '
+            'AppleWebKit/537.36 (KHTML, like Gecko) '
+            'Chrome/42.0.2300.2 '
+            'Safari/537.36'
+        })
+        self.assertEquals('chrome', self.view.get_browser())
