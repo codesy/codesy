@@ -7,8 +7,8 @@ django-cors-headers==1.0.0
 django-mailer==0.1.0
 django-toolbelt==0.0.1
 django-rest-swagger==0.2.8
-djangorestframework==3.0.3
-gunicorn==19.1.1
+djangorestframework==3.0.4
+gunicorn==19.2.0
 newrelic==2.42.0.35
 oauthlib==0.7.2
 psycopg2==2.5.4

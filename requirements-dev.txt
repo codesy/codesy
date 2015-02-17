@@ -1,4 +1,4 @@
 ipdb==0.8
-ipython==2.3.1
+ipython==2.4.0
 Sphinx==1.2.3
 sphinx_rtd_theme==0.1.6
