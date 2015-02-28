@@ -44,3 +44,24 @@ class Issue(models.Model):
     url = models.URLField(unique=True, db_index=True)
     state = models.CharField(max_length=255)
     last_fetched = models.DateTimeField(auto_now=True)
+
+
+class Claim(models.Model):
+    OPEN = 'OP'
+    ESCROW = 'ES'
+    PAID = 'PA'
+    REJECTED = 'RE'
+    STATUS_CHOICES = (
+        (None, ''),
+        (OPEN, 'Open'),
+        (ESCROW, 'Escrow'),
+        (PAID, 'Paid'),
+        (REJECTED, 'Rejected'),
+    )
+    issue = models.ForeignKey('Issue')
+    claimant = models.ForeignKey(settings.AUTH_USER_MODEL)
+    created = models.DateTimeField(null=True, blank=True)
+    modified = models.DateTimeField(null=True, blank=True, auto_now=True)
+    status = models.CharField(max_length=2,
+                              choices=STATUS_CHOICES,
+                              default=OPEN)
