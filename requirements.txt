@@ -8,8 +8,8 @@ django-mailer==0.1.0
 django-toolbelt==0.0.1
 django-rest-swagger==0.2.8
 djangorestframework==3.0.5
-gunicorn==19.2.0
-newrelic==2.42.0.35
+gunicorn==19.2.1
+newrelic==2.44.0.36
 oauthlib==0.7.2
 psycopg2==2.5.4
 pystache==0.5.4
