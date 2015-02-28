@@ -3,14 +3,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Bid
-from .serializers import BidSerializer
+from .models import Bid, Claim
+from .serializers import BidSerializer, ClaimSerializer
 
 
 class BidViewSet(ModelViewSet):
     """
-    API endpoint for bids. Users can only list, create, retrieve, update, or
-    delete their own bids.
+    API endpoint for bids. Users can only access their own bids.
     """
     queryset = Bid.objects.all()
     serializer_class = BidSerializer
@@ -44,3 +43,17 @@ class GetBid(APIView):
                          'url': url},
                         template_name='bid.html')
         return resp
+
+
+class ClaimViewSet(ModelViewSet):
+    """
+    API endpoint for claims. Users can only access their own claims.
+    """
+    queryset = Claim.objects.all()
+    serializer_class = ClaimSerializer
+
+    def pre_save(self, obj):
+        obj.claimant = self.request.user
+
+    def get_queryset(self):
+        return self.queryset.filter(claimant=self.request.user)
