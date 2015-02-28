@@ -11,10 +11,11 @@ from .serializers import UserSerializer
 
 class UserViewSet(ModelViewSet):
     """
-    API endpoint for bids. Users can only list, create, retrieve,
-    update, or delete their own bids.
+    API endpoint for users. Users can only list, create, retrieve,
+    update, or delete themself.
     """
     model = User
+    queryset = User.objects.all()
     serializer_class = UserSerializer
 
     def get_object(self, qs=None):
