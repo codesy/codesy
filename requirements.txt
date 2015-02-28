@@ -1,4 +1,4 @@
-Django==1.7.4
+Django==1.7.5
 PyGithub==1.25.2
 dj-database-url==0.3.0
 dj-static==0.0.6
@@ -15,7 +15,7 @@ psycopg2==2.5.4
 pystache==0.5.4
 python-decouple==2.3
 python-openid==2.2.5
-requests==2.5.1
+requests==2.5.3
 requests-oauthlib==0.4.2
 static==1.1.1
 wsgiref==0.1.2
