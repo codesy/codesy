@@ -1,38 +1,10 @@
+/* codesy site styles */
 .glyphicon-ok {
   color: #5CB85C;
 }
 
 iframe {
   margin-top: 20px;
-}
-
-/* override pure CSS list styling that breaks github lists */
-menu, ol, ul {
-  padding: 0 !important;
-}
-
-div#codesy_bid {
-  position: fixed;
-  bottom: .25em;
-  right: .25em;
-  width:25em;
-  border-style:ridge;
-  background: antiquewhite;
-}
-
-#codesy_bid_form fieldset input{
-  width: 10em;
-  heigth: .5em;
-  font-size: 80%;
-}
-
-#codesy_bid_form fieldset label{
-  font-size: 90%;
-}
-
-#codesy_bid_form #submit_bid{
-  width:48px;
-  font-size: 100% ;
 }
 
 .spin {
@@ -47,4 +19,24 @@ div#codesy_bid {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+
+/* codesy widget styles */
+
+/* override pure CSS list styling that breaks github lists */
+menu, ol, ul {
+  padding: 0 !important;
+}
+
+#codesy_widget {
+  position: fixed;
+  bottom: 2em;
+  right: .25em;
+  border-style:ridge;
+  background: antiquewhite;
+}
+
+#codesy_widget input[type="text"] {
+  min-height: 0;
 }
