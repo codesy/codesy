@@ -3,8 +3,11 @@ from rest_framework import serializers
 from .models import Bid, Claim
 
 
-class BidSerializer(serializers.HyperlinkedModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+class BidSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(
+        read_only=True,
+        default=serializers.CurrentUserDefault()
+    )
 
     class Meta:
         model = Bid
@@ -12,12 +15,13 @@ class BidSerializer(serializers.HyperlinkedModelSerializer):
         read_only_fields = ('id',)
 
 
-class ClaimSerializer(serializers.HyperlinkedModelSerializer):
-    claimant = serializers.HiddenField(
+class ClaimSerializer(serializers.ModelSerializer):
+    claimant = serializers.PrimaryKeyRelatedField(
+        read_only=True,
         default=serializers.CurrentUserDefault()
     )
 
     class Meta:
         model = Claim
-        fields = ('id', 'issue', 'claimant')
+        fields = ('id', 'issue', 'claimant', 'status')
         read_only_fields = ('id',)

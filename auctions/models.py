@@ -22,6 +22,9 @@ class Bid(models.Model):
     class Meta:
         unique_together = (("user", "url"),)
 
+    def __unicode__(self):
+        return u'%s bid on %s' % (self.user, self.url)
+
 
 @receiver(post_save, sender=Bid)
 def notify_matching_askers(sender, instance, **kwargs):
@@ -45,6 +48,9 @@ class Issue(models.Model):
     state = models.CharField(max_length=255)
     last_fetched = models.DateTimeField(auto_now=True)
 
+    def __unicode__(self):
+        return u'Issue for %s (%s)' % (self.url, self.state)
+
 
 class Claim(models.Model):
     OPEN = 'OP'
@@ -65,3 +71,8 @@ class Claim(models.Model):
     status = models.CharField(max_length=2,
                               choices=STATUS_CHOICES,
                               default=OPEN)
+
+    def __unicode__(self):
+        return u'%s claim on Issue %s (%s)' % (
+            self.claimant, self.issue.id, self.status
+        )
