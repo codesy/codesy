@@ -1,0 +1,7 @@
+      <form id="codesy_claim" class="pure-form pure-g" action="//{{current_site.domain}}{% url 'claim-list' %}" method="POST">
+          {% csrf_token %}
+          <fieldset>
+              <input name="issue" type="hidden" value="{{ issue.id }}" />
+              <input class="pure-button button-success" type="submit" value="Claim the payout for this issue" />
+          </fieldset>
+      </form>

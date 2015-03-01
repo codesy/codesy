@@ -39,14 +39,15 @@ class GetBid(APIView):
         url = self.request.QUERY_PARAMS.get('url')
         try:
             bid = Bid.objects.get(user=self.request.user, url=url)
-
-            try:
-                issue = Issue.objects.get(url=url)
-            except Issue.DoesNotExist:
-                issue = None
-
         except Bid.DoesNotExist:
             bid = None
+
+        # TODO: create Issues during initial bid to avoid this
+        try:
+            issue = Issue.objects.get(url=url)
+        except Issue.DoesNotExist:
+            issue = None
+
         resp = Response({'bid': bid,
                          'issue': issue,
                          'url': url},
@@ -69,3 +70,33 @@ class ClaimViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(created=datetime.now())
+
+
+class ConfirmClaim(APIView):
+    """
+    API endpoint for a form to create a claim for an issue.
+
+    Requests for /claims/confirm?bid= will receive the HTML form for creating a
+    claim for the issue associated with the bid.
+
+    bid -- id of bid on the issue being claimed
+    """
+    renderer_classes = (TemplateHTMLRenderer,)
+
+    def get(self, request, format=None):
+        bid_id = self.request.QUERY_PARAMS.get('bid')
+        try:
+            bid = Bid.objects.get(id=bid_id)
+        except Bid.DoesNotExist:
+            bid = None
+
+        # TODO: create Issues during initial bid to avoid this
+        try:
+            issue = Issue.objects.get(bid__id=bid_id)
+        except Issue.DoesNotExist:
+            issue = None
+
+        resp = Response({'bid': bid,
+                         'issue': issue},
+                        template_name='confirm_claim.html')
+        return resp
