@@ -1,9 +1,11 @@
+from datetime import datetime
+
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Bid, Claim
+from .models import Bid, Claim, Issue
 from .serializers import BidSerializer, ClaimSerializer
 
 
@@ -37,9 +39,16 @@ class GetBid(APIView):
         url = self.request.QUERY_PARAMS.get('url')
         try:
             bid = Bid.objects.get(user=self.request.user, url=url)
+
+            try:
+                issue = Issue.objects.get(url=url)
+            except Issue.DoesNotExist:
+                issue = None
+
         except Bid.DoesNotExist:
             bid = None
         resp = Response({'bid': bid,
+                         'issue': issue,
                          'url': url},
                         template_name='bid.html')
         return resp
@@ -57,3 +66,6 @@ class ClaimViewSet(ModelViewSet):
 
     def get_queryset(self):
         return self.queryset.filter(claimant=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(created=datetime.now())

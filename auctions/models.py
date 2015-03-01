@@ -72,6 +72,9 @@ class Claim(models.Model):
                               choices=STATUS_CHOICES,
                               default=OPEN)
 
+    class Meta:
+        unique_together = (("claimant", "issue"),)
+
     def __unicode__(self):
         return u'%s claim on Issue %s (%s)' % (
             self.claimant, self.issue.id, self.status

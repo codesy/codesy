@@ -32,4 +32,12 @@
               </div>
          </fieldset>
       </form>
+      {% if issue %}
+      <form action="//{{current_site.domain}}{% url 'claim-list' %}" method="POST">
+          <fieldset>
+              <input name="issue" type="hidden" value="{{ issue.id }}" />
+              <input class="pure-button button-success" type="submit" value="Claim" />
+          </fieldset>
+      </form>
+      {% endif %}
 {% endblock %}
