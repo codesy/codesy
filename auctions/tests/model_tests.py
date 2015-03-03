@@ -1,8 +1,10 @@
 from datetime import datetime
 
 import fudge
+from fudge.inspector import arg
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from model_mommy import mommy
@@ -33,19 +35,20 @@ class NotifyMatchersReceiverTest(TestCase):
 
         mock_send_mail.expects_call().with_args(
             self._add_url('[codesy] Your ask for 50 for {url} has been met'),
-            self._add_url('Bidders have met your asking price for {url}.'),
-            settings.DEFAULT_FROM_EMAIL,
+            arg.any(),
+            arg.any(),
             ['user1@test.com']
         )
         mock_send_mail.next_call().with_args(
             self._add_url('[codesy] Your ask for 100 for {url} has been met'),
-            self._add_url('Bidders have met your asking price for {url}.'),
-            settings.DEFAULT_FROM_EMAIL,
+            arg.any(),
+            arg.any(),
             ['user2@test.com']
         )
 
         offer_bid = mommy.prepare(
-            'auctions.Bid', offer=100, user=user, ask=1000, url=self.url)
+            'auctions.Bid', offer=100, user=user, ask=1000, url=self.url
+        )
         offer_bid.save()
 
     @fudge.patch('auctions.models.send_mail')
@@ -56,11 +59,35 @@ class NotifyMatchersReceiverTest(TestCase):
 
         mock_send_mail.expects_call().with_args(
             self._add_url('[codesy] Your ask for 100 for {url} has been met'),
-            self._add_url('Bidders have met your asking price for {url}.'),
-            settings.DEFAULT_FROM_EMAIL,
+            arg.any(),
+            arg.any(),
             ['user2@test.com']
         )
 
         offer_bid = mommy.prepare(
-            'auctions.Bid', offer=100, user=user, ask=1000, url=self.url)
+            'auctions.Bid', offer=100, user=user, ask=1000, url=self.url
+        )
+        offer_bid.save()
+
+    @fudge.patch('auctions.models.send_mail')
+    def test_mail_contains_claim_by_bid_url(self, mock_send_mail):
+        user = mommy.make(settings.AUTH_USER_MODEL)
+        self.bid1.ask_match_sent = datetime.now()
+        self.bid1.save()
+
+        offer_bid = mommy.prepare(
+            'auctions.Bid', offer=100, user=user, ask=1000, url=self.url
+        )
+
+        # TODO: replace hard-coded bid id with offer_bid.id
+        mock_send_mail.expects_call().with_args(
+            arg.any(),
+            arg.contains(reverse(
+                'custom-urls:claim-by-bid',
+                kwargs={'bid': 2}
+            )),
+            arg.any(),
+            ['user2@test.com']
+        )
+
         offer_bid.save()

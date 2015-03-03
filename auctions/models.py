@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from django.conf import settings
+from django.contrib.sites.models import Site
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Sum
 from django.db.models.signals import post_save
@@ -28,15 +30,33 @@ class Bid(models.Model):
 
 @receiver(post_save, sender=Bid)
 def notify_matching_askers(sender, instance, **kwargs):
+    # TODO: make a nicer HTML email template
+    NOTIFICATION_EMAIL_STRING = """
+    Bidders have met your asking price for {url}.
+
+    If you fix the issue, you may claim the payout here:
+    https://{site}{claim_confirm_link}
+    """
+
     issue_bids = Bid.objects.filter(url=instance.url).aggregate(Sum('offer'))
     met_asks = (Bid.objects.filter(url=instance.url,
                                    ask__lte=issue_bids['offer__sum'],
                                    ask_match_sent=None)
                            .exclude(ask__lte=0))
+    current_site = Site.objects.get_current()
     for bid in met_asks:
-        send_mail("[codesy] Your ask for %(ask)d for %(url)s has been met" % (
-            {'ask': bid.ask, 'url': bid.url}),
-            "Bidders have met your asking price for %s." % bid.url,
+        send_mail(
+            "[codesy] Your ask for %(ask)d for %(url)s has been met" %
+            (
+                {'ask': bid.ask, 'url': bid.url}
+            ),
+            NOTIFICATION_EMAIL_STRING.format(
+                url=bid.url,
+                site=current_site,
+                claim_confirm_link=reverse(
+                    'custom-urls:claim-by-bid', kwargs={'bid': bid.id}
+                )
+            ),
             settings.DEFAULT_FROM_EMAIL,
             [bid.user.email])
         # use .update to avoid recursive signal processing
