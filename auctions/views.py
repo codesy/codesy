@@ -84,17 +84,18 @@ class ConfirmClaim(APIView):
     renderer_classes = (TemplateHTMLRenderer,)
 
     def get(self, request, format=None):
+        bid = None
+        issue = None
         bid_id = self.request.QUERY_PARAMS.get('bid')
         try:
             bid = Bid.objects.get(id=bid_id)
+            # TODO: create Issues during initial bid to avoid this
+            try:
+                issue = Issue.objects.get(url=bid.url)
+            except Issue.DoesNotExist:
+                issue = None
         except Bid.DoesNotExist:
             bid = None
-
-        # TODO: create Issues during initial bid to avoid this
-        try:
-            issue = Issue.objects.get(bid__id=bid_id)
-        except Issue.DoesNotExist:
-            issue = None
 
         resp = Response({'bid': bid,
                          'issue': issue},
