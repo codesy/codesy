@@ -1,16 +1,17 @@
+from datetime import datetime
+
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Bid
-from .serializers import BidSerializer
+from .models import Bid, Claim, Issue
+from .serializers import BidSerializer, ClaimSerializer
 
 
 class BidViewSet(ModelViewSet):
     """
-    API endpoint for bids. Users can only list, create, retrieve, update, or
-    delete their own bids.
+    API endpoint for bids. Users can only access their own bids.
     """
     queryset = Bid.objects.all()
     serializer_class = BidSerializer
@@ -40,7 +41,63 @@ class GetBid(APIView):
             bid = Bid.objects.get(user=self.request.user, url=url)
         except Bid.DoesNotExist:
             bid = None
+
+        # TODO: create Issues during initial bid to avoid this
+        try:
+            issue = Issue.objects.get(url=url)
+        except Issue.DoesNotExist:
+            issue = None
+
         resp = Response({'bid': bid,
+                         'issue': issue,
                          'url': url},
                         template_name='bid.html')
+        return resp
+
+
+class ClaimViewSet(ModelViewSet):
+    """
+    API endpoint for claims. Users can only access their own claims.
+    """
+    queryset = Claim.objects.all()
+    serializer_class = ClaimSerializer
+
+    def pre_save(self, obj):
+        obj.claimant = self.request.user
+
+    def get_queryset(self):
+        return self.queryset.filter(claimant=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(created=datetime.now())
+
+
+class ConfirmClaim(APIView):
+    """
+    API endpoint for a form to create a claim for an issue.
+
+    Requests for /claims/confirm?bid= will receive the HTML form for creating a
+    claim for the issue associated with the bid.
+
+    bid -- id of bid on the issue being claimed
+    """
+    renderer_classes = (TemplateHTMLRenderer,)
+
+    def get(self, request, format=None):
+        bid = None
+        issue = None
+        bid_id = self.request.QUERY_PARAMS.get('bid')
+        try:
+            bid = Bid.objects.get(id=bid_id)
+            # TODO: create Issues during initial bid to avoid this
+            try:
+                issue = Issue.objects.get(url=bid.url)
+            except Issue.DoesNotExist:
+                issue = None
+        except Bid.DoesNotExist:
+            bid = None
+
+        resp = Response({'bid': bid,
+                         'issue': issue},
+                        template_name='confirm_claim.html')
         return resp

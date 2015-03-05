@@ -11,9 +11,24 @@ class BidSerializerTest(TestCase):
     def test_attrs(self):
         self.assertIsInstance(
             self.serializer,
-            rest_framework.serializers.HyperlinkedModelSerializer)
+            rest_framework.serializers.ModelSerializer)
         self.assertEqual(self.serializer.Meta.model, models.Bid)
         self.assertSequenceEqual(
             self.serializer.Meta.fields, ('id', 'user', 'url', 'ask', 'offer'))
+        self.assertSequenceEqual(
+            self.serializer.Meta.read_only_fields, ('id',))
+
+
+class ClaimSerializerTest(TestCase):
+    def setUp(self):
+        self.serializer = serializers.ClaimSerializer()
+
+    def test_attrs(self):
+        self.assertIsInstance(
+            self.serializer,
+            rest_framework.serializers.ModelSerializer)
+        self.assertEqual(self.serializer.Meta.model, models.Claim)
+        self.assertSequenceEqual(
+            self.serializer.Meta.fields, ('id', 'issue', 'claimant', 'status'))
         self.assertSequenceEqual(
             self.serializer.Meta.read_only_fields, ('id',))
