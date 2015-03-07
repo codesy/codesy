@@ -23,6 +23,13 @@ class BidViewSet(ModelViewSet):
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
 
+    def perform_create(self, serializer):
+        bid = serializer.save()
+        Issue.objects.get_or_create(
+            url=bid.url,
+            defaults={'state': 'open', 'last_fetched': None}
+        )
+
 
 class GetBid(APIView):
     """
@@ -37,16 +44,13 @@ class GetBid(APIView):
 
     def get(self, request, format=None):
         url = self.request.QUERY_PARAMS.get('url')
+        bid = None
+        issue = None
         try:
             bid = Bid.objects.get(user=self.request.user, url=url)
+            issue = Issue.objects.get(url=url)
         except Bid.DoesNotExist:
             bid = None
-
-        # TODO: create Issues during initial bid to avoid this
-        try:
-            issue = Issue.objects.get(url=url)
-        except Issue.DoesNotExist:
-            issue = None
 
         resp = Response({'bid': bid,
                          'issue': issue,
@@ -89,11 +93,7 @@ class ConfirmClaim(APIView):
         bid_id = self.request.QUERY_PARAMS.get('bid')
         try:
             bid = Bid.objects.get(id=bid_id)
-            # TODO: create Issues during initial bid to avoid this
-            try:
-                issue = Issue.objects.get(url=bid.url)
-            except Issue.DoesNotExist:
-                issue = None
+            issue = Issue.objects.get(url=bid.url)
         except Bid.DoesNotExist:
             bid = None
 
