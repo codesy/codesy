@@ -25,10 +25,12 @@ class BidViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         bid = serializer.save()
-        Issue.objects.get_or_create(
+        issue, created = Issue.objects.get_or_create(
             url=bid.url,
             defaults={'state': 'open', 'last_fetched': None}
         )
+        bid.issue = issue
+        bid.save()
 
 
 class GetBid(APIView):
@@ -45,15 +47,21 @@ class GetBid(APIView):
     def get(self, request, format=None):
         url = self.request.QUERY_PARAMS.get('url')
         bid = None
-        issue = None
+        claim = None
         try:
             bid = Bid.objects.get(user=self.request.user, url=url)
-            issue = Issue.objects.get(url=url)
         except Bid.DoesNotExist:
-            bid = None
+            pass
+        else:
+            try:
+                claim = Claim.objects.get(
+                    claimant=self.request.user, issue=bid.issue
+                )
+            except Claim.DoesNotExist:
+                pass
 
         resp = Response({'bid': bid,
-                         'issue': issue,
+                         'claim': claim,
                          'url': url},
                         template_name='bid.html')
         return resp

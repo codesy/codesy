@@ -13,9 +13,9 @@ from auctions import models, serializers, views
 def _make_test_bid():
     user = mommy.make(settings.AUTH_USER_MODEL)
     url = 'http://gh.com/project'
-    bid = mommy.make('auctions.Bid', user=user, url=url)
     issue = mommy.make('auctions.Issue', url=url)
-    return user, url, bid, issue
+    bid = mommy.make('auctions.Bid', user=user, url=url, issue=issue)
+    return user, url, bid
 
 
 def _make_test_claim():
@@ -39,7 +39,7 @@ class BidViewSetTest(TestCase):
             self.viewset.serializer_class, serializers.BidSerializer)
 
     def test_pre_save_sets_user_to_request_user(self):
-        user, url, bid, issue = _make_test_bid()
+        user, url, bid = _make_test_bid()
         self.viewset.request = fudge.Fake().has_attr(user=user)
 
         self.viewset.pre_save(bid)
@@ -47,7 +47,7 @@ class BidViewSetTest(TestCase):
         self.assertEqual(bid.user, user)
 
     def test_get_queryset_filters_by_request_user(self):
-        user1, url, bid1, issue1 = _make_test_bid()
+        user1, url, bid1 = _make_test_bid()
         user2 = mommy.make(settings.AUTH_USER_MODEL)
         mommy.make('auctions.Bid', user=user2)
         mommy.make('auctions.Bid', user=user2)
@@ -63,7 +63,13 @@ class BidViewSetTest(TestCase):
     def test_perform_create_creates_Issue(self):
         url = 'https://github.com/example/project/issue/7'
         fake_serializer = fudge.Fake("serializers.BidSerializer")
-        fake_serializer.expects('save').returns_fake().has_attr(url=url)
+        (
+            fake_serializer
+            .expects('save')
+            .returns_fake()
+            .has_attr(url=url)
+            .expects('save')
+        )
         self.viewset.perform_create(fake_serializer)
         # the Issue should be available
         models.Issue.objects.get(url=url)
@@ -82,11 +88,11 @@ class GetBidTest(TestCase):
 
     @fudge.patch('auctions.views.Response')
     def test_get_existant_bid(self, mock_resp):
-        user, url, bid, issue = _make_test_bid()
+        user, url, bid = _make_test_bid()
         self.view.request = fudge.Fake().has_attr(
             user=user, QUERY_PARAMS={'url': url})
         mock_resp.expects_call().with_args(
-            {'bid': bid, 'url': url, 'issue': issue}, template_name='bid.html')
+            {'bid': bid, 'url': url, 'claim': None}, template_name='bid.html')
 
         self.view.get(self.view.request)
 
@@ -99,7 +105,18 @@ class GetBidTest(TestCase):
         self.view.request = fudge.Fake().has_attr(
             user=user, QUERY_PARAMS={'url': url})
         mock_resp.expects_call().with_args(
-            {'bid': None, 'url': url, 'issue': None}, template_name='bid.html')
+            {'bid': None, 'url': url, 'claim': None}, template_name='bid.html')
+
+        self.view.get(self.view.request)
+
+    @fudge.patch('auctions.views.Response')
+    def test_get_existant_bid_with_claim(self, mock_resp):
+        user, url, bid = _make_test_bid()
+        claim = mommy.make('auctions.Claim', issue=bid.issue, claimant=user)
+        self.view.request = fudge.Fake().has_attr(
+            user=user, QUERY_PARAMS={'url': url})
+        mock_resp.expects_call().with_args(
+            {'bid': bid, 'url': url, 'claim': claim}, template_name='bid.html')
 
         self.view.get(self.view.request)
 
@@ -157,12 +174,12 @@ class ConfirmClaimTest(TestCase):
 
     @fudge.patch('auctions.views.Response')
     def test_get_existant_bid_returns_confirm_claim_form(self, mock_resp):
-        user, url, bid, issue = _make_test_bid()
+        user, url, bid = _make_test_bid()
         self.view.request = fudge.Fake().has_attr(
             QUERY_PARAMS={'bid': bid.id}
         )
         mock_resp.expects_call().with_args(
-            {'bid': bid, 'issue': issue},
+            {'bid': bid, 'issue': bid.issue},
             template_name='confirm_claim.html'
         )
 
