@@ -11,7 +11,7 @@ djangorestframework==3.0.5
 gunicorn==19.2.1
 newrelic==2.44.0.36
 oauthlib==0.7.2
-psycopg2==2.5.4
+psycopg2==2.6
 pystache==0.5.4
 python-decouple==2.3
 python-openid==2.2.5
