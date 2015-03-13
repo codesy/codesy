@@ -30,6 +30,16 @@ class NotifyMatchersReceiverTest(TestCase):
         return string.format(url=self.url)
 
     @fudge.patch('auctions.models.send_mail')
+    def test_dont_email_self_when_offering_more_than_ask(self, mock_send_mail):
+        mock_send_mail.is_callable().times_called(0)
+        user = mommy.make(settings.AUTH_USER_MODEL)
+        url = 'https://github.com/codesy/codesy/issues/149'
+        offer_bid = mommy.prepare(
+            'auctions.Bid', user=user, url=url, offer=100, ask=10
+        )
+        offer_bid.save()
+
+    @fudge.patch('auctions.models.send_mail')
     def test_send_mail_to_matching_askers(self, mock_send_mail):
         user = mommy.make(settings.AUTH_USER_MODEL)
 
