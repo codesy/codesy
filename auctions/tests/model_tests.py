@@ -85,19 +85,16 @@ class NotifyMatchersReceiverTest(TestCase):
         self.bid1.ask_match_sent = datetime.now()
         self.bid1.save()
 
-        offer_bid = mommy.prepare(
-            'auctions.Bid', offer=100, user=user, ask=1000, url=self.url
-        )
-
-        # TODO: replace hard-coded bid id with offer_bid.id
         mock_send_mail.expects_call().with_args(
             arg.any(),
             arg.contains(reverse(
                 'custom-urls:claim-by-bid',
-                kwargs={'bid': 2}
+                kwargs={'bid': self.bid2.id}
             )),
             arg.any(),
             ['user2@test.com']
         )
 
-        offer_bid.save()
+        mommy.make(
+            'auctions.Bid', offer=100, user=user, ask=1000, url=self.url
+        )
