@@ -1,5 +1,7 @@
 {% extends "base_widget.html" %}
 {% block widget_content %}
+  {% if bid.issue and bid.issue.state = 'closed' %}
+  {% else %}
       <form id="codesy_bid" class="pure-form pure-g"
          {% if bid %}
             action = "//{{current_site.domain}}{% url 'bid-detail' bid.id %}" method="POST" >
@@ -37,6 +39,7 @@
             </div>
          </fieldset>
       </form>
+  {% endif %}
         {% if bid.issue %}
             {% include "includes/claim_form.html" %}
         {% endif %}
