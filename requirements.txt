@@ -15,7 +15,7 @@ psycopg2==2.6
 pystache==0.5.4
 python-decouple==2.3
 python-openid==2.2.5
-requests==2.5.3
+requests==2.6.0
 requests-oauthlib==0.4.2
 static==1.1.1
 wsgiref==0.1.2
