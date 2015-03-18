@@ -17,7 +17,6 @@ class BidViewSet(ModelViewSet):
     serializer_class = BidSerializer
 
     def pre_save(self, obj):
-        # TODO: authorize the user's credit card via balanced
         obj.user = self.request.user
 
     def get_queryset(self):
