@@ -99,9 +99,11 @@ class Claim(models.Model):
         (REJECTED, 'Rejected'),
     )
     issue = models.ForeignKey('Issue')
+    # TODO: rename Claim.claimant to Claim.user
     claimant = models.ForeignKey(settings.AUTH_USER_MODEL)
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True, auto_now=True)
+    evidence = models.URLField(blank=True)
     status = models.CharField(max_length=2,
                               choices=STATUS_CHOICES,
                               default=OPEN)
