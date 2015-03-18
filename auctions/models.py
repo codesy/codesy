@@ -27,6 +27,17 @@ class Bid(models.Model):
     def __unicode__(self):
         return u'%s bid on %s' % (self.user, self.url)
 
+    def ask_met(self):
+        other_bids = Bid.objects.filter(
+            url=self.url
+        ).exclude(
+            user=self.user
+        ).aggregate(
+            Sum('offer')
+        )
+
+        return other_bids['offer__sum'] >= self.ask
+
 
 @receiver(post_save, sender=Bid)
 def notify_matching_askers(sender, instance, **kwargs):
@@ -47,15 +58,7 @@ def notify_matching_askers(sender, instance, **kwargs):
     )
 
     for bid in unnotified_asks:
-        other_bids = Bid.objects.filter(
-            url=bid.url
-        ).exclude(
-            user=bid.user
-        ).aggregate(
-            Sum('offer')
-        )
-
-        if other_bids['offer__sum'] >= bid.ask:
+        if bid.ask_met():
             send_mail(
                 "[codesy] Your ask for %(ask)d for %(url)s has been met" %
                 (
