@@ -5,7 +5,13 @@
           {% csrf_token %}
           <fieldset>
               <input name="issue" type="hidden" value="{{ bid.issue.id }}" />
+              <p>
+              <label for="evidence">Evidence (URL):</label><br/>
+              <input name="evidence" type="text" />
+              </p>
+              <p>
               <input class="pure-button button-success" type="submit" value="Claim the payout for this issue" />
+              </p>
           </fieldset>
       </form>
 {% endif %}
