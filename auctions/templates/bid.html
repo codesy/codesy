@@ -5,7 +5,7 @@
       Your ask for {{ bid.ask }} has been met.
     {% endif %}
   {% else %}
-      <form id="codesy_bid" class="pure-form pure-g"
+      <form id="codesy_bid" class="pure-form pure-form-stacked"
          {% if bid %}
             action = "//{{current_site.domain}}{% url 'bid-detail' bid.id %}" method="POST" >
             <input name="_method" type="hidden" value="PUT" />
@@ -14,31 +14,24 @@
          {% endif %}
          <input name="url" type="hidden" value="{{ url }}"></input>
          <fieldset>
-            <div class="pure-u-2-5">
+            <div class="pure-group">
                <label for="ask">Asking</label>
-            </div>
-            <div class="pure-u-2-5">
-               <label for="offer">Offering</label>
-            </div>
-            <div class="pure-u-1-5"></div>
-            <div class="pure-u-2-5">
-               <input name="ask"
+               <input id="ask"
                       class="pure-input"
                       type="text"
                       placeholder="What you'd want."
                       value="{{ bid.ask }}">
-               </input>
             </div>
-            <div class="pure-u-2-5">
-               <input name="offer"
+            <div class="pure-group">
+               <label for="offer">Offering</label>
+               <input id="offer"
                       class="pure-input"
                       type="text"
                       placeholder="What you'd pay."
                       value="{{ bid.offer }}">
-               </input>
             </div>
-            <div class="pure-u-1-5">
-                <input id="submit_bid" class="pure-button pure-button-primary" type="submit" value="Bid" />
+            <div class="pure-controls">
+               <input id="submit_bid" class="pure-button pure-button-primary" type="submit" value="Bid" />
             </div>
          </fieldset>
       </form>
