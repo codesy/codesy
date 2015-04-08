@@ -30,13 +30,18 @@ menu, ol, ul {
 }
 
 #codesy_widget {
+  max-width:200px;
   position: fixed;
-  bottom: 2em;
+  bottom: .25em;
   right: .25em;
   border-style:ridge;
+  padding:1%;
   background: antiquewhite;
 }
 
+#codesy_widget img{
+  max-width: 50%;
+}
 #codesy_widget input[type="text"] {
   min-height: 0;
 }
