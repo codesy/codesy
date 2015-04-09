@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{% block description %}codesy is a pay-what-you-want market for the open source community where we can tip each other to fix important bugs.{% endblock %}">
     <title>{% if request.user.is_authenticated %}{{ request.user.username }} | {% endif %}codesy.io</title>
     <link rel="shortcut icon" href="{% static "img/favicon.png" %}">
 
