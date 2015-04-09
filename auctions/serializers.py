@@ -23,5 +23,5 @@ class ClaimSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Claim
-        fields = ('id', 'issue', 'claimant', 'status')
+        fields = ('id', 'issue', 'claimant', 'evidence', 'status')
         read_only_fields = ('id',)

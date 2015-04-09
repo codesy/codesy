@@ -30,6 +30,16 @@ class NotifyMatchersReceiverTest(TestCase):
         return string.format(url=self.url)
 
     @fudge.patch('auctions.models.send_mail')
+    def test_dont_email_self_when_offering_more_than_ask(self, mock_send_mail):
+        mock_send_mail.is_callable().times_called(0)
+        user = mommy.make(settings.AUTH_USER_MODEL)
+        url = 'https://github.com/codesy/codesy/issues/149'
+        offer_bid = mommy.prepare(
+            'auctions.Bid', user=user, url=url, offer=100, ask=10
+        )
+        offer_bid.save()
+
+    @fudge.patch('auctions.models.send_mail')
     def test_send_mail_to_matching_askers(self, mock_send_mail):
         user = mommy.make(settings.AUTH_USER_MODEL)
 
@@ -75,19 +85,16 @@ class NotifyMatchersReceiverTest(TestCase):
         self.bid1.ask_match_sent = datetime.now()
         self.bid1.save()
 
-        offer_bid = mommy.prepare(
-            'auctions.Bid', offer=100, user=user, ask=1000, url=self.url
-        )
-
-        # TODO: replace hard-coded bid id with offer_bid.id
         mock_send_mail.expects_call().with_args(
             arg.any(),
             arg.contains(reverse(
                 'custom-urls:claim-by-bid',
-                kwargs={'bid': 2}
+                kwargs={'bid': self.bid2.id}
             )),
             arg.any(),
             ['user2@test.com']
         )
 
-        offer_bid.save()
+        mommy.make(
+            'auctions.Bid', offer=100, user=user, ask=1000, url=self.url
+        )
