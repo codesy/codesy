@@ -67,12 +67,12 @@ def notify_matching_askers(sender, instance, **kwargs):
                 NOTIFICATION_EMAIL_STRING.format(
                     url=bid.url,
                     site=current_site,
-                    claim_confirm_link=reverse(
-                        'custom-urls:claim-by-bid', kwargs={'bid': bid.id}
-                    )
+                    claim_confirm_link=reverse('custom-urls:claim-by-bid')
+                    + '?bid=%s' % bid.id
                 ),
                 settings.DEFAULT_FROM_EMAIL,
-                [bid.user.email])
+                [bid.user.email]
+            )
             # use .update to avoid recursive signal processing
             Bid.objects.filter(id=bid.id).update(ask_match_sent=datetime.now())
 
