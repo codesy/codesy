@@ -10,7 +10,7 @@ django-rest-swagger==0.3.2
 djangorestframework==3.1.3
 gunicorn==19.3.0
 newrelic==2.52.0.40
-oauthlib==0.7.2
+oauthlib==1.0.3
 psycopg2==2.6.1
 pystache==0.5.4
 python-decouple==2.3
