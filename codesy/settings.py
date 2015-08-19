@@ -21,10 +21,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('DJANGO_SECRET_KEY')
+SECRET_KEY = config('SECRET_KEY', default='terrible-secret-for-travis')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DJANGO_DEBUG', cast=bool)
+DEBUG = config('DJANGO_DEBUG', default=False, cast=bool)
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -77,8 +77,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.contrib.auth.context_processors.auth',
     'django.contrib.messages.context_processors.messages',
-    'allauth.account.context_processors.account',
-    'allauth.socialaccount.context_processors.socialaccount',
 )
 
 TEMPLATE_DIRS = (
@@ -97,7 +95,7 @@ ACCOUNT_EMAIL_VERIFICATION = config('ACCOUNT_EMAIL_VERIFICATION',
 AUTH_USER_MODEL = 'base.User'
 # OAuth2View uses this for the callback_url protocol
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = config(
-    'ACCOUNT_DEFAULT_HTTP_PROTOCOL', 'http')
+    'ACCOUNT_DEFAULT_HTTP_PROTOCOL', default='http')
 LOGIN_REDIRECT_URL = '/'
 SOCIALACCOUNT_ADAPTER = 'codesy.adapters.CodesySocialAccountAdapter'
 SOCIALACCOUNT_QUERY_EMAIL = True
@@ -111,7 +109,10 @@ ROOT_URLCONF = 'codesy.urls'
 
 WSGI_APPLICATION = 'codesy.wsgi.application'
 
-DATABASES = {'default': config('DATABASE_URL', cast=dj_database_url.parse)}
+DATABASES = {'default': config(
+    'DATABASE_URL',
+    default="postgres://postgres@localhost:5432/codesy",
+    cast=dj_database_url.parse)}
 
 
 # Internationalization

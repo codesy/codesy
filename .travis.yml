@@ -1,12 +1,28 @@
+sudo: false
+
+branches:
+    only:
+        master
+
+cache:
+    directories:
+        - $HOME/.cache/pip
+
 language: python
 
 addons:
     postgresql: '9.3'
 
 env:
-    - TOXENV=py27 DATABASE_URL=postgres://postgres@localhost:5432/codesy DJANGO_SECRET_KEY=terrible-awful-secret-only-for-travis DJANGO_DEBUG=True TEST_RUNNER="django_nose.NoseTestSuiteRunner"
-    - TOXENV=style
-    - TOXENV=docs
+    global:
+        - DATABASE_URL="postgres://postgres@localhost:5432/codesy"
+        - SECRET_KEY="terrible-awful-secret-only-for-travis"
+        - DJANGO_DEBUG="True"
+        - TEST_RUNNER="django_nose.NoseTestSuiteRunner"
+    matrix:
+        - TOXENV=py27
+        - TOXENV=style
+        - TOXENV=docs
 
 install:
     - pip install tox

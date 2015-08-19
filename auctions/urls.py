@@ -13,7 +13,7 @@ custom_endpoint_url_patterns = patterns(
     '',
     url(r'^bid/', views.GetBid.as_view()),
     url(
-        r'^claim/confirmation\?bid=(?P<bid>\d+)$',
+        r'^claim/confirmation',
         views.ConfirmClaim.as_view(),
         name="claim-by-bid"
     ),

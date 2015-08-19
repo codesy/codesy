@@ -87,10 +87,8 @@ class NotifyMatchersReceiverTest(TestCase):
 
         mock_send_mail.expects_call().with_args(
             arg.any(),
-            arg.contains(reverse(
-                'custom-urls:claim-by-bid',
-                kwargs={'bid': self.bid2.id}
-            )),
+            arg.contains(reverse('custom-urls:claim-by-bid')
+                         + '?bid=%s' % self.bid2.id),
             arg.any(),
             ['user2@test.com']
         )
