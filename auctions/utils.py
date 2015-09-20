@@ -5,7 +5,7 @@ from datetime import timedelta
 from django.utils import timezone
 
 from decouple import config
-from github import Github
+from github import Github, UnknownObjectException
 
 from .models import Bid, Issue
 
@@ -18,13 +18,18 @@ def github_client():
                   client_secret=config('GITHUB_CLIENT_SECRET'))
 
 
-def issue_state(url):
+def issue_state(url, gh_client):
     match = GITHUB_ISSUE_RE.match(url)
     if match:
         repo_name, issue_id = match.groups()
-        repo = github_client().get_repo(repo_name)
-        issue = repo.get_issue(int(issue_id))
-        return issue.state
+        try:
+            repo = gh_client.get_repo(repo_name)
+            issue = repo.get_issue(int(issue_id))
+        except UnknownObjectException:
+            # TODO: log this exception somewhere
+            pass
+        else:
+            return issue.state
 
 
 def update(instance, **kwargs):
@@ -46,7 +51,8 @@ def update_bid_issues():
 
 def update_issue_states(since=None):
     since = since or timezone.now() - timedelta(days=1)
+    gh_client = github_client()
     for issue in Issue.objects.filter(last_fetched__lt=since):
-        state = issue_state(issue.url)
+        state = issue_state(issue.url, gh_client)
         if state:
             update(issue, last_fetched=datetime.now(), state=state)

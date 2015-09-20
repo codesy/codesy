@@ -1,0 +1,15 @@
+{
+  "name": "Codesy",
+  "description": "Ppay-what-you-want market for the open source community to encourage coders to fix important bugs.",
+  "keywords": [
+    "open source"
+  ],
+  "website": "https://codesy.io",
+  "repository": "https://github.com/codesy/codesy",
+  "logo": "http://codesy.io/img/codesy_300dpi_323x80.png",
+  "success_url": "/",
+  "scripts": {
+    "postdeploy": "python manage.py migrate"
+  },
+  "image": "heroku/python"
+}
