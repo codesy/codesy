@@ -1,6 +1,8 @@
 $(window).load(function () {
   var codesy = {user:{}}
-  
+
+  Stripe.setPublishableKey('pk_test_NBTdQSXW5HcsEVNgzOZmmZng');
+
   $('#refreshing').hide();
 
   if ($("#api_token_pass").length > 0) {
@@ -10,17 +12,13 @@ $(window).load(function () {
     codesy.user.id = $("#codesy_user_id").val();
   }
 
-  function handleResponse(response) {
-    if (response.status_code === 201) {
-      var card_href, bank_href = null;
-      if (response.cards != null) {
-          card_href = response.cards[0].href;
-      }
-      if (response.bank_accounts != null) {
-          bank_href = response.bank_accounts[0].href;
-      }
-      console.log("card_href: " + card_href);
-      console.log("bank_href: " + bank_href);
+  function handleResponse(status, response) {
+    if (response.error) {
+      console.error("Stripe failed to tokenize");
+      $('#payment-errors').text(response.error.message);
+      $('#refreshing').hide();
+    } else {
+      var token = response.id;
       $.ajax({
         method: "PATCH",
         url: "/users/"+codesy.user.id + "/",
@@ -28,8 +26,7 @@ $(window).load(function () {
           xhr.setRequestHeader("Authorization","Token "+ codesy.user.token);
         },
         data: {
-          balanced_card_href: card_href,
-          balanced_bank_account_href: bank_href
+          balanced_card_href: token
         },
         success: function(data, status, jqXHR) {
           console.log("Updated user.");
@@ -41,9 +38,6 @@ $(window).load(function () {
           $('#refreshing').hide();
         },
       });
-    } else {
-      console.error("Balanced failed to tokenize.");
-      $('#refreshing').hide();
     }
   }
 
@@ -57,18 +51,14 @@ $(window).load(function () {
     $('#refreshing').show();
 
     var payload = {
-      name: $('#cc-name').val(),
       number: $('#cc-number').val(),
-      expiration_month: $('#cc-ex-month').val(),
-      expiration_year: $('#cc-ex-year').val(),
-      cvv: $('#ex-cvv').val(),
-      address: {
-        postal_code: $('#ex-postal-code').val()
-      }
+      exp_month: $('#cc-ex-month').val(),
+      exp_year: $('#cc-ex-year').val(),
+      cvc: $('#ex-cvv').val()
     };
 
     // Create credit card
-    balanced.card.create(payload, handleResponse);
+    Stripe.card.createToken(payload, handleResponse);
   });
 
 
