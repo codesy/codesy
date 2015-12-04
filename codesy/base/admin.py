@@ -14,7 +14,7 @@ class CodesyUserAdmin(UserAdmin):
     form = CodesyUserChangeForm
 
     fieldsets = UserAdmin.fieldsets + (
-        ('Payments', {'fields': ('balanced_card_href',
+        ('Payments', {'fields': ('stripe_card_token',
                                  'balanced_bank_account_href')}),
     )
 

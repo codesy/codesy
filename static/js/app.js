@@ -26,7 +26,7 @@ $(window).load(function () {
           xhr.setRequestHeader("Authorization","Token "+ codesy.user.token);
         },
         data: {
-          balanced_card_href: token
+          stripe_card_token: token
         },
         success: function(data, status, jqXHR) {
           console.log("Updated user.");

@@ -68,7 +68,7 @@
                 Sign in to connect a payment method
                 {% else %}
                     <div id="payment-errors"></div>
-                    {% if request.user.balanced_card_href %}
+                    {% if request.user.stripe_card_token %}
                         <h2>3. Payment connected. <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></h2>
                         Card on file; happy bidding!
                         <a id="cc-show" >Change your card info.</a>
