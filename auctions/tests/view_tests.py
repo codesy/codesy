@@ -90,7 +90,7 @@ class GetBidTest(TestCase):
     def test_get_existant_bid(self, mock_resp):
         user, url, bid = _make_test_bid()
         self.view.request = fudge.Fake().has_attr(
-            user=user, QUERY_PARAMS={'url': url})
+            user=user, query_params={'url': url})
         mock_resp.expects_call().with_args(
             {'bid': bid, 'url': url, 'claim': None}, template_name='bid.html')
 
@@ -103,7 +103,7 @@ class GetBidTest(TestCase):
         url = 'http://gh.com/project'
         mommy.make('auctions.Bid', user=other_user, url=url)
         self.view.request = fudge.Fake().has_attr(
-            user=user, QUERY_PARAMS={'url': url})
+            user=user, query_params={'url': url})
         mock_resp.expects_call().with_args(
             {'bid': None, 'url': url, 'claim': None}, template_name='bid.html')
 
@@ -114,7 +114,7 @@ class GetBidTest(TestCase):
         user, url, bid = _make_test_bid()
         claim = mommy.make('auctions.Claim', issue=bid.issue, claimant=user)
         self.view.request = fudge.Fake().has_attr(
-            user=user, QUERY_PARAMS={'url': url})
+            user=user, query_params={'url': url})
         mock_resp.expects_call().with_args(
             {'bid': bid, 'url': url, 'claim': claim}, template_name='bid.html')
 
@@ -176,7 +176,7 @@ class ConfirmClaimTest(TestCase):
     def test_get_existant_bid_returns_confirm_claim_form(self, mock_resp):
         user, url, bid = _make_test_bid()
         self.view.request = fudge.Fake().has_attr(
-            QUERY_PARAMS={'bid': bid.id}
+            query_params={'bid': bid.id}
         )
         mock_resp.expects_call().with_args(
             {'bid': bid, 'issue': bid.issue},
@@ -188,7 +188,7 @@ class ConfirmClaimTest(TestCase):
     @fudge.patch('auctions.views.Response')
     def test_get_nonexistant_bid_assigns_None(self, mock_resp):
         self.view.request = fudge.Fake().has_attr(
-            QUERY_PARAMS={'bid': 123}
+            query_params={'bid': 123}
         )
         mock_resp.expects_call().with_args(
             {'bid': None, 'issue': None},

@@ -44,7 +44,7 @@ class GetBid(APIView):
     renderer_classes = (TemplateHTMLRenderer,)
 
     def get(self, request, format=None):
-        url = self.request.QUERY_PARAMS.get('url')
+        url = self.request.query_params.get('url')
         bid = None
         claim = None
         try:
@@ -97,7 +97,7 @@ class ConfirmClaim(APIView):
     def get(self, request, format=None):
         bid = None
         issue = None
-        bid_id = self.request.QUERY_PARAMS.get('bid')
+        bid_id = self.request.query_params.get('bid')
         try:
             bid = Bid.objects.get(id=bid_id)
             issue = Issue.objects.get(url=bid.url)
