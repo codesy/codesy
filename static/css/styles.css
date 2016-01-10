@@ -2,11 +2,11 @@
 .glyphicon-ok {
   color: #5CB85C;
 }
-
+/*
 iframe {
   margin-top: 20px;
 }
-
+*/
 .spin {
   -webkit-animation: spin 2s infinite linear;
   animation: spin 2s infinite linear;
@@ -22,7 +22,7 @@ iframe {
 }
 
 
-/* codesy widget styles */
+/* codesy widget styles */
 
 /* override pure CSS list styling that breaks github lists */
 menu, ol, ul {
