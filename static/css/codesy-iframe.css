@@ -1,0 +1,9 @@
+#codesy_iframe {
+  max-width:150px;
+  position: fixed;
+  bottom: .25em;
+  right: .25em;
+  border-style:ridge;
+  padding:1%;
+  background: antiquewhite;
+}
