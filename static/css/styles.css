@@ -24,24 +24,27 @@ iframe {
 
 /* codesy widget styles */
 
-/* override pure CSS list styling that breaks github lists */
-menu, ol, ul {
-  padding: 0 !important;
-}
-
 #codesy_widget {
-  max-width:200px;
-  position: fixed;
-  bottom: .25em;
-  right: .25em;
+  max-width:150px;
   border-style:ridge;
   padding:1%;
   background: antiquewhite;
 }
 
-#codesy_widget img{
-  max-width: 50%;
+#codesy_widget label {
+  font-size: x-small;
+
 }
+
+#codesy_widget img {
+  max-height:20px;;
+}
+
+
 #codesy_widget input[type="text"] {
-  min-height: 0;
+  font-size: xx-small;
+}
+
+input.button-small {
+    font-size: 75%;
 }
