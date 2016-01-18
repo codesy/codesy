@@ -12,6 +12,7 @@
          {% else %}
             action="//{{current_site.domain}}{% url 'bid-list' %}" method="POST" >
          {% endif %}
+         {% csrf_token %}
          <input name="url" type="hidden" value="{{ url }}"></input>
          <fieldset>
             <div class="pure-group">
