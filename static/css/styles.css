@@ -2,11 +2,6 @@
 .glyphicon-ok {
   color: #5CB85C;
 }
-/*
-iframe {
-  margin-top: 20px;
-}
-*/
 .spin {
   -webkit-animation: spin 2s infinite linear;
   animation: spin 2s infinite linear;
@@ -21,15 +16,6 @@ iframe {
   to { transform: rotate(360deg); }
 }
 
-
-/* codesy widget styles */
-
-#codesy_widget {
-  max-width:150px;
-  border-style:ridge;
-  padding:1%;
-  background: antiquewhite;
-}
 
 #codesy_widget label {
   font-size: x-small;
