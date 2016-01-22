@@ -2,11 +2,6 @@
 .glyphicon-ok {
   color: #5CB85C;
 }
-/*
-iframe {
-  margin-top: 20px;
-}
-*/
 .spin {
   -webkit-animation: spin 2s infinite linear;
   animation: spin 2s infinite linear;
@@ -22,26 +17,20 @@ iframe {
 }
 
 
-/* codesy widget styles */
+#codesy_widget label {
+  font-size: x-small;
 
-/* override pure CSS list styling that breaks github lists */
-menu, ol, ul {
-  padding: 0 !important;
 }
 
-#codesy_widget {
-  max-width:200px;
-  position: fixed;
-  bottom: .25em;
-  right: .25em;
-  border-style:ridge;
-  padding:1%;
-  background: antiquewhite;
+#codesy_widget img {
+  max-height:20px;;
 }
 
-#codesy_widget img{
-  max-width: 50%;
-}
+
 #codesy_widget input[type="text"] {
-  min-height: 0;
+  font-size: xx-small;
+}
+
+input.button-small {
+    font-size: 75%;
 }
