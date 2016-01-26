@@ -5,14 +5,15 @@
       Your ask for {{ bid.ask }} has been met.
     {% endif %}
   {% else %}
-      <form id="codesy_bid" class="pure-form pure-form-aligned"
-         {% if bid %}
-            action = "//{{current_site.domain}}{% url 'bid-detail' bid.id %}" method="POST" >
-            <input name="_method" type="hidden" value="PUT" />
-         {% else %}
-            action="//{{current_site.domain}}{% url 'bid-list' %}" method="POST" >
-            
-         {% endif %}
+      <form id="codesy_bid" class="pure-form pure-form-aligned" 
+            {% if bid %}
+               action = "//{{current_site.domain}}{% url 'bid-detail' bid.id %}" 
+               data-method="PUT" 
+            {% else %}
+               action="//{{current_site.domain}}{% url 'bid-list' %}"
+               data-method="POST" 
+            {% endif %}
+         > <!-- end of FORM tag -->
          {% csrf_token %}
          <input name="url" type="hidden" value="{{ url }}"></input>
          <fieldset>
