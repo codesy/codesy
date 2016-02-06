@@ -65,6 +65,41 @@ class GetBid(APIView):
                         template_name='bid.html')
         return resp
 
+class GetClaim(APIView):
+    """
+    API endpoint for a single bid form.
+
+    Requests for /claim/?url= will receive the HTML form for 
+    updating the user's existing claim.
+
+    url -- url of an OSS issue or bug
+    """
+    renderer_classes = (TemplateHTMLRenderer,)
+
+    def get(self, request, format=None):
+        url = self.request.query_params.get('url')
+        bid = None
+        claim = None
+        try:
+            bid = Bid.objects.get(user=self.request.user, url=url)
+        except Bid.DoesNotExist:
+            pass
+        else:
+            try:
+                claim = Claim.objects.get(
+                    claimant=self.request.user, issue=bid.issue
+                )
+            except Claim.DoesNotExist:
+                pass
+
+        resp = Response({'bid': bid,
+                         'claim': claim,
+                         'url': url},
+                        template_name='claim_detail.html')
+        return resp
+
+
+
 
 class ClaimViewSet(ModelViewSet):
     """
