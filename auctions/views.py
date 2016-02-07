@@ -83,8 +83,8 @@ class ClaimViewSet(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(created=datetime.now())
 
-    def retrieve (self,request,*args,**kwargs):
-        response = super(ClaimViewSet,self).retrieve(request, *args, **kwargs)
+    def retrieve(self, request, *args, **kwargs):
+        response = super(ClaimViewSet, self).retrieve(request, *args, **kwargs)
         response.template_name = "claim_detail.html"
         return response
 
