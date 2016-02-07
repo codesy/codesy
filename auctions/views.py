@@ -65,26 +65,6 @@ class GetBid(APIView):
                         template_name='bid.html')
         return resp
 
-class GetClaim(APIView):
-    """
-    API endpoint for a single bid form.
-
-    Requests for /claim/?url= will receive the HTML form for 
-    updating the user's existing claim.
-
-    url -- url of an OSS issue or bug
-    """
-    renderer_classes = (TemplateHTMLRenderer,)
-
-    def get(self, request, id):
-
-
-        resp = Response({'id': id},
-                        template_name='claim_detail.html')
-        return resp
-
-
-
 
 class ClaimViewSet(ModelViewSet):
     """
@@ -92,6 +72,7 @@ class ClaimViewSet(ModelViewSet):
     """
     queryset = Claim.objects.all()
     serializer_class = ClaimSerializer
+    renderer_classes = TemplateHTMLRenderer
 
     def pre_save(self, obj):
         obj.claimant = self.request.user
@@ -101,13 +82,12 @@ class ClaimViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(created=datetime.now())
-        
+
     def retrieve (self,request,*args,**kwargs):
-        import ipdb; ipdb.set_trace()
-        response =super(ClaimViewSet,self).retrieve(request, *args, **kwargs)
-        
-        response.template_name="claim_detail.html"
+        response = super(ClaimViewSet,self).retrieve(request, *args, **kwargs)
+        response.template_name = "claim_detail.html"
         return response
+
 
 class ConfirmClaim(APIView):
     """
