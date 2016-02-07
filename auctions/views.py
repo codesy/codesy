@@ -76,25 +76,10 @@ class GetClaim(APIView):
     """
     renderer_classes = (TemplateHTMLRenderer,)
 
-    def get(self, request, format=None):
-        url = self.request.query_params.get('url')
-        bid = None
-        claim = None
-        try:
-            bid = Bid.objects.get(user=self.request.user, url=url)
-        except Bid.DoesNotExist:
-            pass
-        else:
-            try:
-                claim = Claim.objects.get(
-                    claimant=self.request.user, issue=bid.issue
-                )
-            except Claim.DoesNotExist:
-                pass
+    def get(self, request, id):
 
-        resp = Response({'bid': bid,
-                         'claim': claim,
-                         'url': url},
+
+        resp = Response({'id': id},
                         template_name='claim_detail.html')
         return resp
 
@@ -116,7 +101,13 @@ class ClaimViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(created=datetime.now())
-
+        
+    def retrieve (self,request,*args,**kwargs):
+        import ipdb; ipdb.set_trace()
+        response =super(ClaimViewSet,self).retrieve(request, *args, **kwargs)
+        
+        response.template_name="claim_detail.html"
+        return response
 
 class ConfirmClaim(APIView):
     """

@@ -12,7 +12,6 @@ router.register(r'claims', views.ClaimViewSet)
 custom_endpoint_url_patterns = patterns(
     '',
     url(r'^bid/', views.GetBid.as_view()),
-    url(r'^claim/',views.GetClaim.as_view()),
     url(
         r'^claim/confirmation',
         views.ConfirmClaim.as_view(),
