@@ -72,7 +72,7 @@ class ClaimViewSet(ModelViewSet):
     """
     queryset = Claim.objects.all()
     serializer_class = ClaimSerializer
-    renderer_classes = TemplateHTMLRenderer
+    renderer_classes = (TemplateHTMLRenderer,)
 
     def pre_save(self, obj):
         obj.claimant = self.request.user
