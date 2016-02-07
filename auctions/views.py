@@ -83,34 +83,22 @@ class ClaimViewSet(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(created=datetime.now())
 
-    def retrieve(self, request, *args, **kwargs):
-        response = super(ClaimViewSet, self).retrieve(request, *args, **kwargs)
-        response.template_name = "claim_detail.html"
-        return response
 
-
-class ConfirmClaim(APIView):
+class ClaimAPIView(APIView):
     """
-    API endpoint for a form to create a claim for an issue.
+    Custom API endpoint for user-centric Claim status page
 
-    Requests for /claims/confirm?bid= will receive the HTML form for creating a
-    claim for the issue associated with the bid.
+    Requests for /claim-status/{id} will receive the claim details, along with
+    an HTML form for offering bidders to approve or deny the claim.
 
-    bid -- id of bid on the issue being claimed
+    id -- id of claim
     """
     renderer_classes = (TemplateHTMLRenderer,)
 
-    def get(self, request, format=None):
-        bid = None
-        issue = None
-        bid_id = self.request.query_params.get('bid')
+    def get(self, request, pk, format=None):
         try:
-            bid = Bid.objects.get(id=bid_id)
-            issue = Issue.objects.get(url=bid.url)
-        except Bid.DoesNotExist:
-            bid = None
+            claim = Claim.objects.get(pk=pk)
+        except Claim.DoesNotExist:
+            claim = None
 
-        resp = Response({'bid': bid,
-                         'issue': issue},
-                        template_name='confirm_claim.html')
-        return resp
+        return  Response({'claim': claim}, template_name='claim_detail.html')
