@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -107,6 +107,8 @@ class Claim(models.Model):
     status = models.CharField(max_length=2,
                               choices=STATUS_CHOICES,
                               default=OPEN)
+    def expires( self ):
+             return self.created + datetime.timedelta( days = 30 )
 
     class Meta:
         unique_together = (("claimant", "issue"),)
