@@ -11,7 +11,6 @@ from django.dispatch import receiver
 from mailer import send_mail
 
 
-
 class Bid(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     url = models.URLField()
@@ -119,4 +118,4 @@ class Claim(models.Model):
 
     @property
     def expires(self):
-        return self.created + datetime.timedelta( days = 30 )
+        return self.created + datetime.timedelta(days=30)
