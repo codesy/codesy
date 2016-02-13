@@ -53,7 +53,6 @@ THIRD_PARTY_APPS = (
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_swagger',
-    'debug_toolbar',
 )
 
 LOCAL_APPS = (
