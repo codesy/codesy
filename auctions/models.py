@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.db import models
@@ -110,7 +110,7 @@ class Claim(models.Model):
 
     @property
     def expires(self):
-        return self.created + datetime.timedelta(days=30)
+        return self.created + timedelta(days=30)
 
 
 class Vote(models.Model):
