@@ -111,3 +111,16 @@ class Claim(models.Model):
     @property
     def expires(self):
         return self.created + datetime.timedelta(days=30)
+
+
+class Vote(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    claim = models.ForeignKey(Claim)
+    approved = models.BooleanField(default=None, blank=True)
+    created = models.DateTimeField(null=True, blank=True)
+    modified = models.DateTimeField(null=True, blank=True, auto_now=True)
+
+    def __unicode__(self):
+        return u'Vote for %s by (%s): %s' % (
+            self.claim, self.user, self.approved
+        )

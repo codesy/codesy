@@ -5,8 +5,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Bid, Claim, Issue
-from .serializers import BidSerializer, ClaimSerializer
+from .models import Bid, Claim, Issue, Vote
+from .serializers import BidSerializer, ClaimSerializer, VoteSerializer
 
 
 class BidViewSet(ModelViewSet):
@@ -102,3 +102,21 @@ class ClaimAPIView(APIView):
             claim = None
 
         return Response({'claim': claim}, template_name='claim_status.html')
+
+
+# TODO: Create OwnModelViewSet mix-in
+class VoteViewSet(ModelViewSet):
+    """
+    API endpoint for votes. Users can only access their own votes.
+    """
+    queryset = Vote.objects.all()
+    serializer_class = VoteSerializer
+
+    def pre_save(self, obj):
+        obj.user = self.request.user
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(created=datetime.now())
