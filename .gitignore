@@ -12,3 +12,4 @@ MANIFEST
 stunnel.log
 stunnel/stunnel.pem
 docs/html
+.tox

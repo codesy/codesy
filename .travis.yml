@@ -4,10 +4,6 @@ branches:
     only:
         master
 
-cache:
-    directories:
-        - $HOME/.cache/pip
-
 language: python
 
 addons:
