@@ -67,7 +67,8 @@
                 <h2>3. Connect payments.</h2>
                 Sign in to connect a payment method
                 {% else %}
-                    {% if request.user.balanced_card_href %}
+                    <div id="payment-errors"></div>
+                    {% if request.user.stripe_card_token %}
                         <h2>3. Payment connected. <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></h2>
                         Card on file; happy bidding!
                         <a id="cc-show" >Change your card info.</a>
@@ -76,10 +77,6 @@
                         <h2>3. Connect payments.</h2>
                         <form role="form" class="form-horizontal">
                     {% endif %}
-                          <div class="form-group">
-                            <label for="cc-name">Name on Card</label>
-                            <input type="text" class="form-control" id="cc-name" autocomplete="off" value="John Doe" />
-                          </div>
                           <div class="form-group">
                             <label for=cc-number">Card Number</label>
                             <input type="text" class="form-control" id="cc-number" autocomplete="off" value="4111111111111111" maxlength="16" />
@@ -90,8 +87,8 @@
                             <input type="text" class="form-control" id="cc-ex-year" autocomplete="off" value="2020" maxlength="4" size="4"/>
                           </div>
                           <div class="form-group">
-                            <label for="ex-cvv">Card Verification Code (CVV)</label>
-                            <input type="text" class="form-control" id="ex-cvv" autocomplete="off" value="123" maxlength="4" size="4"/>
+                            <label for="cvc">Card Verification Code (CVC)</label>
+                            <input type="text" class="form-control" id="cvc" autocomplete="off" value="123" maxlength="4" size="4"/>
                           </div>
 
                           <button id="cc-submit" class="btn btn-success">Authorize &amp; Connect</button> <span id="refreshing" class="glyphicon glyphicon-refresh spin"></span>
@@ -105,7 +102,7 @@
 
 {% block scripts %}
    {% if request.user.is_authenticated %}
-      <script type="text/javascript" src="https://js.balancedpayments.com/1.1/balanced.js"></script>
-      <script src="{% static "js/app.js" %}" ></script>
+      <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+      <script src="{% static "js/home-app.js" %}" ></script>
    {% endif %}
 {% endblock %}

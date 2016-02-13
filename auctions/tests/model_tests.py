@@ -4,7 +4,6 @@ import fudge
 from fudge.inspector import arg
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from model_mommy import mommy
@@ -80,15 +79,14 @@ class NotifyMatchersReceiverTest(TestCase):
         offer_bid.save()
 
     @fudge.patch('auctions.models.send_mail')
-    def test_mail_contains_claim_by_bid_url(self, mock_send_mail):
+    def test_mail_contains_text_for_claiming_via_url(self, mock_send_mail):
         user = mommy.make(settings.AUTH_USER_MODEL)
         self.bid1.ask_match_sent = datetime.now()
         self.bid1.save()
 
         mock_send_mail.expects_call().with_args(
             arg.any(),
-            arg.contains(reverse('custom-urls:claim-by-bid')
-                         + '?bid=%s' % self.bid2.id),
+            arg.contains("visiting the issue url:\n"),
             arg.any(),
             ['user2@test.com']
         )

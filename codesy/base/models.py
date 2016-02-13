@@ -14,7 +14,7 @@ EMAIL_URL = 'https://api.github.com/user/emails'
 
 
 class User(AbstractUser):
-    balanced_card_href = models.CharField(max_length=100, blank=True)
+    stripe_card_token = models.CharField(max_length=100, blank=True)
     balanced_bank_account_href = models.CharField(max_length=100, blank=True)
 
     USERNAME_FIELD = 'username'

@@ -75,9 +75,9 @@ class BidViewSetTest(TestCase):
         models.Issue.objects.get(url=url)
 
 
-class GetBidTest(TestCase):
+class BidAPIViewTest(TestCase):
     def setUp(self):
-        self.view = views.GetBid()
+        self.view = views.BidAPIView()
 
     def test_attrs(self):
         self.assertIsInstance(self.view, rest_framework.views.APIView)
@@ -90,7 +90,7 @@ class GetBidTest(TestCase):
     def test_get_existant_bid(self, mock_resp):
         user, url, bid = _make_test_bid()
         self.view.request = fudge.Fake().has_attr(
-            user=user, QUERY_PARAMS={'url': url})
+            user=user, query_params={'url': url})
         mock_resp.expects_call().with_args(
             {'bid': bid, 'url': url, 'claim': None}, template_name='bid.html')
 
@@ -103,7 +103,7 @@ class GetBidTest(TestCase):
         url = 'http://gh.com/project'
         mommy.make('auctions.Bid', user=other_user, url=url)
         self.view.request = fudge.Fake().has_attr(
-            user=user, QUERY_PARAMS={'url': url})
+            user=user, query_params={'url': url})
         mock_resp.expects_call().with_args(
             {'bid': None, 'url': url, 'claim': None}, template_name='bid.html')
 
@@ -114,7 +114,7 @@ class GetBidTest(TestCase):
         user, url, bid = _make_test_bid()
         claim = mommy.make('auctions.Claim', issue=bid.issue, claimant=user)
         self.view.request = fudge.Fake().has_attr(
-            user=user, QUERY_PARAMS={'url': url})
+            user=user, query_params={'url': url})
         mock_resp.expects_call().with_args(
             {'bid': bid, 'url': url, 'claim': claim}, template_name='bid.html')
 
@@ -161,9 +161,9 @@ class ClaimViewSetTest(TestCase):
         self.viewset.perform_create(fake_serializer)
 
 
-class ConfirmClaimTest(TestCase):
+class ClaimAPIViewTest(TestCase):
     def setUp(self):
-        self.view = views.ConfirmClaim()
+        self.view = views.ClaimAPIView()
 
     def test_attrs(self):
         self.assertIsInstance(self.view, rest_framework.views.APIView)
@@ -173,26 +173,22 @@ class ConfirmClaimTest(TestCase):
         )
 
     @fudge.patch('auctions.views.Response')
-    def test_get_existant_bid_returns_confirm_claim_form(self, mock_resp):
-        user, url, bid = _make_test_bid()
-        self.view.request = fudge.Fake().has_attr(
-            QUERY_PARAMS={'bid': bid.id}
-        )
+    def test_get_existant_claim_returns_claim_status(self, mock_resp):
+        claim = mommy.make('auctions.Claim')
+        self.view.request = fudge.Fake()
         mock_resp.expects_call().with_args(
-            {'bid': bid, 'issue': bid.issue},
-            template_name='confirm_claim.html'
+            {'claim': claim},
+            template_name='claim_status.html'
         )
 
-        self.view.get(self.view.request)
+        self.view.get(self.view.request, claim.pk)
 
     @fudge.patch('auctions.views.Response')
-    def test_get_nonexistant_bid_assigns_None(self, mock_resp):
-        self.view.request = fudge.Fake().has_attr(
-            QUERY_PARAMS={'bid': 123}
-        )
+    def test_get_nonexistant_claim_assigns_None(self, mock_resp):
+        self.view.request = fudge.Fake()
         mock_resp.expects_call().with_args(
-            {'bid': None, 'issue': None},
-            template_name='confirm_claim.html'
+            {'claim': None},
+            template_name='claim_status.html'
         )
 
-        self.view.get(self.view.request)
+        self.view.get(self.view.request, 1)

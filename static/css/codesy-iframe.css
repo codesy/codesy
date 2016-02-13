@@ -1,0 +1,14 @@
+#codesy_iframe {
+  visibility: visible !important;
+  max-width:150px;
+  position: fixed;
+  bottom: .25em;
+  right: .25em;
+  border-style:ridge;
+  padding:5px;
+  background: antiquewhite;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+
+}

@@ -52,7 +52,7 @@ THIRD_PARTY_APPS = (
     'mailer',
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_framework_swagger'
+    'rest_framework_swagger',
 )
 
 LOCAL_APPS = (
@@ -69,7 +69,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -155,7 +155,6 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES':
