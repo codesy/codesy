@@ -32,7 +32,7 @@ class BidViewSet(ModelViewSet):
         bid.save()
 
 
-class GetBid(APIView):
+class BidAPIView(APIView):
     """
     API endpoint for a single bid form.
 
