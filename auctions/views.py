@@ -101,5 +101,4 @@ class ClaimAPIView(APIView):
         except Claim.DoesNotExist:
             claim = None
 
-        # import ipdb ; ipdb.set_trace()
         return Response({'claim': claim}, template_name='claim_status.html')

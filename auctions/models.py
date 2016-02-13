@@ -1,8 +1,6 @@
-import datetime
+from datetime import datetime
 
 from django.conf import settings
-from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Sum
 from django.db.models.signals import post_save
@@ -45,10 +43,9 @@ def notify_matching_askers(sender, instance, **kwargs):
     NOTIFICATION_EMAIL_STRING = """
     Bidders have met your asking price for {url}.
 
-    If you fix the issue, you may claim the payout here:
-    https://{site}{claim_confirm_link}
+    If you fix the issue, you may claim the payout by visiting the issue url:
+    {url}
     """
-    current_site = Site.objects.get_current()
 
     unnotified_asks = Bid.objects.filter(
         url=instance.url,
@@ -64,12 +61,7 @@ def notify_matching_askers(sender, instance, **kwargs):
                 (
                     {'ask': bid.ask, 'url': bid.url}
                 ),
-                NOTIFICATION_EMAIL_STRING.format(
-                    url=bid.url,
-                    site=current_site,
-                    claim_confirm_link=reverse('custom-urls:claim-by-bid')
-                    + '?bid=%s' % bid.id
-                ),
+                NOTIFICATION_EMAIL_STRING.format(url=bid.url),
                 settings.DEFAULT_FROM_EMAIL,
                 [bid.user.email]
             )
