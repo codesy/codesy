@@ -75,9 +75,9 @@ class BidViewSetTest(TestCase):
         models.Issue.objects.get(url=url)
 
 
-class GetBidTest(TestCase):
+class BidAPIViewTest(TestCase):
     def setUp(self):
-        self.view = views.GetBid()
+        self.view = views.BidAPIView()
 
     def test_attrs(self):
         self.assertIsInstance(self.view, rest_framework.views.APIView)
