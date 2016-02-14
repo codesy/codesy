@@ -9,18 +9,25 @@ from .models import Bid, Claim, Vote
 from .serializers import BidSerializer, ClaimSerializer, VoteSerializer
 
 
-class BidViewSet(ModelViewSet):
+class AutoOwnObjectsModelViewSet(ModelViewSet):
     """
-    API endpoint for bids. Users can only access their own bids.
+    Custom ModelViewSet that automatically:
+        1. assigns obj.user to self.request.user
+        2. restricts queryset to users' own objects
     """
-    queryset = Bid.objects.all()
-    serializer_class = BidSerializer
-
     def pre_save(self, obj):
         obj.user = self.request.user
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
+
+
+class BidViewSet(AutoOwnObjectsModelViewSet):
+    """
+    API endpoint for bids. Users can only access their own bids.
+    """
+    queryset = Bid.objects.all()
+    serializer_class = BidSerializer
 
 
 class BidAPIView(APIView):
@@ -57,7 +64,7 @@ class BidAPIView(APIView):
         return resp
 
 
-class ClaimViewSet(ModelViewSet):
+class ClaimViewSet(AutoOwnObjectsModelViewSet):
     """
     API endpoint for claims. Users can only access their own claims.
     """
@@ -65,12 +72,7 @@ class ClaimViewSet(ModelViewSet):
     serializer_class = ClaimSerializer
     renderer_classes = (TemplateHTMLRenderer,)
 
-    def pre_save(self, obj):
-        obj.user = self.request.user
-
-    def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
-
+    # TODO: move ClaimViewSet.perform_create to model pre_save signal handler
     def perform_create(self, serializer):
         serializer.save(created=datetime.now())
 
@@ -95,19 +97,13 @@ class ClaimAPIView(APIView):
         return Response({'claim': claim}, template_name='claim_status.html')
 
 
-# TODO: Create OwnModelViewSet mix-in
-class VoteViewSet(ModelViewSet):
+class VoteViewSet(AutoOwnObjectsModelViewSet):
     """
     API endpoint for votes. Users can only access their own votes.
     """
     queryset = Vote.objects.all()
     serializer_class = VoteSerializer
 
-    def pre_save(self, obj):
-        obj.user = self.request.user
-
-    def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
-
+    # TODO: move VoteViewSet.perform_create to a model pre_save signal handler
     def perform_create(self, serializer):
         serializer.save(created=datetime.now())

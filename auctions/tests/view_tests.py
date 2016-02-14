@@ -32,7 +32,7 @@ class BidViewSetTest(TestCase):
 
     def test_attrs(self):
         self.assertIsInstance(
-            self.viewset, rest_framework.viewsets.ModelViewSet)
+            self.viewset, views.AutoOwnObjectsModelViewSet)
         self.assertIsInstance(self.viewset.queryset, QuerySet)
         self.assertEqual(self.viewset.queryset.model, models.Bid)
         self.assertEqual(
@@ -112,7 +112,7 @@ class ClaimViewSetTest(TestCase):
 
     def test_attrs(self):
         self.assertIsInstance(
-            self.viewset, rest_framework.viewsets.ModelViewSet)
+            self.viewset, views.AutoOwnObjectsModelViewSet)
         self.assertIsInstance(self.viewset.queryset, QuerySet)
         self.assertEqual(self.viewset.queryset.model, models.Claim)
         self.assertEqual(
@@ -177,3 +177,16 @@ class ClaimAPIViewTest(TestCase):
         )
 
         self.view.get(self.view.request, 1)
+
+
+class VoteViewSetTest(TestCase):
+    def setUp(self):
+        self.viewset = views.VoteViewSet()
+
+    def test_attrs(self):
+        self.assertIsInstance(
+            self.viewset, views.AutoOwnObjectsModelViewSet)
+        self.assertIsInstance(self.viewset.queryset, QuerySet)
+        self.assertEqual(self.viewset.queryset.model, models.Vote)
+        self.assertEqual(
+            self.viewset.serializer_class, serializers.VoteSerializer)
