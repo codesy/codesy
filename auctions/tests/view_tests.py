@@ -59,21 +59,6 @@ class BidViewSetTest(TestCase):
 
         self.assertSequenceEqual(qs.order_by('id'), [bid1, bid4, bid5])
 
-    @fudge.test
-    def test_perform_create_creates_Issue(self):
-        url = 'https://github.com/example/project/issue/7'
-        fake_serializer = fudge.Fake("serializers.BidSerializer")
-        (
-            fake_serializer
-            .expects('save')
-            .returns_fake()
-            .has_attr(url=url)
-            .expects('save')
-        )
-        self.viewset.perform_create(fake_serializer)
-        # the Issue should be available
-        models.Issue.objects.get(url=url)
-
 
 class BidAPIViewTest(TestCase):
     def setUp(self):

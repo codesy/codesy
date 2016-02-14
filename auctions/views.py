@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Bid, Claim, Issue, Vote
+from .models import Bid, Claim, Vote
 from .serializers import BidSerializer, ClaimSerializer, VoteSerializer
 
 
@@ -21,15 +21,6 @@ class BidViewSet(ModelViewSet):
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
-
-    def perform_create(self, serializer):
-        bid = serializer.save()
-        issue, created = Issue.objects.get_or_create(
-            url=bid.url,
-            defaults={'state': 'open', 'last_fetched': None}
-        )
-        bid.issue = issue
-        bid.save()
 
 
 class BidAPIView(APIView):
