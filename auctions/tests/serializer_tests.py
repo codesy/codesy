@@ -29,7 +29,7 @@ class ClaimSerializerTest(TestCase):
             rest_framework.serializers.ModelSerializer)
         self.assertEqual(self.serializer.Meta.model, models.Claim)
         self.assertSequenceEqual(
-            self.serializer.Meta.fields, ('id', 'issue', 'claimant',
+            self.serializer.Meta.fields, ('id', 'issue', 'user',
                                           'evidence', 'status'))
         self.assertSequenceEqual(
             self.serializer.Meta.read_only_fields, ('id',))

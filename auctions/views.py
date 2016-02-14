@@ -5,31 +5,29 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Bid, Claim, Issue
-from .serializers import BidSerializer, ClaimSerializer
+from .models import Bid, Claim, Vote
+from .serializers import BidSerializer, ClaimSerializer, VoteSerializer
 
 
-class BidViewSet(ModelViewSet):
+class AutoOwnObjectsModelViewSet(ModelViewSet):
     """
-    API endpoint for bids. Users can only access their own bids.
+    Custom ModelViewSet that automatically:
+        1. assigns obj.user to self.request.user
+        2. restricts queryset to users' own objects
     """
-    queryset = Bid.objects.all()
-    serializer_class = BidSerializer
-
     def pre_save(self, obj):
         obj.user = self.request.user
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
 
-    def perform_create(self, serializer):
-        bid = serializer.save()
-        issue, created = Issue.objects.get_or_create(
-            url=bid.url,
-            defaults={'state': 'open', 'last_fetched': None}
-        )
-        bid.issue = issue
-        bid.save()
+
+class BidViewSet(AutoOwnObjectsModelViewSet):
+    """
+    API endpoint for bids. Users can only access their own bids.
+    """
+    queryset = Bid.objects.all()
+    serializer_class = BidSerializer
 
 
 class BidAPIView(APIView):
@@ -54,7 +52,7 @@ class BidAPIView(APIView):
         else:
             try:
                 claim = Claim.objects.get(
-                    claimant=self.request.user, issue=bid.issue
+                    user=self.request.user, issue=bid.issue
                 )
             except Claim.DoesNotExist:
                 pass
@@ -66,7 +64,7 @@ class BidAPIView(APIView):
         return resp
 
 
-class ClaimViewSet(ModelViewSet):
+class ClaimViewSet(AutoOwnObjectsModelViewSet):
     """
     API endpoint for claims. Users can only access their own claims.
     """
@@ -74,12 +72,7 @@ class ClaimViewSet(ModelViewSet):
     serializer_class = ClaimSerializer
     renderer_classes = (TemplateHTMLRenderer,)
 
-    def pre_save(self, obj):
-        obj.claimant = self.request.user
-
-    def get_queryset(self):
-        return self.queryset.filter(claimant=self.request.user)
-
+    # TODO: move ClaimViewSet.perform_create to model pre_save signal handler
     def perform_create(self, serializer):
         serializer.save(created=datetime.now())
 
@@ -102,3 +95,15 @@ class ClaimAPIView(APIView):
             claim = None
 
         return Response({'claim': claim}, template_name='claim_status.html')
+
+
+class VoteViewSet(AutoOwnObjectsModelViewSet):
+    """
+    API endpoint for votes. Users can only access their own votes.
+    """
+    queryset = Vote.objects.all()
+    serializer_class = VoteSerializer
+
+    # TODO: move VoteViewSet.perform_create to a model pre_save signal handler
+    def perform_create(self, serializer):
+        serializer.save(created=datetime.now())
