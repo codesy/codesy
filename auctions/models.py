@@ -104,8 +104,7 @@ class Claim(models.Model):
         (REJECTED, 'Rejected'),
     )
     issue = models.ForeignKey('Issue')
-    # TODO: rename Claim.claimant to Claim.user
-    claimant = models.ForeignKey(settings.AUTH_USER_MODEL)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True, auto_now=True)
     evidence = models.URLField(blank=True)
@@ -114,11 +113,11 @@ class Claim(models.Model):
                               default=OPEN)
 
     class Meta:
-        unique_together = (("claimant", "issue"),)
+        unique_together = (("user", "issue"),)
 
     def __unicode__(self):
         return u'%s claim on Issue %s (%s)' % (
-            self.claimant, self.issue.id, self.status
+            self.user, self.issue.id, self.status
         )
 
     @property
@@ -147,7 +146,7 @@ def notify_matching_offerers(sender, instance, created, **kwargs):
     """
     current_site = Site.objects.get_current()
 
-    self_Q = models.Q(user=instance.claimant)
+    self_Q = models.Q(user=instance.user)
     offered0_Q = models.Q(offer=0)
     others_bids = Bid.objects.filter(
         issue=instance.issue
@@ -159,10 +158,10 @@ def notify_matching_offerers(sender, instance, created, **kwargs):
         send_mail(
             "[codesy] %(user)s has claimed payout for %(url)s" %
             (
-                {'user': instance.claimant, 'url': instance.issue.url}
+                {'user': instance.user, 'url': instance.issue.url}
             ),
             OFFERER_NOTIFICATION_EMAIL_STRING.format(
-                user=instance.claimant,
+                user=instance.user,
                 url=instance.issue.url,
                 offer=bid.offer,
                 pay_date=instance.expires,

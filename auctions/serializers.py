@@ -16,14 +16,14 @@ class BidSerializer(serializers.ModelSerializer):
 
 
 class ClaimSerializer(serializers.ModelSerializer):
-    claimant = serializers.PrimaryKeyRelatedField(
+    user = serializers.PrimaryKeyRelatedField(
         read_only=True,
         default=serializers.CurrentUserDefault()
     )
 
     class Meta:
         model = Claim
-        fields = ('id', 'issue', 'claimant', 'evidence', 'status')
+        fields = ('id', 'issue', 'user', 'evidence', 'status')
         read_only_fields = ('id',)
 
 

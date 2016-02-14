@@ -45,7 +45,7 @@ class BidAPIView(APIView):
         else:
             try:
                 claim = Claim.objects.get(
-                    claimant=self.request.user, issue=bid.issue
+                    user=self.request.user, issue=bid.issue
                 )
             except Claim.DoesNotExist:
                 pass
@@ -66,10 +66,10 @@ class ClaimViewSet(ModelViewSet):
     renderer_classes = (TemplateHTMLRenderer,)
 
     def pre_save(self, obj):
-        obj.claimant = self.request.user
+        obj.user = self.request.user
 
     def get_queryset(self):
-        return self.queryset.filter(claimant=self.request.user)
+        return self.queryset.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(created=datetime.now())

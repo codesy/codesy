@@ -164,7 +164,7 @@ class NotifyMatchingOfferersTest(MarketTestCase):
         mock_send_mail.is_callable().times_called(3)
         mommy.make(
             Claim,
-            claimant=self.user1,
+            user=self.user1,
             issue=self.issue,
             evidence=self.evidence,
             created=datetime.now()
@@ -181,7 +181,7 @@ class NotifyMatchingOfferersTest(MarketTestCase):
         mock_send_mail.is_callable().times_called(3)
         mommy.make(
             Claim,
-            claimant=self.user1,
+            user=self.user1,
             issue=self.issue,
             evidence=self.evidence,
             created=datetime.now()
@@ -192,7 +192,7 @@ class NotifyMatchingOfferersTest(MarketTestCase):
         mock_send_mail.is_callable().times_called(3)
         claim = mommy.make(
             Claim,
-            claimant=self.user1,
+            user=self.user1,
             issue=self.issue,
             created=datetime.now()
         )

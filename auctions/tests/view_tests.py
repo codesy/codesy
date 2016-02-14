@@ -22,7 +22,7 @@ def _make_test_claim():
     user = mommy.make(settings.AUTH_USER_MODEL)
     url = 'http://gh.com/project'
     issue = mommy.make('auctions.Issue', url=url)
-    claim = mommy.make('auctions.Claim', claimant=user, issue=issue)
+    claim = mommy.make('auctions.Claim', user=user, issue=issue)
     return user, url, issue, claim
 
 
@@ -97,7 +97,7 @@ class BidAPIViewTest(TestCase):
     @fudge.patch('auctions.views.Response')
     def test_get_existant_bid_with_claim(self, mock_resp):
         user, url, bid = _make_test_bid()
-        claim = mommy.make('auctions.Claim', issue=bid.issue, claimant=user)
+        claim = mommy.make('auctions.Claim', issue=bid.issue, user=user)
         self.view.request = fudge.Fake().has_attr(
             user=user, query_params={'url': url})
         mock_resp.expects_call().with_args(
@@ -118,18 +118,18 @@ class ClaimViewSetTest(TestCase):
         self.assertEqual(
             self.viewset.serializer_class, serializers.ClaimSerializer)
 
-    def test_pre_save_sets_claimant_to_request_user(self):
+    def test_pre_save_sets_user_to_request_user(self):
         user, url, issue, claim = _make_test_claim()
         self.viewset.request = fudge.Fake().has_attr(user=user)
 
         self.viewset.pre_save(claim)
 
-        self.assertEqual(claim.claimant, user)
+        self.assertEqual(claim.user, user)
 
     def test_get_queryset_filters_by_request_user(self):
         user1, url, issue, claim1 = _make_test_claim()
         user2 = mommy.make(settings.AUTH_USER_MODEL)
-        mommy.make('auctions.Claim', claimant=user2)
+        mommy.make('auctions.Claim', user=user2)
         self.viewset.request = fudge.Fake().has_attr(user=user1)
 
         qs = self.viewset.get_queryset()
