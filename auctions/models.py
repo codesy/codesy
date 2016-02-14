@@ -147,10 +147,12 @@ def notify_matching_offerers(sender, instance, created, **kwargs):
     """
     current_site = Site.objects.get_current()
 
+    self_Q = models.Q(user=instance.claimant)
+    offered0_Q = models.Q(offer=0)
     others_bids = Bid.objects.filter(
         issue=instance.issue
     ).exclude(
-        user=instance.claimant
+        self_Q | offered0_Q
     )
 
     for bid in others_bids:

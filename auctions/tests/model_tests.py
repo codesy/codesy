@@ -158,9 +158,26 @@ class NotifyMatchingOfferersTest(MarketTestCase):
                          '4f1bcd014ec735918bebd1c386e2f99a7f83ff64')
 
     @fudge.patch('auctions.models.send_mail')
-    def test_send_email_to_offerers_when_claim_is_made(self,
-                                                       mock_send_mail):
+    def test_send_email_to_other_offerers_when_claim_is_made(self,
+                                                             mock_send_mail):
         # Should be called 3 times: for user2, user3, and user4
+        mock_send_mail.is_callable().times_called(3)
+        mommy.make(
+            Claim,
+            claimant=self.user1,
+            issue=self.issue,
+            evidence=self.evidence,
+            created=datetime.now()
+        )
+
+    @fudge.patch('auctions.models.send_mail')
+    def test_dont_send_email_to_bidders_who_offered_0(self,
+                                                      mock_send_mail):
+        user5 = mommy.make(settings.AUTH_USER_MODEL,
+                           email='user5@test.com')
+        mommy.make(Bid, user=user5, ask=500, offer=0, url=self.url)
+
+        # Should still be called just 3 times: for user2, user3, and user4
         mock_send_mail.is_callable().times_called(3)
         mommy.make(
             Claim,
