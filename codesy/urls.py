@@ -36,8 +36,9 @@ urlpatterns = patterns(
     url(r'^docs/', include('rest_framework_swagger.urls')),
 
     # auctions API
-    url(r'^', include('auctions.urls')),
+    url(r'^', include('api.urls')),
 
     # user API
+    # TODO: move user API code into new api app
     url(r'^', include(router.urls))
 )

@@ -1,7 +1,9 @@
 from django.test import TestCase
 import rest_framework
 
-from auctions import models, serializers
+from auctions import models
+
+from .. import serializers
 
 
 class BidSerializerTest(TestCase):
@@ -29,7 +31,7 @@ class ClaimSerializerTest(TestCase):
             rest_framework.serializers.ModelSerializer)
         self.assertEqual(self.serializer.Meta.model, models.Claim)
         self.assertSequenceEqual(
-            self.serializer.Meta.fields, ('id', 'issue', 'claimant',
+            self.serializer.Meta.fields, ('id', 'issue', 'user',
                                           'evidence', 'status'))
         self.assertSequenceEqual(
             self.serializer.Meta.read_only_fields, ('id',))

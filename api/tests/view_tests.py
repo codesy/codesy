@@ -1,5 +1,4 @@
 import fudge
-from fudge.inspector import arg
 
 from django.conf import settings
 from django.db.models.query import QuerySet
@@ -7,7 +6,9 @@ from django.test import TestCase
 from model_mommy import mommy
 import rest_framework
 
-from auctions import models, serializers, views
+from auctions import models
+
+from .. import serializers, views
 
 
 def _make_test_bid():
@@ -22,7 +23,7 @@ def _make_test_claim():
     user = mommy.make(settings.AUTH_USER_MODEL)
     url = 'http://gh.com/project'
     issue = mommy.make('auctions.Issue', url=url)
-    claim = mommy.make('auctions.Claim', claimant=user, issue=issue)
+    claim = mommy.make('auctions.Claim', user=user, issue=issue)
     return user, url, issue, claim
 
 
@@ -32,7 +33,7 @@ class BidViewSetTest(TestCase):
 
     def test_attrs(self):
         self.assertIsInstance(
-            self.viewset, rest_framework.viewsets.ModelViewSet)
+            self.viewset, views.AutoOwnObjectsModelViewSet)
         self.assertIsInstance(self.viewset.queryset, QuerySet)
         self.assertEqual(self.viewset.queryset.model, models.Bid)
         self.assertEqual(
@@ -59,21 +60,6 @@ class BidViewSetTest(TestCase):
 
         self.assertSequenceEqual(qs.order_by('id'), [bid1, bid4, bid5])
 
-    @fudge.test
-    def test_perform_create_creates_Issue(self):
-        url = 'https://github.com/example/project/issue/7'
-        fake_serializer = fudge.Fake("serializers.BidSerializer")
-        (
-            fake_serializer
-            .expects('save')
-            .returns_fake()
-            .has_attr(url=url)
-            .expects('save')
-        )
-        self.viewset.perform_create(fake_serializer)
-        # the Issue should be available
-        models.Issue.objects.get(url=url)
-
 
 class BidAPIViewTest(TestCase):
     def setUp(self):
@@ -86,7 +72,7 @@ class BidAPIViewTest(TestCase):
             (rest_framework.renderers.TemplateHTMLRenderer,)
         )
 
-    @fudge.patch('auctions.views.Response')
+    @fudge.patch('api.views.Response')
     def test_get_existant_bid(self, mock_resp):
         user, url, bid = _make_test_bid()
         self.view.request = fudge.Fake().has_attr(
@@ -96,7 +82,7 @@ class BidAPIViewTest(TestCase):
 
         self.view.get(self.view.request)
 
-    @fudge.patch('auctions.views.Response')
+    @fudge.patch('api.views.Response')
     def test_get_nonexistant_bid_assigns_None(self, mock_resp):
         user = mommy.make(settings.AUTH_USER_MODEL)
         other_user = mommy.make(settings.AUTH_USER_MODEL)
@@ -109,10 +95,10 @@ class BidAPIViewTest(TestCase):
 
         self.view.get(self.view.request)
 
-    @fudge.patch('auctions.views.Response')
+    @fudge.patch('api.views.Response')
     def test_get_existant_bid_with_claim(self, mock_resp):
         user, url, bid = _make_test_bid()
-        claim = mommy.make('auctions.Claim', issue=bid.issue, claimant=user)
+        claim = mommy.make('auctions.Claim', issue=bid.issue, user=user)
         self.view.request = fudge.Fake().has_attr(
             user=user, query_params={'url': url})
         mock_resp.expects_call().with_args(
@@ -127,38 +113,29 @@ class ClaimViewSetTest(TestCase):
 
     def test_attrs(self):
         self.assertIsInstance(
-            self.viewset, rest_framework.viewsets.ModelViewSet)
+            self.viewset, views.AutoOwnObjectsModelViewSet)
         self.assertIsInstance(self.viewset.queryset, QuerySet)
         self.assertEqual(self.viewset.queryset.model, models.Claim)
         self.assertEqual(
             self.viewset.serializer_class, serializers.ClaimSerializer)
 
-    def test_pre_save_sets_claimant_to_request_user(self):
+    def test_pre_save_sets_user_to_request_user(self):
         user, url, issue, claim = _make_test_claim()
         self.viewset.request = fudge.Fake().has_attr(user=user)
 
         self.viewset.pre_save(claim)
 
-        self.assertEqual(claim.claimant, user)
+        self.assertEqual(claim.user, user)
 
     def test_get_queryset_filters_by_request_user(self):
         user1, url, issue, claim1 = _make_test_claim()
         user2 = mommy.make(settings.AUTH_USER_MODEL)
-        mommy.make('auctions.Claim', claimant=user2)
+        mommy.make('auctions.Claim', user=user2)
         self.viewset.request = fudge.Fake().has_attr(user=user1)
 
         qs = self.viewset.get_queryset()
 
         self.assertSequenceEqual(qs.order_by('id'), [claim1, ])
-
-    @fudge.test
-    def test_perform_create_saves_created_datetime(self):
-        fake_serializer = (
-            fudge.Fake('serializers.ClaimSerializer')
-            .expects('save')
-            .with_args(created=arg.any())
-        )
-        self.viewset.perform_create(fake_serializer)
 
 
 class ClaimAPIViewTest(TestCase):
@@ -172,7 +149,7 @@ class ClaimAPIViewTest(TestCase):
             (rest_framework.renderers.TemplateHTMLRenderer,)
         )
 
-    @fudge.patch('auctions.views.Response')
+    @fudge.patch('api.views.Response')
     def test_get_existant_claim_returns_claim_status(self, mock_resp):
         claim = mommy.make('auctions.Claim')
         self.view.request = fudge.Fake()
@@ -183,7 +160,7 @@ class ClaimAPIViewTest(TestCase):
 
         self.view.get(self.view.request, claim.pk)
 
-    @fudge.patch('auctions.views.Response')
+    @fudge.patch('api.views.Response')
     def test_get_nonexistant_claim_assigns_None(self, mock_resp):
         self.view.request = fudge.Fake()
         mock_resp.expects_call().with_args(
@@ -192,3 +169,16 @@ class ClaimAPIViewTest(TestCase):
         )
 
         self.view.get(self.view.request, 1)
+
+
+class VoteViewSetTest(TestCase):
+    def setUp(self):
+        self.viewset = views.VoteViewSet()
+
+    def test_attrs(self):
+        self.assertIsInstance(
+            self.viewset, views.AutoOwnObjectsModelViewSet)
+        self.assertIsInstance(self.viewset.queryset, QuerySet)
+        self.assertEqual(self.viewset.queryset.model, models.Vote)
+        self.assertEqual(
+            self.viewset.serializer_class, serializers.VoteSerializer)

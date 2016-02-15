@@ -5,7 +5,7 @@
 
 <a target="_blank" href='{{ claim.issue.url }}'>{{ claim.issue.url }}</a></br>
 
-{%  if claim.claimant == request.user %}
+{%  if claim.user == request.user %}
 
 <a target="_blank" href='{{ claim.evidence }}'>{{ claim.evidence }}</a></br>
 
