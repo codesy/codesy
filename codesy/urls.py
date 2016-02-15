@@ -14,9 +14,6 @@ router.register(r'users', views.UserViewSet)
 
 urlpatterns = patterns(
     '',
-    # Special view for whats-deployed app
-    url(r'^revision.txt$', 'codesy.views.revision', name='revision'),
-
     # Home page
     url(r'^$', views.Home.as_view(), name='home'),
 

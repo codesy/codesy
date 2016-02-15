@@ -1,7 +1,5 @@
 import hashlib
-import os
 
-from django.http import HttpResponse
 from django.views.generic import TemplateView
 from rest_framework.viewsets import ModelViewSet
 
@@ -50,8 +48,3 @@ class Home(TemplateView):
         elif 'Chrome' in agent:
             browser = 'chrome'
         return browser
-
-
-def revision(request):
-    return HttpResponse(os.environ.get('COMMIT_HASH', ''),
-                        content_type='text/plain')
