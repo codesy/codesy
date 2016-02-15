@@ -1,4 +1,5 @@
 from datetime import datetime
+import time
 
 import fudge
 from fudge.inspector import arg
@@ -8,7 +9,7 @@ from django.test import TestCase
 
 from model_mommy import mommy
 
-from ..models import Bid, Claim, Issue
+from ..models import Bid, Claim, Issue, Vote
 
 
 class MarketTestCase(TestCase):
@@ -137,6 +138,24 @@ class NotifyMatchersReceiverTest(MarketTestCase):
         )
 
 
+class ClaimTest(TestCase):
+    def test_save_updates_datetimes(self):
+        test_claim = mommy.make(Claim)
+        test_claim_created = test_claim.created
+        self.assertTrue(datetime.now() >= test_claim_created,
+                        "Claim.created should be auto-populated.")
+        time.sleep(1)
+        test_claim.evidence = 'https://test.com/123'
+        test_claim.save()
+        self.assertEqual(test_claim_created, test_claim.created,
+                         "Claim.created should stay the same after an update.")
+        test_claim_modified = test_claim.modified
+        self.assertTrue(test_claim_modified >= test_claim_created,
+                        "Claim.modified should be auto-populated on update.")
+        self.assertTrue(datetime.now() >= test_claim_modified,
+                        "Claim.modified should be auto-populated.")
+
+
 class NotifyMatchingOfferersTest(MarketTestCase):
     def setUp(self):
         """
@@ -202,3 +221,21 @@ class NotifyMatchingOfferersTest(MarketTestCase):
         claim.save()
         claim.status = 'PA'
         claim.save()
+
+
+class VoteTest(TestCase):
+    def test_save_updates_datetimes(self):
+        test_vote = mommy.make(Vote, approved=False)
+        test_vote_created = test_vote.created
+        self.assertTrue(datetime.now() >= test_vote_created,
+                        "Vote.created should be auto-populated.")
+        time.sleep(1)
+        test_vote.approved = True
+        test_vote.save()
+        self.assertEqual(test_vote_created, test_vote.created,
+                         "Vote.created should stay the same after an update.")
+        test_vote_modified = test_vote.modified
+        self.assertTrue(test_vote_modified >= test_vote_created,
+                        "Vote.modified should be auto-populated on update.")
+        self.assertTrue(datetime.now() >= test_vote_modified,
+                        "Vote.modified should be auto-populated.")

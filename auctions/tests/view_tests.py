@@ -1,5 +1,4 @@
 import fudge
-from fudge.inspector import arg
 
 from django.conf import settings
 from django.db.models.query import QuerySet
@@ -135,15 +134,6 @@ class ClaimViewSetTest(TestCase):
         qs = self.viewset.get_queryset()
 
         self.assertSequenceEqual(qs.order_by('id'), [claim1, ])
-
-    @fudge.test
-    def test_perform_create_saves_created_datetime(self):
-        fake_serializer = (
-            fudge.Fake('serializers.ClaimSerializer')
-            .expects('save')
-            .with_args(created=arg.any())
-        )
-        self.viewset.perform_create(fake_serializer)
 
 
 class ClaimAPIViewTest(TestCase):

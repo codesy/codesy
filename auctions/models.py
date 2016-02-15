@@ -12,6 +12,7 @@ from mailer import send_mail
 
 
 class Bid(models.Model):
+    # TODO: add created and modified fields to auctions.models.Bid
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     url = models.URLField()
     issue = models.ForeignKey('Issue', null=True)
@@ -176,6 +177,7 @@ def notify_matching_offerers(sender, instance, created, **kwargs):
 class Vote(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     claim = models.ForeignKey(Claim)
+    # TODO: Vote.approved needs null=True or blank=False
     approved = models.BooleanField(default=None, blank=True)
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True, auto_now=True)
@@ -184,3 +186,12 @@ class Vote(models.Model):
         return u'Vote for %s by (%s): %s' % (
             self.claim, self.user, self.approved
         )
+
+
+@receiver(post_save, sender=Claim)
+@receiver(post_save, sender=Vote)
+def update_datetimes_for_model_save(sender, instance, created, **kwargs):
+    if created:
+        instance.created = datetime.now()
+    else:
+        instance.modified = datetime.now()

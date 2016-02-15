@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -72,10 +70,6 @@ class ClaimViewSet(AutoOwnObjectsModelViewSet):
     serializer_class = ClaimSerializer
     renderer_classes = (TemplateHTMLRenderer,)
 
-    # TODO: move ClaimViewSet.perform_create to model pre_save signal handler
-    def perform_create(self, serializer):
-        serializer.save(created=datetime.now())
-
 
 class ClaimAPIView(APIView):
     """
@@ -103,7 +97,3 @@ class VoteViewSet(AutoOwnObjectsModelViewSet):
     """
     queryset = Vote.objects.all()
     serializer_class = VoteSerializer
-
-    # TODO: move VoteViewSet.perform_create to a model pre_save signal handler
-    def perform_create(self, serializer):
-        serializer.save(created=datetime.now())
