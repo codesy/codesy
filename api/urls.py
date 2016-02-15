@@ -9,7 +9,6 @@ from . import views
 router = routers.DefaultRouter()
 router.register(r'bids', views.BidViewSet)
 router.register(r'claims', views.ClaimViewSet)
-router.register(r'issues', views.ClaimViewSet)
 router.register(r'votes', views.VoteViewSet)
 
 custom_endpoint_url_patterns = patterns(
