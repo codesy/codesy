@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Bid, Claim, Vote
+from auctions.models import Bid, Claim, Vote
+
 from .serializers import BidSerializer, ClaimSerializer, VoteSerializer
 
 
