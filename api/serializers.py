@@ -1,6 +1,15 @@
 from rest_framework import serializers
 
+from codesy.base.models import User
 from auctions.models import Bid, Claim, Vote
+
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'stripe_card_token',
+                  'balanced_bank_account_href')
+        read_only_fields = ('id', 'username')
 
 
 class BidSerializer(serializers.ModelSerializer):

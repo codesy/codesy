@@ -5,32 +5,13 @@ from django.test import TestCase
 from model_mommy import mommy
 import fudge
 
-from codesy import base, serializers, views
+from codesy import views
 
 
 class AuthViewTest(TestCase):
     def test_allauth_signup_disabled(self):
         resp = self.client.get(reverse("account_signup"))
         self.assertContains(resp, 'Sign Up Closed')
-
-
-class UserViewSetTest(TestCase):
-    def setUp(self):
-        self.view = views.UserViewSet()
-
-    def test_attrs(self):
-        self.assertIsInstance(self.view, views.ModelViewSet)
-        self.assertEqual(self.view.model, base.models.User)
-        self.assertEqual(
-            self.view.serializer_class, serializers.UserSerializer)
-
-    def test_get_object(self):
-        user = mommy.make(settings.AUTH_USER_MODEL)
-        self.view.request = fudge.Fake().has_attr(user=user)
-
-        obj = self.view.get_object()
-
-        self.assertEqual(obj, user)
 
 
 class HomeTest(TestCase):

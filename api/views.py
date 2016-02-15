@@ -4,8 +4,22 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from auctions.models import Bid, Claim, Vote
+from codesy.base.models import User
+from .serializers import (BidSerializer, ClaimSerializer, UserSerializer,
+                          VoteSerializer)
 
-from .serializers import BidSerializer, ClaimSerializer, VoteSerializer
+
+class UserViewSet(ModelViewSet):
+    """
+    API endpoint for users. Users can only list, create, retrieve,
+    update, or delete themself.
+    """
+    model = User
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get_object(self, qs=None):
+        return self.request.user
 
 
 class AutoOwnObjectsModelViewSet(ModelViewSet):

@@ -1,23 +1,6 @@
 import hashlib
 
 from django.views.generic import TemplateView
-from rest_framework.viewsets import ModelViewSet
-
-from .base.models import User
-from .serializers import UserSerializer
-
-
-class UserViewSet(ModelViewSet):
-    """
-    API endpoint for users. Users can only list, create, retrieve,
-    update, or delete themself.
-    """
-    model = User
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-    def get_object(self, qs=None):
-        return self.request.user
 
 
 class Home(TemplateView):
