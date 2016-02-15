@@ -6,9 +6,29 @@ from django.test import TestCase
 from model_mommy import mommy
 import rest_framework
 
+from codesy.base.models import User
 from auctions import models
 
 from .. import serializers, views
+
+
+class UserViewSetTest(TestCase):
+    def setUp(self):
+        self.view = views.UserViewSet()
+
+    def test_attrs(self):
+        self.assertIsInstance(self.view, views.ModelViewSet)
+        self.assertEqual(self.view.model, User)
+        self.assertEqual(
+            self.view.serializer_class, serializers.UserSerializer)
+
+    def test_get_object(self):
+        user = mommy.make(settings.AUTH_USER_MODEL)
+        self.view.request = fudge.Fake().has_attr(user=user)
+
+        obj = self.view.get_object()
+
+        self.assertEqual(obj, user)
 
 
 def _make_test_bid():

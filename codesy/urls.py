@@ -2,22 +2,16 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
 
-from rest_framework import routers
-
 from . import views
 
 admin.site.site_header = u'Codesy administration'
 admin.site.site_title = u'Codesy site admin'
 
-router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
 
 urlpatterns = patterns(
     '',
-    # Home page
+    # Static home/ explanation pages
     url(r'^$', views.Home.as_view(), name='home'),
-
-    # Static explanation pages
     url(r'^how-it-works$',
         TemplateView.as_view(template_name="how_it_works.html"),
         name='how_it_works'),
@@ -30,12 +24,8 @@ urlpatterns = patterns(
     url(r'^admin/', include(admin.site.urls)),
 
     # API docs
-    url(r'^docs/', include('rest_framework_swagger.urls')),
+    url(r'^api/docs/', include('rest_framework_swagger.urls')),
 
     # auctions API
     url(r'^', include('api.urls')),
-
-    # user API
-    # TODO: move user API code into new api app
-    url(r'^', include(router.urls))
 )

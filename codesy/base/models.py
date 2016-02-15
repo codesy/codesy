@@ -15,6 +15,7 @@ EMAIL_URL = 'https://api.github.com/user/emails'
 
 class User(AbstractUser):
     stripe_card_token = models.CharField(max_length=100, blank=True)
+    # TODO: remove/replace User.balanced_bank_account_href
     balanced_bank_account_href = models.CharField(max_length=100, blank=True)
 
     USERNAME_FIELD = 'username'
