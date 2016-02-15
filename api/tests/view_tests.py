@@ -6,7 +6,9 @@ from django.test import TestCase
 from model_mommy import mommy
 import rest_framework
 
-from auctions import models, serializers, views
+from auctions import models
+
+from .. import serializers, views
 
 
 def _make_test_bid():
@@ -70,7 +72,7 @@ class BidAPIViewTest(TestCase):
             (rest_framework.renderers.TemplateHTMLRenderer,)
         )
 
-    @fudge.patch('auctions.views.Response')
+    @fudge.patch('api.views.Response')
     def test_get_existant_bid(self, mock_resp):
         user, url, bid = _make_test_bid()
         self.view.request = fudge.Fake().has_attr(
@@ -80,7 +82,7 @@ class BidAPIViewTest(TestCase):
 
         self.view.get(self.view.request)
 
-    @fudge.patch('auctions.views.Response')
+    @fudge.patch('api.views.Response')
     def test_get_nonexistant_bid_assigns_None(self, mock_resp):
         user = mommy.make(settings.AUTH_USER_MODEL)
         other_user = mommy.make(settings.AUTH_USER_MODEL)
@@ -93,7 +95,7 @@ class BidAPIViewTest(TestCase):
 
         self.view.get(self.view.request)
 
-    @fudge.patch('auctions.views.Response')
+    @fudge.patch('api.views.Response')
     def test_get_existant_bid_with_claim(self, mock_resp):
         user, url, bid = _make_test_bid()
         claim = mommy.make('auctions.Claim', issue=bid.issue, user=user)
@@ -147,7 +149,7 @@ class ClaimAPIViewTest(TestCase):
             (rest_framework.renderers.TemplateHTMLRenderer,)
         )
 
-    @fudge.patch('auctions.views.Response')
+    @fudge.patch('api.views.Response')
     def test_get_existant_claim_returns_claim_status(self, mock_resp):
         claim = mommy.make('auctions.Claim')
         self.view.request = fudge.Fake()
@@ -158,7 +160,7 @@ class ClaimAPIViewTest(TestCase):
 
         self.view.get(self.view.request, claim.pk)
 
-    @fudge.patch('auctions.views.Response')
+    @fudge.patch('api.views.Response')
     def test_get_nonexistant_claim_assigns_None(self, mock_resp):
         self.view.request = fudge.Fake()
         mock_resp.expects_call().with_args(

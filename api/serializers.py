@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Bid, Claim, Vote
+from auctions.models import Bid, Claim, Vote
 
 
 class BidSerializer(serializers.ModelSerializer):

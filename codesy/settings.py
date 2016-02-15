@@ -57,6 +57,7 @@ THIRD_PARTY_APPS = (
 
 LOCAL_APPS = (
     'codesy.base',
+    'api',
     'auctions',
 )
 

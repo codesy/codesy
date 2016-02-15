@@ -1,7 +1,9 @@
 from django.test import TestCase
 import rest_framework
 
-from auctions import models, serializers
+from auctions import models
+
+from .. import serializers
 
 
 class BidSerializerTest(TestCase):
