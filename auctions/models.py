@@ -125,7 +125,6 @@ class Claim(models.Model):
     def expires(self):
         return self.created + timedelta(days=30)
 
-    # TODO: Claim.get_absolute_url should return claim-status/<pk>
     def get_absolute_url(self):
         return reverse('custom-urls:claim-status', kwargs={'pk': self.id})
 

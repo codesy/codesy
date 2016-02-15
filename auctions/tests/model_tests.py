@@ -1,10 +1,11 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 
 import fudge
 from fudge.inspector import arg
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from model_mommy import mommy
@@ -139,6 +140,20 @@ class NotifyMatchersReceiverTest(MarketTestCase):
 
 
 class ClaimTest(TestCase):
+    # HACK: ? do we really need to test whether I typed correctly?
+    def test_get_absolute_url_returns_claim_status(self):
+        test_claim = mommy.make(Claim)
+        self.assertTrue(
+            reverse('custom-urls:claim-status',
+                    kwargs={'pk': test_claim.id})
+            in test_claim.get_absolute_url()
+        )
+
+    def test_expires_is_30_days_after_create(self):
+        test_claim = mommy.make(Claim)
+        self.assertEqual(test_claim.expires,
+                         test_claim.created + timedelta(days=30))
+
     def test_save_updates_datetimes(self):
         test_claim = mommy.make(Claim)
         test_claim_created = test_claim.created
