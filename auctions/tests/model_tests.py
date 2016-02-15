@@ -140,6 +140,10 @@ class NotifyMatchersReceiverTest(MarketTestCase):
 
 
 class ClaimTest(TestCase):
+    def test_default_values(self):
+        test_claim = mommy.make(Claim)
+        self.assertEqual('Pending', test_claim.status)
+
     # HACK: ? do we really need to test whether I typed correctly?
     def test_get_absolute_url_returns_claim_status(self):
         test_claim = mommy.make(Claim)
@@ -230,11 +234,9 @@ class NotifyMatchingOfferersTest(MarketTestCase):
             issue=self.issue,
             created=datetime.now()
         )
-        claim.status = 'ES'
+        claim.evidence = 'http://test.com/updated-evidence'
         claim.save()
-        claim.status = 'RE'
-        claim.save()
-        claim.status = 'PA'
+        claim.status = 'Rejected'
         claim.save()
 
 
