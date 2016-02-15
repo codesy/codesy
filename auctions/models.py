@@ -92,26 +92,19 @@ class Issue(models.Model):
 
 
 class Claim(models.Model):
-    # TODO: clean up Claim.status choices
-    OPEN = 'OP'
-    ESCROW = 'ES'
-    PAID = 'PA'
-    REJECTED = 'RE'
     STATUS_CHOICES = (
-        (None, ''),
-        (OPEN, 'Open'),
-        (ESCROW, 'Escrow'),
-        (PAID, 'Paid'),
-        (REJECTED, 'Rejected'),
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
     )
     issue = models.ForeignKey('Issue')
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True, auto_now=True)
     evidence = models.URLField(blank=True)
-    status = models.CharField(max_length=2,
+    status = models.CharField(max_length=255,
                               choices=STATUS_CHOICES,
-                              default=OPEN)
+                              default='Pending')
 
     class Meta:
         unique_together = (("user", "issue"),)
