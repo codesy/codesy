@@ -134,7 +134,7 @@ def notify_matching_offerers(sender, instance, created, **kwargs):
     OFFERER_NOTIFICATION_EMAIL_STRING = """
     {user} has claimed the payout for {url}.
 
-    codesy.io will pay your offer of {offer} to {user} on {pay_date}.
+    codesy.io will pay your offer of {offer} to {user}.
 
     To approve or reject this claim, go to:
     https://{site}{claim_link}
@@ -159,7 +159,6 @@ def notify_matching_offerers(sender, instance, created, **kwargs):
                 user=instance.user,
                 url=instance.issue.url,
                 offer=bid.offer,
-                pay_date=instance.expires,
                 site=current_site,
                 claim_link=instance.get_absolute_url()
             ),

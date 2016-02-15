@@ -69,7 +69,6 @@ class ClaimViewSet(AutoOwnObjectsModelViewSet):
     """
     queryset = Claim.objects.all()
     serializer_class = ClaimSerializer
-    renderer_classes = (TemplateHTMLRenderer,)
 
 
 class ClaimAPIView(APIView):
