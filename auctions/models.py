@@ -21,6 +21,8 @@ class Bid(models.Model):
     ask_match_sent = models.DateTimeField(null=True, blank=True)
     offer = models.DecimalField(max_digits=6, decimal_places=2, blank=True,
                                 default=0)
+    created = models.DateTimeField(null=True, blank=True)
+    modified = models.DateTimeField(null=True, blank=True, auto_now=True)
 
     class Meta:
         unique_together = (("user", "url"),)
@@ -180,6 +182,7 @@ class Vote(models.Model):
         )
 
 
+@receiver(post_save, sender=Bid)
 @receiver(post_save, sender=Claim)
 @receiver(post_save, sender=Vote)
 def update_datetimes_for_model_save(sender, instance, created, **kwargs):

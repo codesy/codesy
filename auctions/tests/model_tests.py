@@ -68,6 +68,23 @@ class BidTests(MarketTestCase):
         issue = Issue.objects.get(url=url)
         self.assertEquals(url, issue.url)
 
+    def test_save_updates_datetimes(self):
+        test_bid = mommy.make(Bid)
+        test_bid_created = test_bid.created
+        self.assertTrue(datetime.now() >= test_bid_created,
+                        "Bid.created should be auto-populated.")
+        time.sleep(1)
+        test_bid.ask = 100
+        test_bid.offer = 10
+        test_bid.save()
+        self.assertEqual(test_bid_created, test_bid.created,
+                         "Bid.created should stay the same after an update.")
+        test_bid_modified = test_bid.modified
+        self.assertTrue(test_bid_modified >= test_bid_created,
+                        "Bid.modified should be auto-populated on update.")
+        self.assertTrue(datetime.now() >= test_bid_modified,
+                        "Bid.modified should be auto-populated.")
+
 
 class NotifyMatchersReceiverTest(MarketTestCase):
 
