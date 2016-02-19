@@ -6,7 +6,7 @@
    There is a claim this issue: <a target="_blank" href='{{ claim.issue.url }}'>{{ claim.issue.url }}</a></br>
    The person making the claim submitted this URL as proof:<a target="_blank" href='{{ claim.evidence }}'>{{ claim.evidence }}</a></br>
    
-   <div> Currently the claim is:  : {{claim.status}} </div>
+   <div> Currently the claim is:  : {{claim.status}} with {{ votes | length }} votes out of {{offers | length }} offers.  </div>
 
 
    The claim was created at: {{ claim.created }}</br>

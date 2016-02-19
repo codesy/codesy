@@ -1,13 +1,9 @@
-<form id="codesy_vpte" 
- action="{% url 'vote-list' claim.id %}" 
- method="POST" >
- {% csrf_token %}
- <fieldset>
-     <label for="evidence">Do you approve this claim?</label>
-     
-           <input type="checkbox"></input>
-           <input type="submit"></input>
-      </div>
-
- </fieldset>
+<form id="codesy_vote" 
+   action="{% url 'vote-list' %}" 
+   method="POST" >
+   {% csrf_token %}
+   <input name = "claim"  type="hidden" value="{{claim.id}}"></iinput>
+   <label >Do you approve this claim?</label>
+   <input id = "approved" type="checkbox"></input>
+   <input type="submit"></input>
 </form>
