@@ -174,10 +174,9 @@ class Vote(models.Model):
     approved = models.BooleanField(default=None, blank=True)
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True, auto_now=True)
-    
+
     class Meta:
         unique_together = (("user", "claim"),)
-    
 
     def __unicode__(self):
         return u'Vote for %s by (%s): %s' % (
@@ -190,12 +189,11 @@ def notify_approved_claim(sender, instance, created, **kwargs):
     claim = instance.claim
     votes = Vote.objects.filter(claim=claim)
     approvals = votes.filter(approved=True)
+    current_site = Site.objects.get_current()
     if votes == approvals:
         # TODO: make a nicer HTML email template
         CLAIM_APPROVED_EMAIL_STRING = """
-        
         Your claim for {url} has been approved.
-        
         https://{site}
         """
         send_mail(
