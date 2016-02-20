@@ -1,3 +1,5 @@
+from django.shortcuts import get_object_or_404
+
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -97,22 +99,15 @@ class ClaimAPIView(APIView):
     renderer_classes = (TemplateHTMLRenderer,)
 
     def get(self, request, pk, format=None):
-        try:
-            claim = Claim.objects.get(pk=pk)
-        except Claim.DoesNotExist:
-            claim = None
-        try:
-            votes = Vote.objects.filter(claim=claim)
-            voted = votes.filter(user=request.user).count() > 0
-        except Vote.DoesNotExist:
-            votes = None
-            voted = False
-
+        claim, votes, offers = None, [], []
+        claim = get_object_or_404(Claim, pk=pk)
+        votes = Vote.objects.filter(claim=claim)
+        voted = votes.filter(user=request.user).count() > 0
         offers = Bid.objects.filter(issue=claim.issue).filter(offer__gt=0)
 
-        return Response(
-            {'claim': claim, 'votes': votes, 'voted': voted, "offers": offers},
-            template_name='claim_status.html')
+        context = {'claim': claim, "offers": offers, 'voted': voted,
+                   'votes': votes}
+        return Response(context, template_name='claim_status.html')
 
 
 class VoteViewSet(AutoOwnObjectsModelViewSet):
