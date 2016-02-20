@@ -101,8 +101,18 @@ class ClaimAPIView(APIView):
             claim = Claim.objects.get(pk=pk)
         except Claim.DoesNotExist:
             claim = None
+        try:
+            votes = Vote.objects.filter(claim=claim)
+            voted = votes.filter(user=request.user).count() > 0
+        except Vote.DoesNotExist:
+            votes = None
+            voted = False
 
-        return Response({'claim': claim}, template_name='claim_status.html')
+        offers = Bid.objects.filter(issue=claim.issue).filter(offer__gt=0)
+
+        return Response(
+            {'claim': claim, 'votes': votes, 'voted': voted, "offers": offers},
+            template_name='claim_status.html')
 
 
 class VoteViewSet(AutoOwnObjectsModelViewSet):

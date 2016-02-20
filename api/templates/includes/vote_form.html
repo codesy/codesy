@@ -1,10 +1,9 @@
-
-<form id="codesy_vpte" 
- class="pure-form pure-form-stacked" 
- action="//{{current_site.domain}}{% url 'claim-list' %}" 
- data-method="POST" >
- {% csrf_token %}
- <fieldset>
-     <label for="evidence">THIS WILL BE A VOTING FORM</label>
- </fieldset>
+<form id="codesy_vote" 
+   action="{% url 'vote-list' %}" 
+   method="POST" >
+   {% csrf_token %}
+   <input name = "claim"  type="hidden" value="{{claim.id}}"></iinput>
+   <label >Do you approve this claim?</label>
+   <input id = "approved" type="checkbox"></input>
+   <input type="submit"></input>
 </form>

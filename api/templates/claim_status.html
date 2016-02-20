@@ -3,24 +3,29 @@
 
 {% block content %}
 
-<a target="_blank" href='{{ claim.issue.url }}'>{{ claim.issue.url }}</a></br>
-
-{%  if claim.user == request.user %}
-
-<a target="_blank" href='{{ claim.evidence }}'>{{ claim.evidence }}</a></br>
-
-
-{% else %}
-   {% include "includes/vote_form.html" %}
-
-{% endif %}
+   There is a claim this issue: <a target="_blank" href='{{ claim.issue.url }}'>{{ claim.issue.url }}</a></br>
+   The person making the claim submitted this URL as proof:<a target="_blank" href='{{ claim.evidence }}'>{{ claim.evidence }}</a></br>
+   
+   <div> Currently the claim is:  : {{claim.status}} with {{ votes | length }} votes out of {{offers | length }} offers.  </div>
 
 
+   The claim was created at: {{ claim.created }}</br>
+   and will expire at: {{ claim.expires }}</br>
 
-{{ claim.created }}</br>
-{{ claim.expires }}</br>
+   {%  if claim.user != request.user %}
 
-<div> NEED TO LOOK UP VOTING STATS HERE</div>
+      {% if voted %}
+         
+         YOU ALREADY VOTED
+      
+      {% else %}
+         
+         {% include "includes/vote_form.html" %}
+
+      {% endif %}
+
+   {% endif %}
+
 {% endblock %}
 
 {% block scripts %}
