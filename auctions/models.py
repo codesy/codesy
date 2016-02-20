@@ -181,6 +181,30 @@ class Vote(models.Model):
         )
 
 
+@receiver(post_save, sender=Vote)
+def notify_approved_claim(sender, instance, created, **kwargs):
+    claim = instance.claim
+    votes = Vote.objects.filter(claim=claim)
+    approvals = votes.filter(approved=True)
+    if votes == approvals:
+        # TODO: make a nicer HTML email template
+        CLAIM_APPROVED_EMAIL_STRING = """
+        
+        Your claim for {url} has been approved.
+        
+        https://{site}
+        """
+        send_mail(
+            "[codesy] Your claimed has been approved",
+            CLAIM_APPROVED_EMAIL_STRING.format(
+                url=claim.url,
+                site=current_site,
+            ),
+            settings.DEFAULT_FROM_EMAIL,
+            [claim.user.email]
+        )
+
+
 @receiver(post_save, sender=Bid)
 @receiver(post_save, sender=Claim)
 @receiver(post_save, sender=Vote)
