@@ -174,6 +174,10 @@ class Vote(models.Model):
     approved = models.BooleanField(default=None, blank=True)
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True, auto_now=True)
+    
+    class Meta:
+        unique_together = (("user", "claim"),)
+    
 
     def __unicode__(self):
         return u'Vote for %s by (%s): %s' % (
