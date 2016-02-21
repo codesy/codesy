@@ -7,6 +7,7 @@ from fudge.inspector import arg
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.db import IntegrityError
 
 from model_mommy import mommy
 
@@ -273,3 +274,15 @@ class VoteTest(TestCase):
                         "Vote.modified should be auto-populated on update.")
         self.assertTrue(datetime.now() >= test_vote_modified,
                         "Vote.modified should be auto-populated.")
+    
+    def test_user_claim_unigue(self):
+        user1 = mommy.make(settings.AUTH_USER_MODEL,
+                                email='user1@test.com')
+        claim = mommy.make(Claim)
+        first_vote = mommy.make(Vote, claim=claim, user=user1, approved=True)
+        with self.assertRaises(IntegrityError):
+            mommy.make(Vote, claim=claim, user=user1, approved=False)
+        
+
+
+
