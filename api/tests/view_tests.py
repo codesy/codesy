@@ -2,6 +2,7 @@ import fudge
 
 from django.conf import settings
 from django.db.models.query import QuerySet
+from django.http import Http404
 from django.test import TestCase
 from model_mommy import mommy
 import rest_framework
@@ -160,7 +161,9 @@ class ClaimViewSetTest(TestCase):
 
 class ClaimAPIViewTest(TestCase):
     def setUp(self):
+        self.user1, self.url, self.issue, self.claim1 = _make_test_claim()
         self.view = views.ClaimAPIView()
+        self.view.request = fudge.Fake().has_attr(user=self.user1)
 
     def test_attrs(self):
         self.assertIsInstance(self.view, rest_framework.views.APIView)
@@ -169,26 +172,30 @@ class ClaimAPIViewTest(TestCase):
             (rest_framework.renderers.TemplateHTMLRenderer,)
         )
 
-    @fudge.patch('api.views.Response')
-    def test_get_existant_claim_returns_claim_status(self, mock_resp):
-        claim = mommy.make('auctions.Claim')
-        self.view.request = fudge.Fake()
-        mock_resp.expects_call().with_args(
-            {'claim': claim},
-            template_name='claim_status.html'
-        )
+    def test_get_nonexistant_claim_returns_404(self):
+        try:
+            self.view.get(self.view.request, 999)
+            self.fail("Nonexistant claim should have returned 404")
+        except Http404:
+            pass
 
-        self.view.get(self.view.request, claim.pk)
+    def test_get_existant_claim_no_votes_returns_claim_status(self):
+        resp = self.view.get(self.view.request, self.claim1.pk)
+        self.assertEqual(self.claim1, resp.data['claim'])
+        self.assertEqual([], list(resp.data['offers']))
+        self.assertEqual(False, resp.data['voted'])
+        self.assertEqual([], list(resp.data['votes']))
 
-    @fudge.patch('api.views.Response')
-    def test_get_nonexistant_claim_assigns_None(self, mock_resp):
-        self.view.request = fudge.Fake()
-        mock_resp.expects_call().with_args(
-            {'claim': None},
-            template_name='claim_status.html'
-        )
-
-        self.view.get(self.view.request, 1)
+    def test_get_existant_claim_with_votes_returns_claim_status(self):
+        user2 = mommy.make(settings.AUTH_USER_MODEL, username='User2')
+        vote1 = mommy.make('auctions.Vote', claim=self.claim1, user=user2,
+                           approved=True)
+        self.view.request = fudge.Fake().has_attr(user=user2)
+        resp = self.view.get(self.view.request, self.claim1.pk)
+        self.assertEqual(self.claim1, resp.data['claim'])
+        self.assertEqual([], list(resp.data['offers']))
+        self.assertEqual(True, resp.data['voted'])
+        self.assertEqual([vote1], list(resp.data['votes']))
 
 
 class VoteViewSetTest(TestCase):
