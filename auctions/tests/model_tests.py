@@ -259,6 +259,21 @@ class NotifyMatchingOfferersTest(MarketTestCase):
 
 
 class VoteTest(TestCase):
+    def setUp(self):
+        self.user1 = mommy.make(settings.AUTH_USER_MODEL,
+                                email='user1@test.com')
+        self.user2 = mommy.make(settings.AUTH_USER_MODEL,
+                                email='user2@test.com')
+        self.user3 = mommy.make(settings.AUTH_USER_MODEL,
+                                email='user3@test.com')
+        url = 'http://test.com/bug/123'
+        issue = mommy.make(Issue, url=url)
+
+        mommy.make(Bid, user=self.user1, url=url, issue=issue, ask=50)
+        mommy.make(Bid, user=self.user2, url=url, issue=issue, offer=50)
+        mommy.make(Bid, user=self.user3, url=url, issue=issue, offer=50)
+        self.claim = mommy.make(Claim, issue=issue, user=self.user1)
+
     def test_save_updates_datetimes(self):
         test_vote = mommy.make(Vote, approved=False)
         test_vote_created = test_vote.created
@@ -274,15 +289,14 @@ class VoteTest(TestCase):
                         "Vote.modified should be auto-populated on update.")
         self.assertTrue(datetime.now() >= test_vote_modified,
                         "Vote.modified should be auto-populated.")
-    
-    def test_user_claim_unigue(self):
-        user1 = mommy.make(settings.AUTH_USER_MODEL,
-                                email='user1@test.com')
-        claim = mommy.make(Claim)
-        first_vote = mommy.make(Vote, claim=claim, user=user1, approved=True)
+
+    def test_user_claim_unique(self):
+        mommy.make(Vote, claim=self.claim, user=self.user1, approved=True)
         with self.assertRaises(IntegrityError):
-            mommy.make(Vote, claim=claim, user=user1, approved=False)
-        
+            mommy.make(Vote, claim=self.claim, user=self.user1, approved=False)
 
-
-
+    @fudge.patch('auctions.models.send_mail')
+    def test_notify_claim_approved(self, mock_send_mail):
+        mock_send_mail.expects_call()
+        mommy.make(Vote, claim=self.claim, user=self.user2, approved=True)
+        mommy.make(Vote, claim=self.claim, user=self.user3, approved=True)
