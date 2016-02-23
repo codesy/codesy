@@ -187,10 +187,17 @@ class Vote(models.Model):
 @receiver(post_save, sender=Vote)
 def notify_approved_claim(sender, instance, created, **kwargs):
     claim = instance.claim
-    votes_needed = Bid.objects.filter(issue=claim.issue).filter(offer__gt=0)
-    approvals = Vote.objects.filter(claim=claim, approved=True)
+    votes_needed = Bid.objects \
+                      .filter(issue=claim.issue) \
+                      .exclude(user=claim.user) \
+                      .filter(offer__gt=0) \
+                      .count()
 
-    if votes_needed.count() == approvals.count():
+    approvals = Vote.objects \
+                    .filter(claim=claim, approved=True) \
+                    .count()
+
+    if votes_needed == approvals:
         current_site = Site.objects.get_current()
         # TODO: make a nicer HTML email template
         CLAIM_APPROVED_EMAIL_STRING = """
