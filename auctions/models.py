@@ -195,6 +195,7 @@ def notify_approved_claim(sender, instance, created, **kwargs):
 
     approvals = Vote.objects \
                     .filter(claim=claim, approved=True) \
+                    .exclude(user=claim.user) \
                     .count()
 
     if votes_needed == approvals:
