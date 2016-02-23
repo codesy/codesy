@@ -198,6 +198,8 @@ def notify_approved_claim(sender, instance, created, **kwargs):
                     .exclude(user=claim.user) \
                     .count()
 
+    # TODO: notify claimant when claim rejected
+
     if votes_needed == approvals:
         current_site = Site.objects.get_current()
         # TODO: make a nicer HTML email template

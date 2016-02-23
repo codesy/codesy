@@ -306,3 +306,9 @@ class VoteTest(TestCase):
         mock_send_mail.is_callable().times_called(0)
         mommy.make(Vote, claim=self.claim, user=self.user1, approved=True)
         mommy.make(Vote, claim=self.claim, user=self.user2, approved=True)
+
+    @fudge.patch('auctions.models.send_mail')
+    def test_no_votes_not_counted(self, mock_send_mail):
+        mock_send_mail.is_callable().times_called(0)
+        mommy.make(Vote, claim=self.claim, user=self.user2, approved=False)
+        mommy.make(Vote, claim=self.claim, user=self.user3, approved=True)
