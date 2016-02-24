@@ -1,29 +1,21 @@
-
-
 {% extends "base_widget.html" %}
-
 
 {% block widget_content %}
 
+<!--  IS THERE A CLAIM? -->
+   {% if claim %}
+      There is a claim on this issue. 
+      <a href="//{{current_site.domain}}/claim-status/{{claim.id}}" target="_blank">Go see it</a>
 <!-- HAVE WE BEEN HERE BEFORE? -->
-   {% if bid == None %}
+   {% elif bid == None %}
+   
       {% include "includes/bid_form.html" %}
 <!-- IS THE USER ASKING OR OFFERING -->
    {% elif bid.ask > 0 %}
 <!-- HANDLE ASKS -->
-      {% if claim %}
-         There is a claim on this issue. 
-         <a href="//{{current_site.domain}}/claim-status/{{claim.id}}" target="_blank">Go see it</a>
-      {% else %}
-         {% include "includes/claim_form.html" %}
-         {% include "includes/bid_form.html" %}
-      {% endif %}
+      {% include "includes/claim_form.html" %}
    {% elif bid.offer > 0  %}
 <!-- HANDLE OFFERS -->
-      {% if claim %}
-         There is a claim on this issue. 
-         <a href="//{{current_site.domain}}/claim-status/{{claim.id}}"target="_blank">Go see it</a>
-      {% endif %}
       {% include "includes/bid_form.html" %}
 <!-- IF BID AND ASK ARE BOTH ZERO? -->
    {% else %}

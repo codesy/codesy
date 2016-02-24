@@ -67,7 +67,7 @@ class BidAPIView(APIView):
         else:
             try:
                 claim = Claim.objects.get(
-                    user=self.request.user, issue=bid.issue
+                     issue=bid.issue
                 )
             except Claim.DoesNotExist:
                 pass
