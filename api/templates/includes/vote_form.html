@@ -1,6 +1,6 @@
 <form id="codesy_vote" 
    action="{% url 'vote-list' %}" 
-   method="POST" >
+   data-method="POST" >
    {% csrf_token %}
    <input name = "claim"  type="hidden" value="{{claim.id}}"></iinput>
    <label >Do you approve this claim?</label>

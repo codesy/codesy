@@ -1,24 +1,30 @@
 {% if claim %}
-<p>You have <a target="_blank" href="//{{current_site.domain}}{% url 'custom-urls:claim-status' pk=claim.pk %}">made a claim</a> for this issue.</p>
+
+   <p>You have 
+      <a target="_blank" 
+         href="//{{current_site.domain}}{% url 'custom-urls:claim-status' pk=claim.pk %}">
+         made a claim</a> for this issue.</p>
+
+
 {% else %}
-         <form id="codesy_claim" 
-          class="pure-form pure-form-stacked" 
-          action="//{{current_site.domain}}{% url 'claim-list' %}" 
-          data-method="POST" >
-          {% csrf_token %}
-          <fieldset>
-              <input name="issue" type="hidden" value="{{ bid.issue.id }}" />
-              <label for="evidence">Claim the payout:</label>
-              <input 
-                 id="evidence" 
-                 name="evidence"
-                 class="pure-input" 
-                 type="text" 
-                 placeholder="Provide a URL."/>
-               <div class="pure-controls">
-                 <input class="pure-button pure-button-primary" type="submit" value="Claim it" />
-               </div>
-          </fieldset>
-      </form>
+   <form id="codesy_claim" 
+         class="pure-form pure-form-stacked" 
+         action="//{{current_site.domain}}{% url 'claim-list' %}" 
+         data-method="POST" >
+   {% csrf_token %}
+   <fieldset>
+     <input name="issue" type="hidden" value="{{ bid.issue.id }}" />
+     <label for="evidence">Claim the payout:</label>
+     <input 
+        id="evidence" 
+        name="evidence"
+        class="pure-input" 
+        type="text" 
+        placeholder="Provide a URL."/>
+      <div class="pure-controls">
+        <input class="pure-button pure-button-primary" type="submit" value="Claim it" />
+      </div>
+   </fieldset>
+   </form>
 {% endif %}
 

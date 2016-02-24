@@ -1,0 +1,41 @@
+      <form id="codesy_bid" class="pure-form pure-form-aligned" 
+            {% if bid %}
+               action = "//{{current_site.domain}}{% url 'bid-detail' bid.id %}" 
+               data-method="PUT" 
+            {% else %}
+               action="//{{current_site.domain}}{% url 'bid-list' %}"
+               data-method="POST" 
+            {% endif %}
+         > <!-- end of FORM tag -->
+         {% csrf_token %}
+         <input name="url" type="hidden" value="{{ url }}"></input>
+         <fieldset>
+            <div class="pure-control-group">
+               <label for="ask">Ask</label>
+               <input id="ask"
+                      name="ask"
+                      class="pure-input"
+                      type="text"
+                      placeholder="What you'd want."
+                      value="{{ bid.ask }}">
+            </div>
+            <div class="pure-control-group">
+               <label for="offer">Offer</label>
+               <input id="offer"
+                      name="offer"
+                      class="pure-input"
+                      type="text"
+                      placeholder="What you'd pay."
+                      value="{{ bid.offer }}">
+            </div>
+            <div class="pure-control-group">
+               <input id="submit_bid" class="button-small pure-button pure-button-primary" 
+                      type="submit" 
+                      value="{%  if bid.offer > 0  %}
+                                  Change your Bid
+                             {% else %}
+                                  Make a bid
+                             {% endif %}" />
+            </div>
+         </fieldset>
+      </form>
