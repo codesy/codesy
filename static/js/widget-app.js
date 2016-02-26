@@ -1,4 +1,4 @@
-function submitBid(e) {
+function submitForm(e) {
   e.preventDefault();
   form = $(this)
   var csrf_token = form.find('input[name=csrfmiddlewaretoken]').val()
@@ -21,5 +21,5 @@ function submitBid(e) {
 }
 
 $(document).ready(function() {
-  $('form').submit(submitBid)
+  $('form').submit(submitForm)
 });
