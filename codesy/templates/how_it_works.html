@@ -3,25 +3,31 @@
 
 {% block content %}
 
-  <ol>
-    <li>Add codesy to your browser.
-    <li>When you visit a bug, you'll see a codesy form with two questions:
-    <ul>
-      <li>How much will you "chip in" for someone else to fix it?</li>
-      <li>How much would you ask for to fix it yourself?</li>
-    </ul>
-    <li>Bid your amounts.</li>
-    <li>codesy collects all bids, and monitors all bugs.</li>
-    <li>When the offers on a bug add up to someone's asking price, codesy emails them.</li>
-    <li>If, and when, they fix the bug, codesy emails them to claim their earnings.</li>
-    <li>They may divide their earnings up between 3 entities:
-    <ul>
-        <li>Themself</li>
-        <li>The project with the bug</li>
-        <li>codesy</li>
-    </ul>
-  </ol>
-  <p>We'll combine all the offers until they match an asking price, then notify the matching coder to fix the bug and collect their earnings.</p>
-  <p>See our <a href="{% url "faq" %}">Frequently Asked Questions</a> for more.</p>
+<div class="row medium-8 large-7 columns">
+<div class="blog-post">
 
+
+     <ol>
+       <li>Add codesy to your browser.
+       <li>When you visit a bug, you'll see a codesy form with two questions:
+       <ul>
+         <li>How much will you "chip in" for someone else to fix it?</li>
+         <li>How much would you ask for to fix it yourself?</li>
+       </ul>
+       <li>Bid your amounts.</li>
+       <li>codesy collects all bids, and monitors all bugs.</li>
+       <li>When the offers on a bug add up to someone's asking price, codesy emails them.</li>
+       <li>If, and when, they fix the bug, codesy emails them to claim their earnings.</li>
+       <li>They may divide their earnings up between 3 entities:
+       <ul>
+           <li>Themself</li>
+           <li>The project with the bug</li>
+           <li>codesy</li>
+       </ul>
+     </ol>
+     <p>We'll combine all the offers until they match an asking price, then notify the matching coder to fix the bug and collect their earnings.</p>
+     <p>See our <a href="{% url "faq" %}">Frequently Asked Questions</a> for more.</p>
+
+</div>
+</div>
 {% endblock %}

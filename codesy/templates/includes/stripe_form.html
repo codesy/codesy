@@ -1,0 +1,35 @@
+{% block cc_form %}
+
+                {% if not request.user.is_authenticated %}
+                <h3>3. Connect payments.</h3>
+                Sign in to connect a payment method
+                {% else %}
+                    <div id="payment-errors"></div>
+                    {% if request.user.stripe_card_token %}
+                        <h3>3. Payment connected. <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></h3>
+                        Card on file; happy bidding!
+                        <a id="cc-show" >Change your card info.</a>
+                        <form id="cc-entry" role="form" class="form-horizontal" hidden="true">
+                    {% else %}
+                        <h3>3. Connect payments.</h3>
+                        <form role="form" class="form-horizontal">
+                    {% endif %}
+                          <div class="form-group">
+                            <label for="cc-number">Card Number</label>
+                            <input type="text" class="form-control" id="cc-number" autocomplete="off" value="4111111111111111" maxlength="16" />
+                          </div>
+                          <div class="form-group">
+                            <label for="cc-ex-month">Expiration</label>
+                            <input type="text" class="form-control" id="cc-ex-month" autocomplete="off" value="01" maxlength="2" size="2"/>
+                            <input type="text" class="form-control" id="cc-ex-year" autocomplete="off" value="2020" maxlength="4" size="4"/>
+                          </div>
+                          <div class="form-group">
+                            <label for="cvc">Card Verification Code (CVC)</label>
+                            <input type="text" class="form-control" id="cvc" autocomplete="off" value="123" maxlength="4" size="4"/>
+                          </div>
+
+                          <button id="cc-submit" class="btn btn-success">Authorize &amp; Connect</button> <span id="refreshing" class="glyphicon glyphicon-refresh spin"></span>
+                        </form>
+
+                  {% endif %}
+{% endblock %}
