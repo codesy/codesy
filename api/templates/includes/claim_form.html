@@ -8,7 +8,7 @@
 
 {% else %}
    <form id="codesy_claim" 
-         class="pure-form pure-form-stacked" 
+         class="ajaxSubmit pure-form pure-form-stacked" 
          action="//{{current_site.domain}}{% url 'claim-list' %}" 
          data-method="POST" >
    {% csrf_token %}
