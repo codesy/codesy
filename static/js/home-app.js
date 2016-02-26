@@ -5,9 +5,10 @@ $(window).load(function () {
 
   $('#refreshing').hide();
 
-  if ($("#api_token_pass").length > 0) {
-    codesy.user.token = $("#api_token_pass").val();
-  }
+  // if ($("#api_token_pass").length > 0) {
+  //   codesy.user.token = $("#api_token_pass").val();
+  // }
+  
   if ($("#codesy_user_id").length > 0) {
     codesy.user.id = $("#codesy_user_id").val();
   }

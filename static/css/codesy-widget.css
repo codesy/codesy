@@ -1,13 +1,11 @@
-/* These are the styles for the contens of the codesy iframe */
+/* These are the styles for the contents of the codesy iframe */
 #codesy_widget,#codesy_claim label {
   font-size: x-small;
-
 }
 
 #codesy_widget img {
   max-height:20px;;
 }
-
 
 #codesy_widget,#codesy_claim input[type="text"] {
   font-size: x-small;
