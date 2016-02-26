@@ -175,9 +175,46 @@ class Vote(models.Model):
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True, auto_now=True)
 
+    class Meta:
+        unique_together = (("user", "claim"),)
+
     def __unicode__(self):
         return u'Vote for %s by (%s): %s' % (
             self.claim, self.user, self.approved
+        )
+
+
+@receiver(post_save, sender=Vote)
+def notify_approved_claim(sender, instance, created, **kwargs):
+    claim = instance.claim
+    votes_needed = Bid.objects \
+                      .filter(issue=claim.issue) \
+                      .exclude(user=claim.user) \
+                      .filter(offer__gt=0) \
+                      .count()
+
+    approvals = Vote.objects \
+                    .filter(claim=claim, approved=True) \
+                    .exclude(user=claim.user) \
+                    .count()
+
+    # TODO: notify claimant when claim rejected
+
+    if votes_needed == approvals:
+        current_site = Site.objects.get_current()
+        # TODO: make a nicer HTML email template
+        CLAIM_APPROVED_EMAIL_STRING = """
+        Your claim for {url} has been approved.
+        https://{site}
+        """
+        send_mail(
+            "[codesy] Your claimed has been approved",
+            CLAIM_APPROVED_EMAIL_STRING.format(
+                url=claim.issue.url,
+                site=current_site,
+            ),
+            settings.DEFAULT_FROM_EMAIL,
+            [claim.user.email]
         )
 
 
