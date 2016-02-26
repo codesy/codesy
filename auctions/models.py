@@ -12,7 +12,6 @@ from mailer import send_mail
 
 
 class Bid(models.Model):
-    # TODO: add created and modified fields to auctions.models.Bid
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     url = models.URLField()
     issue = models.ForeignKey('Issue', null=True)
