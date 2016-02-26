@@ -1,7 +1,16 @@
 /* codesy site styles */
-.glyphicon-ok {
+.fi-check {
   color: #5CB85C;
 }
+
+.fi-fast-forward {
+  color: red;
+}
+
+.fi-loop {
+  color:red;
+}
+
 .spin {
   -webkit-animation: spin 2s infinite linear;
   animation: spin 2s infinite linear;
@@ -16,21 +25,3 @@
   to { transform: rotate(360deg); }
 }
 
-
-#codesy_widget,#codesy_claim label {
-  font-size: x-small;
-
-}
-
-#codesy_widget img {
-  max-height:20px;;
-}
-
-
-#codesy_widget,#codesy_claim input[type="text"] {
-  font-size: x-small;
-}
-
-input.button-small {
-    font-size: 90%;
-}

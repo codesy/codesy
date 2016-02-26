@@ -9,13 +9,14 @@
     <title>{% if request.user.is_authenticated %}{{ request.user.username }} | {% endif %}codesy.io</title>
     <link rel="shortcut icon" href="{% static "img/favicon.png" %}">
     <link rel="stylesheet" href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/foundation-icons/3.0/foundation-icons.min.css">
     <link rel="stylesheet" href="{% static "css/codesy-home.css" %}">
     <link rel="stylesheet" href="{% static "css/main.css" %}">
 
   </head>
   <body>
 
-      <div class="top-bar">
+      <div class="nav-bar top-bar">
           <a href="/"><img src="{% static "img/codesy_300dpi_323x80.png" %}" width="161" height="40"/></a>
          <div class="top-bar-right">
             <ul class="menu">
@@ -44,7 +45,16 @@
 
       <hr/>
       <footer class="footer">
-        <p><a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://licensebuttons.net/l/by-sa/4.0/80x15.png" /></a> codesy.io llc; Git Logo <a rel="license" href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" style="border-width:0" src="https://licensebuttons.net/l/by/3.0/80x15.png" /></a> <a href="http://www.jasonlong.me/">Jason Long</a>; Icons by <a href="http://glyphicons.com/">Glyphicons</a> via <a href="http://getbootstrap.com/">Bootstrap</a></p>
+        <p>
+           <a rel="license" 
+              href="http://creativecommons.org/licenses/by-sa/4.0/">
+              <img alt="Creative Commons License" 
+                 style="border-width:0" 
+                 src="https://licensebuttons.net/l/by-sa/4.0/80x15.png" 
+                 />
+           </a> codesy.io llc; Git Logo <a rel="license" href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" style="border-width:0" src="https://licensebuttons.net/l/by/3.0/80x15.png" /></a> <a href="http://www.jasonlong.me/">Jason Long</a>; Icons by
+           <a href="http://zurb.com/playground/foundation-icon-fonts-3/">Foundation</a>
+        </p>
       </footer>
     </div>
 

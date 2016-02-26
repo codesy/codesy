@@ -1,30 +1,38 @@
- {% extends "base.html" %}
+{% extends "base.html" %}
 {% load staticfiles %}
 
 {% block content %}
 
-   There is a claim this issue: <a target="_blank" href='{{ claim.issue.url }}'>{{ claim.issue.url }}</a></br>
-   The person making the claim submitted this URL as proof:<a target="_blank" href='{{ claim.evidence }}'>{{ claim.evidence }}</a></br>
+<div class="row medium-8 large-7 columns">
+<div class="blog-post">
    
-   <div> Currently the claim is:  : {{claim.status}} with {{ votes | length }} votes out of {{offers | length }} offers.  </div>
+
+      There is a claim this issue: <a target="_blank" href='{{ claim.issue.url }}'>
+         {{ claim.issue.url }}</a></br>
+      The person making the claim submitted this URL as proof:<a target="_blank" href='{{ claim.evidence }}'>{{ claim.evidence }}</a></br>
+   
+      <div> Currently the claim is:  : {{claim.status}} with {{ votes | length }} votes out of {{offers | length }} offers.  </div>
 
 
-   The claim was created at: {{ claim.created }}</br>
-   and will expire at: {{ claim.expires }}</br>
+      The claim was created at: {{ claim.created }}</br>
+      and will expire at: {{ claim.expires }}</br>
 
-   {%  if claim.user != request.user %}
+      {%  if claim.user != request.user %}
 
-      {% if voted %}
+         {% if voted %}
          
-         YOU ALREADY VOTED
+            YOU ALREADY VOTED
       
-      {% else %}
+         {% else %}
          
-         {% include "includes/vote_form.html" %}
+            {% include "includes/vote_form.html" %}
+
+         {% endif %}
 
       {% endif %}
 
-   {% endif %}
+</div>
+</div>
 
 {% endblock %}
 

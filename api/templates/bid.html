@@ -8,7 +8,6 @@
       <a href="//{{current_site.domain}}/claim-status/{{claim.id}}" target="_blank">Go see it</a>
 <!-- HAVE WE BEEN HERE BEFORE? -->
    {% elif bid == None %}
-   
       {% include "includes/bid_form.html" %}
 <!-- IS THE USER ASKING OR OFFERING -->
    {% elif bid.ask > 0 %}
