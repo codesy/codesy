@@ -13,7 +13,6 @@
          action="//{{current_site.domain}}{% url 'claim-list' %}" 
          data-method="POST" >
       {% csrf_token %}
-      <fieldset>
          <input name="issue" type="hidden" value="{{ bid.issue.id }}" />     
          <label>Claim the payout:
             <input 

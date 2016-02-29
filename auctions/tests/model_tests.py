@@ -71,9 +71,12 @@ class BidTests(MarketTestCase):
 
     def test_save_updates_datetimes(self):
         test_bid = mommy.make(Bid)
+        test_bid = Bid.objects.get(pk=test_bid.pk)
         test_bid_created = test_bid.created
-        self.assertTrue(datetime.now() >= test_bid_created,
-                        "Bid.created should be auto-populated.")
+        self.assertTrue(
+            datetime.now() >= test_bid_created.replace(tzinfo=None),
+            "Bid.created should be auto-populated."
+        )
         time.sleep(1)
         test_bid.ask = 100
         test_bid.offer = 10
@@ -83,8 +86,10 @@ class BidTests(MarketTestCase):
         test_bid_modified = test_bid.modified
         self.assertTrue(test_bid_modified >= test_bid_created,
                         "Bid.modified should be auto-populated on update.")
-        self.assertTrue(datetime.now() >= test_bid_modified,
-                        "Bid.modified should be auto-populated.")
+        self.assertTrue(
+            datetime.now() >= test_bid_modified.replace(tzinfo=None),
+            "Bid.modified should be auto-populated."
+        )
 
 
 class NotifyMatchersReceiverTest(MarketTestCase):
@@ -165,6 +170,7 @@ class ClaimTest(TestCase):
     # HACK: ? do we really need to test whether I typed correctly?
     def test_get_absolute_url_returns_claim_status(self):
         test_claim = mommy.make(Claim)
+        test_claim = Claim.objects.get(pk=test_claim.pk)
         self.assertTrue(
             reverse('custom-urls:claim-status',
                     kwargs={'pk': test_claim.id})
@@ -173,14 +179,18 @@ class ClaimTest(TestCase):
 
     def test_expires_is_30_days_after_create(self):
         test_claim = mommy.make(Claim)
+        test_claim = Claim.objects.get(pk=test_claim.pk)
         self.assertEqual(test_claim.expires,
                          test_claim.created + timedelta(days=30))
 
     def test_save_updates_datetimes(self):
         test_claim = mommy.make(Claim)
+        test_claim = Claim.objects.get(pk=test_claim.pk)
         test_claim_created = test_claim.created
-        self.assertTrue(datetime.now() >= test_claim_created,
-                        "Claim.created should be auto-populated.")
+        self.assertTrue(
+            datetime.now() >= test_claim_created.replace(tzinfo=None),
+            "Claim.created should be auto-populated."
+        )
         time.sleep(1)
         test_claim.evidence = 'https://test.com/123'
         test_claim.save()
@@ -189,8 +199,10 @@ class ClaimTest(TestCase):
         test_claim_modified = test_claim.modified
         self.assertTrue(test_claim_modified >= test_claim_created,
                         "Claim.modified should be auto-populated on update.")
-        self.assertTrue(datetime.now() >= test_claim_modified,
-                        "Claim.modified should be auto-populated.")
+        self.assertTrue(
+            datetime.now() >= test_claim_modified.replace(tzinfo=None),
+            "Claim.modified should be auto-populated."
+        )
 
 
 class NotifyMatchingOfferersTest(MarketTestCase):
@@ -276,9 +288,12 @@ class VoteTest(TestCase):
 
     def test_save_updates_datetimes(self):
         test_vote = mommy.make(Vote, approved=False)
+        test_vote = Vote.objects.get(pk=test_vote.pk)
         test_vote_created = test_vote.created
-        self.assertTrue(datetime.now() >= test_vote_created,
-                        "Vote.created should be auto-populated.")
+        self.assertTrue(
+            datetime.now() >= test_vote_created.replace(tzinfo=None),
+            "Vote.created should be auto-populated."
+        )
         time.sleep(1)
         test_vote.approved = True
         test_vote.save()
@@ -287,8 +302,10 @@ class VoteTest(TestCase):
         test_vote_modified = test_vote.modified
         self.assertTrue(test_vote_modified >= test_vote_created,
                         "Vote.modified should be auto-populated on update.")
-        self.assertTrue(datetime.now() >= test_vote_modified,
-                        "Vote.modified should be auto-populated.")
+        self.assertTrue(
+            datetime.now() >= test_vote_modified.replace(tzinfo=None),
+            "Vote.modified should be auto-populated."
+        )
 
     def test_user_claim_unique(self):
         mommy.make(Vote, claim=self.claim, user=self.user1, approved=True)

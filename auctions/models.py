@@ -12,7 +12,6 @@ from mailer import send_mail
 
 
 class Bid(models.Model):
-    # TODO: add created and modified fields to auctions.models.Bid
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     url = models.URLField()
     issue = models.ForeignKey('Issue', null=True)
@@ -223,6 +222,6 @@ def notify_approved_claim(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Vote)
 def update_datetimes_for_model_save(sender, instance, created, **kwargs):
     if created:
-        instance.created = datetime.now()
+        sender.objects.filter(id=instance.id).update(created=datetime.now())
     else:
-        instance.modified = datetime.now()
+        sender.objects.filter(id=instance.id).update(modified=datetime.now())
