@@ -8,6 +8,10 @@ body {
   width: 140px;
 }
 
+#codesy_widget a {
+  font-weight: 900;  
+}
+
 #codesy_widget img {
   max-height:20px;
 }

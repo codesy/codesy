@@ -2,7 +2,7 @@
 #codesy_iframe {
   visibility: visible !important;
   max-width:150px;
-  height:200px;
+  height:250px;
   overflow: hidden;
   position: fixed;
   bottom: .25em;

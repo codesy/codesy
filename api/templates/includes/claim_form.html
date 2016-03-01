@@ -1,29 +1,30 @@
+{% with YOU="Your claim" SOMEONE="There is a claim" %}
+
 {% if claim %}
-   <p>
-      You have 
-      <a target="_blank" 
+   <div>
+      <a class="small button success expanded"
+         target="_blank" 
          href="//{{current_site.domain}}{% url 'custom-urls:claim-status' pk=claim.pk %}">
-         made a claim
+         {% if claim.user != request.user %}{{YOU}}{% else %}{{SOMEONE}}{% endif %}
+         <i class='fi-fast-forward'></i>
       </a> 
-      for this issue.
-   </p>
+   </div>
 {% else %}
    <form id="codesy_claim" 
          class="ajaxSubmit" 
          action="//{{current_site.domain}}{% url 'claim-list' %}" 
          data-method="POST" >
       {% csrf_token %}
-         <input name="issue" type="hidden" value="{{ bid.issue.id }}" />     
-         <label>Claim the payout:
+         <input name="issue" type="hidden" value="{{ bid.issue.id }}" />
             <input 
                id="evidence" 
                name="evidence"
                type="text" 
                placeholder="Provide a URL."
             />
-         </label>
-         <input type="submit" class="button expanded" value="Make a claim"></input>
+            <input type="submit" class="button expanded" value="Make a claim"></input>
       </fieldset>
    </form>
 {% endif %}
+{% endwith %}
 

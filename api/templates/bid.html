@@ -2,21 +2,16 @@
 
 {% block widget_content %}
 
-<!--  IS THERE A CLAIM? -->
-   {% if claim %}
-      There is a claim on this issue. 
-      <a href="//{{current_site.domain}}/claim-status/{{claim.id}}" target="_blank">Go see it</a>
+{% include "includes/claim_form.html" %}
+
 <!-- HAVE WE BEEN HERE BEFORE? -->
-   {% elif bid == None %}
+   {% if bid == None %}
       {% include "includes/bid_form.html" %}
 <!-- IS THE USER ASKING OR OFFERING -->
    {% elif bid.ask > 0 %}
 <!-- HANDLE ASKS -->
-   {% if bid and bid.ask > 0 %}
-      You have already bid {{ bid.ask }}
-      {% include "includes/claim_form.html" %}
+      {% include "includes/bid_form.html" %}
    {% endif %}
-   {% include "includes/bid_form.html" %}
   
 {% endblock %}
 

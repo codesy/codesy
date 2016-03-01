@@ -1,3 +1,5 @@
+
+
 <form id="codesy_bid"
       class="ajaxSubmit"
       {% if bid %}
@@ -10,13 +12,13 @@
    > <!-- end of FORM tag -->
    {% csrf_token %}
    <input name="url" type="hidden" value="{{ url }}"></input>
-   <label>Ask<input id="ask"
+   <label>{% if bid.ask > 0 %}You have asked for{% else %}Ask{% endif %}<input id="ask"
              name="ask"
              type="text"
              placeholder="What you'd want."
              value="{{ bid.ask }}">
    </label>
-   <label>Offer<input id="offer"
+   <label>{% if bid.offer > 0 %}You have offered{% else %}Offer{% endif %}<input id="offer"
              name="offer"
              type="text"
              placeholder="What you'd pay."
@@ -24,8 +26,7 @@
    </label>
    <input type="submit" 
           class="button expanded" 
-          value="{%  if bid.offer > 0  %}Change your Bid{% else %}Make a bid{% endif %}" />
+          value="{%  if bid.offer > 0 or bid.ask > 0 %}Change your Bid{% else %}Make a bid{% endif %}" />
 
 
 </form>
-
