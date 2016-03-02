@@ -10,6 +10,9 @@
 <!-- IS THE USER ASKING OR OFFERING -->
    {% elif bid.ask > 0 %}
 <!-- HANDLE ASKS -->
+      {% include "includes/bid_form.html" %}      
+   {% elif bid.offer > 0 %}
+<!-- HANDLE OFFERS -->
       {% include "includes/bid_form.html" %}
    {% endif %}
   

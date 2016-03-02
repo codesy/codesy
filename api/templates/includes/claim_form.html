@@ -1,5 +1,6 @@
 {% with YOU="Your claim" SOMEONE="There is a claim" %}
 
+{{request.user}}
 {% if claim %}
    <div>
       <a class="small button success expanded"
@@ -10,21 +11,23 @@
       </a> 
    </div>
 {% else %}
-   <form id="codesy_claim" 
-         class="ajaxSubmit" 
-         action="//{{current_site.domain}}{% url 'claim-list' %}" 
-         data-method="POST" >
-      {% csrf_token %}
-         <input name="issue" type="hidden" value="{{ bid.issue.id }}" />
-            <input 
-               id="evidence" 
-               name="evidence"
-               type="text" 
-               placeholder="Provide a URL."
-            />
-            <input type="submit" class="button expanded" value="Make a claim"></input>
-      </fieldset>
-   </form>
+   {% if bid.ask > 0 %}
+      <form id="codesy_claim" 
+            class="ajaxSubmit" 
+            action="//{{current_site.domain}}{% url 'claim-list' %}" 
+            data-method="POST" >
+         {% csrf_token %}
+            <input name="issue" type="hidden" value="{{ bid.issue.id }}" />
+               <input 
+                  id="evidence" 
+                  name="evidence"
+                  type="text" 
+                  placeholder="Provide a URL."
+               />
+               <input type="submit" class="button expanded" value="Make a claim"></input>
+         </fieldset>
+      </form>
+   {% endif %}
 {% endif %}
 {% endwith %}
 
