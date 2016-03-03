@@ -55,7 +55,9 @@ class BidTests(MarketTestCase):
         self.assertFalse(self.bid1.ask_met())
 
     def test_save_assigns_issue_for_existing_url(self):
-        mommy.make(Bid, ask=200, offer=5, url=self.url)
+        existing_issue = self.bid1.issue
+        new_bid = mommy.make(Bid, ask=200, offer=5, url=existing_issue.url)
+        self.assertIsNotNone(new_bid.issue)
         issues = Issue.objects.all()
         self.assertEquals(1, len(issues))
         issue = issues[0]
