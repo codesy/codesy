@@ -12,12 +12,10 @@ urlpatterns = patterns(
     '',
     # Static home/ explanation pages
     url(r'^$', views.Home.as_view(), name='home'),
-    url(r'^how-it-works$',
-        TemplateView.as_view(template_name="how_it_works.html"),
-        name='how_it_works'),
-    url(r'^faq$', TemplateView.as_view(template_name="faq.html"), name='faq'),
 
     # allauth
+    (r'^accounts/logout/$', 'django.contrib.auth.views.logout',
+         {'next_page': '/'}),
     url(r'^accounts/', include('allauth.urls')),
 
     # admin site
