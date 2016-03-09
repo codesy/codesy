@@ -1,6 +1,9 @@
+/* This is the style for the iframe added to issue pages */
 #codesy_iframe {
   visibility: visible !important;
   max-width:150px;
+  height:250px;
+  overflow: hidden;
   position: fixed;
   bottom: .25em;
   right: .25em;

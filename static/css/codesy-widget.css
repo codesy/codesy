@@ -1,0 +1,30 @@
+/* These are the styles for the contents of the codesy iframe */
+
+body {
+  background:none;
+}
+
+#codesy_widget {
+  width: 140px;
+}
+
+#codesy_widget a {
+  font-weight: 900;  
+}
+
+#codesy_widget img {
+  max-height:20px;
+}
+
+#codesy_widget input {
+  height: 2em;
+  margin: 0px;
+  border:0px;
+  padding: 0px;
+}
+
+#codesy_widget input[type="submit"] {
+  margin-top: 5px;
+  padding: 5px;
+  font-weight: 900;
+}

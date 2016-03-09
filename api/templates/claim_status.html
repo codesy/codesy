@@ -1,30 +1,65 @@
- {% extends "base.html" %}
+{% extends "base.html" %}
 {% load staticfiles %}
 
 {% block content %}
 
-   There is a claim this issue: <a target="_blank" href='{{ claim.issue.url }}'>{{ claim.issue.url }}</a></br>
-   The person making the claim submitted this URL as proof:<a target="_blank" href='{{ claim.evidence }}'>{{ claim.evidence }}</a></br>
+
+
+{% with YOU="You" SOMEONE="A developer" %}
+
+<div class="row medium-8 large-7 columns">
+
+<div class="callout primary">
+      <h3>
+         {% if claim.user != request.user %}{{SOMEONE}}{% else %}{{YOU}}{% endif %}
+         claimed a fix to this issue:
+         <a target="_blank" href='{{ claim.issue.url }}'>{{ claim.issue.url }}</a>
+      </h3>
+      <h3>and submitted this URL as proof of the fix:
+         <a target="_blank" href='{{ claim.evidence }}'>{{ claim.evidence }}</a>
+      </h3>
+</div>
+
+{% endwith %}
+
+{% with VOTES=votes.length OFFERS=offers.length %}
+
+<div class="callout secondary">
+{% if voted %}
+   {% if VOTES < OFFERS  %}
+   <h3>There are some votes needed for approval.</h3>
+   {% elif VOTES == OFFERS %}
+   <h3>This claim was approved.</h3>
+   {% else %}
+   <h3>This claim was not approved.</h3>
+   {% endif %}
+{% else %}
+   <h3>There have been no votes on this claim yet.</h3>   
+{% endif %}
    
-   <div> Currently the claim is:  : {{claim.status}} with {{ votes | length }} votes out of {{offers | length }} offers.  </div>
+   <div>
+     If this claim does not receive enough votes for approval by
+     {{ claim.expires|date:"M d, Y" }} it will be closed.
+   </div>
+</div>   
+
+{% endwith %}
 
 
-   The claim was created at: {{ claim.created }}</br>
-   and will expire at: {{ claim.expires }}</br>
+{%  if claim.user != request.user %}
 
-   {%  if claim.user != request.user %}
+   {% if voted %}
+   
+      {% include "includes/vote_confirmation.html" %}   
 
-      {% if voted %}
-         
-         YOU ALREADY VOTED
-      
-      {% else %}
-         
-         {% include "includes/vote_form.html" %}
-
-      {% endif %}
+   {% else %}
+   
+      {% include "includes/vote_form.html" %}
 
    {% endif %}
+
+{% endif %}
+
 
 {% endblock %}
 

@@ -1,103 +1,35 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+   
+{% block description %}
 
-{% block description %}codesy is a pay-what-you-want market for the open source community where we can tip each other to fix important bugs.{% endblock %}
+codesy is a pay-what-you-want market for the open source community where we can tip each other to fix important bugs.
+
+{% endblock %}
 
 {% block jumbotron %}
-          <div class="container">
-              <div class="col-md-6">
-                  <h1>codesy.io</h1>
-                  <p>every day, <strong>millions</strong> of us coders work around bugs in open-source software.</p>
-                  <p>codesy is a <strong>pay-what-you-want</strong> market for the open source community where we can tip each other to fix important bugs.</p>
-              </div>
-              <div class="col-md-6">
-                  <iframe width="100%" height="315" src="//www.youtube.com/embed/6gmP4nk0EOE" frameborder="0" allowfullscreen></iframe>
-              </div>
-          </div>
+
+   <div class="callout large primary">
+      <div class="row column text-center">
+         <h1>
+            codesy.io
+         </h1>
+         <p>
+            every day, <strong>millions</strong> of us coders work around bugs in open-source software.
+         </p>
+         <p>
+            codesy is a <strong>pay-what-you-want</strong> market for the open source community where we can tip each other to fix important bugs.
+         </p>
+      </div>
+   </div>
+
+
 {% endblock %}
 
 {% block content %}
-
-        <div class="row">
-            <div class="install-step col-md-4">
-                <h2>1. Install. <span class="glyphicon glyphicon-chevron-right"></span></h2>
-                {% if browser == 'chrome' %}
-                <p id="add-to-chrome">
-                <img src="{% static "img/chrome.png" %}" width="32" height="32"/> <a id="chrome-install-button" class="btn btn-lg btn-success" onclick="chrome.webstore.install()" role="button">Add to Chrome</a>
-                </p>
-                {% elif browser == 'firefox' %}
-                <p id="add-to-firefox">
-                <img src="{% static "img/firefox.png" %}" width="32" height="32"/> <a class="btn btn-lg btn-success" href="codesy.xpi" role="button">Add to Firefox</a>
-                </p>
-                {% else %}
-                <p id="unknown-browser">
-                Unknown browser. The codesy widget currently only works with Firefox and Chrome. We want to add it to others soon. Want to help? <a href="https://github.com/codesy">Catch us on GitHub</a>.
-                </p>
-                {% endif %}
-            </div>
-            <div class="installed col-md-4" hidden="true">
-               <h2>1. Installed. <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></h2>
-            </div>
-
-
-            {% if request.user.is_authenticated %}
-            <div id="signed-in" class="col-md-4">
-                <h2>2. Signed in. <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></h2>
-                <p>Welcome <img src="{{ gravatar_url }}"/> {{ request.user.username }}</p>
-                <input id="codesy_user_id" type="hidden" name="codesy_user_id" value="{{ request.user.id }}"/>
-
-                <input id="api_token_pass" type="hidden" name="api_token_pass" value="{{ request.user.auth_token }}"/>
-                <a href="/accounts/logout/">Sign out</a>
-            </div>
-            {% else %}
-            <div id="sign-in-step" class="col-md-4">
-                <div class="install-step">
-                    <h2>2. <img width="32" height="32" src="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" /> <span class="glyphicon glyphicon-chevron-right"></span> Sign in.</h2>
-                    Install to sign in.
-                </div>
-                <div class="installed" hidden="true">
-                    <h2>2. <img width="32" height="32" src="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" /> <a href="/accounts/github/login/?process=login">Sign in.</a> <span class="glyphicon glyphicon-chevron-right"></span></h2>
-                </div>
-            </div>
-            {% endif %}
-
-
-            <div id="connect-payment-step" class="col-md-4">
-                {% if not request.user.is_authenticated %}
-                <h2>3. Connect payments.</h2>
-                Sign in to connect a payment method
-                {% else %}
-                    <div id="payment-errors"></div>
-                    {% if request.user.stripe_card_token %}
-                        <h2>3. Payment connected. <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></h2>
-                        Card on file; happy bidding!
-                        <a id="cc-show" >Change your card info.</a>
-                        <form id="cc-entry" role="form" class="form-horizontal" hidden="true">
-                    {% else %}
-                        <h2>3. Connect payments.</h2>
-                        <form role="form" class="form-horizontal">
-                    {% endif %}
-                          <div class="form-group">
-                            <label for=cc-number">Card Number</label>
-                            <input type="text" class="form-control" id="cc-number" autocomplete="off" value="4111111111111111" maxlength="16" />
-                          </div>
-                          <div class="form-group">
-                            <label for="cc-ex-month">Expiration</label>
-                            <input type="text" class="form-control" id="cc-ex-month" autocomplete="off" value="01" maxlength="2" size="2"/>
-                            <input type="text" class="form-control" id="cc-ex-year" autocomplete="off" value="2020" maxlength="4" size="4"/>
-                          </div>
-                          <div class="form-group">
-                            <label for="cvc">Card Verification Code (CVC)</label>
-                            <input type="text" class="form-control" id="cvc" autocomplete="off" value="123" maxlength="4" size="4"/>
-                          </div>
-
-                          <button id="cc-submit" class="btn btn-success">Authorize &amp; Connect</button> <span id="refreshing" class="glyphicon glyphicon-refresh spin"></span>
-                        </form>
-                {% endif %}
-        </div>
-    </div>
-
-
+   {% include "includes/get_started.html" %}
+   {% include "includes/how_it_works.html" %}
+   {% include "includes/faq.html" %}
 {% endblock %}
 
 {% block scripts %}
@@ -106,3 +38,4 @@
       <script src="{% static "js/home-app.js" %}" ></script>
    {% endif %}
 {% endblock %}
+

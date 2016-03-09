@@ -1,0 +1,13 @@
+{% for vote in votes %}
+   {% if request.user == vote.user %}
+      <div class="callout warning">
+         <h3>You  
+            {% if vote.approved %}have approved{% else %}did not approve{% endif %}
+            this claim.
+         </h3>
+      </div>
+   {% endif %}
+{% endfor %}
+      
+      
+

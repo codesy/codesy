@@ -21,5 +21,5 @@ function submitForm(e) {
 }
 
 $(document).ready(function() {
-  $('form').submit(submitForm)
+  $('form.ajaxSubmit').submit(submitForm)
 });

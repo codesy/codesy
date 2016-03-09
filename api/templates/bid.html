@@ -2,11 +2,19 @@
 
 {% block widget_content %}
 
-   {% if bid and bid.ask > 0 %}
-      You have already bid {{ bid.ask }}
-      {% include "includes/claim_form.html" %}
+{% include "includes/claim_form.html" %}
+
+<!-- HAVE WE BEEN HERE BEFORE? -->
+   {% if bid == None %}
+      {% include "includes/bid_form.html" %}
+<!-- IS THE USER ASKING OR OFFERING -->
+   {% elif bid.ask > 0 %}
+<!-- HANDLE ASKS -->
+      {% include "includes/bid_form.html" %}      
+   {% elif bid.offer > 0 %}
+<!-- HANDLE OFFERS -->
+      {% include "includes/bid_form.html" %}
    {% endif %}
-   {% include "includes/bid_form.html" %}
   
 {% endblock %}
 

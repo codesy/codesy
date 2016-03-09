@@ -1,9 +1,20 @@
-<form id="codesy_vote" 
-   action="{% url 'vote-list' %}" 
-   data-method="POST" >
-   {% csrf_token %}
-   <input name = "claim"  type="hidden" value="{{claim.id}}"></iinput>
-   <label >Do you approve this claim?</label>
-   <input id = "approved" type="checkbox"></input>
-   <input type="submit"></input>
-</form>
+<div class="callout warning">
+   <h3>You haven't voted yet. Do you approve this claim?.</h3>
+   <form id="codesy_vote"
+      class="ajaxSubmit"
+      action="{% url 'vote-list' %}"
+      data-method="POST" >
+      {% csrf_token %}
+      <input name = "claim"  type="hidden" value="{{claim.id}}"></iinput>
+      <div class="switch large">
+         <input class= "switch-input" id="approved" type="checkbox" name="approved" value="True">
+         <label class="switch-paddle" for="approved" >
+            <span class="show-for-sr">Do you approve?</span>
+            <span class="switch-active" aria-hidden="true">Yes</span>
+            <span class="switch-inactive" aria-hidden="true">No</span>
+         </label>
+      </div>
+      <input type="submit" class="button expanded" value="Vote"></input>
+   </form>
+   </div>
+
