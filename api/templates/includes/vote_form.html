@@ -7,7 +7,7 @@
       {% csrf_token %}
       <input name = "claim"  type="hidden" value="{{claim.id}}"></iinput>
       <div class="switch large">
-         <input class= "switch-input" id="approved" type="checkbox" >
+         <input class= "switch-input" id="approved" type="checkbox" name="approved" value="True">
          <label class="switch-paddle" for="approved" >
             <span class="show-for-sr">Do you approve?</span>
             <span class="switch-active" aria-hidden="true">Yes</span>
