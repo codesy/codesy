@@ -1,11 +1,11 @@
-{% with YOU="Your claim" SOMEONE="There is a claim" %}
+{% with YOU="You've made a claim" SOMEONE="There is a claim" %}
 
 {% if claim %}
    <div>
       <a class="small button success expanded"
          target="_blank" 
          href="//{{current_site.domain}}{% url 'custom-urls:claim-status' pk=claim.pk %}">
-         {% if claim.user != request.user %}{{YOU}}{% else %}{{SOMEONE}}{% endif %}
+         {% if claim.user != request.user %}{{SOMEONE}}{% else %}{{YOU}}{% endif %}
          <i class='fi-fast-forward'></i>
       </a> 
    </div>
@@ -15,7 +15,7 @@
             class="ajaxSubmit" 
             action="//{{current_site.domain}}{% url 'claim-list' %}" 
             data-method="POST" >
-         {% csrf_token %}
+            {% csrf_token %}
             <input name="issue" type="hidden" value="{{ bid.issue.id }}" />
                <input 
                   id="evidence" 
