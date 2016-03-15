@@ -82,4 +82,3 @@ This means `anyone` can request a production deployment by submitting a Pull Req
 
 .. _heroku: https://www.heroku.com/
 .. _git hooks: http://git-scm.com/book/en/Customizing-Git-Git-Hooks
-.. _balanced.js: https://github.com/balanced/balanced-js
