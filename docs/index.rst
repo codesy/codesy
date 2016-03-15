@@ -12,14 +12,14 @@ coders to fix important bugs.
 The code for codesy's API backend combines:
 
 * `GitHub`_ Authentication (via `django-allauth`_)
-* `Balanced`_ payments (via `balanced.js`_)
+* `Stripe`_ payments (via `Stripe.js`_)
 * codesy variation of `Nate Oostendorp`_'s "`Concurrent Sealed Bid Auction`_"
   system and `CodePatron`_ concept.
 
 .. _GitHub: https://github.com/
 .. _django-allauth: https://github.com/pennersr/django-allauth
-.. _Balanced: https://www.balancedpayments.com/
-.. _balanced.js: https://docs.balancedpayments.com/1.1/guides/balanced-js/
+.. _Stripe: https://stripe.com/
+.. _Stripe.js: https://stripe.com/docs/custom-form
 .. _Nate Oostendorp: http://oostendorp.net/
 .. _Concurrent Sealed Bid Auction: https://docs.google.com/document/d/1dKYFRTUU6FsX6V4PtWILwN3jkzxiQtbyFQXG75AA4jU/preview
 .. _CodePatron: https://docs.google.com/document/d/1fdTM7WqGzUtAN8Hd3aRfXR1mHcAG-WsH6JSwxOqcGqY/preview

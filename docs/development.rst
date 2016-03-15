@@ -41,6 +41,7 @@ codesy's backend tries to be very slim, so starting should be easy.
    ./manage.py createsuperuser
 
 
+
 .. _python: https://www.python.org/
 .. _stunnel: https://www.stunnel.org/
 .. _Clone: http://git-scm.com/book/en/Git-Basics-Getting-a-Git-Repository#Cloning-an-Existing-Repository
@@ -79,6 +80,8 @@ is to run ``stunnel`` on https://127.0.0.1:8443 in front of Django:
 
 .. note:: You always need to run both ``runserver`` and ``stunnel``.
 
+#. Change the `default django Site record`_ from ``example.com`` to ``127.0.0.1:8443``
+
 Read the `Chrome Extension docs`_ and the `Firefox Add-on docs`_ too learn how
 to configure them to use https://127.0.0.1:8443.
 
@@ -86,6 +89,7 @@ Finally, you'll need to enable GitHub authentication ...
 
 .. _install stunnel: https://duckduckgo.com/?q=install+stunnel
 .. _easiest way to run https connections with Django: http://stackoverflow.com/a/8025645/571420
+.. _default django Site record: https://127.0.0.1:8443/admin/sites/site/1/
 .. _Chrome Extension docs: https://github.com/codesy/chrome-extension
 .. _Firefox Add-on docs: https://github.com/codesy/firefox-addon
 
@@ -114,12 +118,11 @@ Now you can sign in with GitHub at https://127.0.0.1:8443.
 Payments
 --------
 
-codesy is pre-configured to use the `balanced.js`_ test marketplace. So, you
-can use the `test credit card numbers`_ and `test bank accounts`_ from the
-balanced docs.
+codesy is pre-configured to use the `Stripe`_ test marketplace. So, you
+can use the `test credit card numbers`_ from the Stripe docs.
 
-.. _test credit card numbers: https://docs.balancedpayments.com/1.1/overview/resources/#test-credit-card-numbers
-.. _test bank accounts: https://docs.balancedpayments.com/1.1/overview/resources/#test-bank-account-numbers
+.. _Stripe: https://stripe.com/
+.. _test credit card numbers: https://stripe.com/docs/testing#cards
 
 Run the Tests
 -------------
