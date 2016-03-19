@@ -42,11 +42,23 @@ class MarketTestCase(TestCase):
         return string.format(url=self.url)
 
 
-class BidTests(MarketTestCase):
+class IssueTest(MarketTestCase):
+
+    def test_unicode(self):
+        self.issue.state = 'unknown'
+        self.assertEqual(
+            str(self.issue), 'Issue for %s (%s)' % (self.url, self.issue.state)
+        )
+
+
+class BidTest(MarketTestCase):
     def test_ask_met(self):
         self.assertFalse(self.bid1.ask_met())
         mommy.make(Bid, ask=0, offer=10, url=self.url)
         self.assertTrue(self.bid1.ask_met())
+
+    def test_zero_ask_return_false(self):
+        self.assertEqual(self.bid3.ask_met(), False)
 
     def test_ask_met_doesnt_include_bidder(self):
         self.assertFalse(self.bid1.ask_met())
@@ -336,6 +348,13 @@ class VoteTest(TestCase):
         mommy.make(Bid, user=self.user2, url=url, issue=issue, offer=50)
         mommy.make(Bid, user=self.user3, url=url, issue=issue, offer=50)
         self.claim = mommy.make(Claim, issue=issue, user=self.user1)
+
+    def test_unicode(self):
+        vote = mommy.make(Vote, approved=True)
+        self.assertEqual(
+            str(vote), 'Vote for %s by (%s): %s' %
+            (vote.claim, vote.user, vote.approved)
+        )
 
     def test_save_updates_datetimes(self):
         test_vote = mommy.make(Vote, approved=False)
