@@ -223,9 +223,10 @@ def update_claim_status(sender, instance, created, **kwargs):
         claim.status = "Approved"
         claim.save()
 
-    if (claim.num_rejections / float(offers_needed)) >= 0.5:
-        claim.status = "Rejected"
-        claim.save()
+    if offers_needed > 0:
+        if (claim.num_rejections / float(offers_needed)) >= 0.5:
+            claim.status = "Rejected"
+            claim.save()
 
 
 @receiver(post_save, sender=Vote)
