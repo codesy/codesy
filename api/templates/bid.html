@@ -2,7 +2,12 @@
 
 {% block widget_content %}
 
-{% include "includes/claim_form.html" %}
+{% if bid.ask_met %}
+   {% include "includes/claim_form.html" %}
+{% elif claim %}
+   {% include "includes/claim_form.html" %}
+{% endif %}
+
 
 <!-- HAVE WE BEEN HERE BEFORE? -->
    {% if bid == None %}

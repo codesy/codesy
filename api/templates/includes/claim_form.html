@@ -10,11 +10,12 @@
       </a> 
    </div>
 {% else %}
-   {% if bid.ask > 0 %}
+   {% if bid.ask_met %}
       <form id="codesy_claim" 
             class="ajaxSubmit" 
             action="//{{current_site.domain}}{% url 'claim-list' %}" 
             data-method="POST" >
+            <label>Your ask was met!</label>
             {% csrf_token %}
             <input name="issue" type="hidden" value="{{ bid.issue.id }}" />
                <input 
@@ -23,7 +24,7 @@
                   type="text" 
                   placeholder="Provide a URL."
                />
-               <input type="submit" class="button expanded" value="Make a claim"></input>
+               <input type="submit" class="button expanded" value="Claim your {{bid.ask}}"></input>
          </fieldset>
       </form>
    {% endif %}
