@@ -44,12 +44,13 @@ class BidViewSet(AutoOwnObjectsModelViewSet):
     queryset = Bid.objects.all()
     serializer_class = BidSerializer
 
+
 class BidList(APIView):
     """List of bids for the User
     """
     renderer_classes = (TemplateHTMLRenderer,)
 
-    def get(self, request, pk, format=None):
+    def get(self, request, format=None):
         try:
             bids = Bid.objects.filter(user=self.request.user)
         except:
