@@ -21,7 +21,7 @@
 {% if user.is_authenticated %}
          <div class="top-bar-right">
             <ul class="menu">
-               <li><a href="">My Claims...</a></li>
+               <li><a href="/bid-list">Your bids</a></li>
 <!-- TODO: Create menus for claims, bids, votes, etc. -->
             </ul>
          </div>
@@ -48,11 +48,11 @@
       <hr/>
       <footer class="footer">
         <p>
-           <a rel="license" 
+           <a rel="license"
               href="http://creativecommons.org/licenses/by-sa/4.0/">
-              <img alt="Creative Commons License" 
-                 style="border-width:0" 
-                 src="https://licensebuttons.net/l/by-sa/4.0/80x15.png" 
+              <img alt="Creative Commons License"
+                 style="border-width:0"
+                 src="https://licensebuttons.net/l/by-sa/4.0/80x15.png"
                  />
            </a> codesy.io llc; Git Logo <a rel="license" href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" style="border-width:0" src="https://licensebuttons.net/l/by/3.0/80x15.png" /></a> <a href="http://www.jasonlong.me/">Jason Long</a>; Icons by
            <a href="http://zurb.com/playground/foundation-icon-fonts-3/">Foundation</a>
@@ -63,7 +63,7 @@
     <script src="//cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/foundation/6.2.0/foundation.min.js"></script>
     <script src="{% static "js/widget-app.js" %}" ></script>
-    
+
 
     {% block scripts %}{%endblock %}
   </body>
