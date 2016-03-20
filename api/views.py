@@ -44,6 +44,19 @@ class BidViewSet(AutoOwnObjectsModelViewSet):
     queryset = Bid.objects.all()
     serializer_class = BidSerializer
 
+class BidList(APIView):
+    """List of bids for the User
+    """
+    renderer_classes = (TemplateHTMLRenderer,)
+
+    def get(self, request, pk, format=None):
+        try:
+            bids = Bid.objects.filter(user=self.request.user)
+        except:
+            bids = []
+
+        return Response({'bids': bids}, template_name='bid_list.html')
+
 
 class BidAPIView(APIView):
     """
