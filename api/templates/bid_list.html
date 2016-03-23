@@ -8,7 +8,7 @@
     {% for bid in bids%}
         <div class="row medium-8 large-7 columns">
             <div class="callout primary">
-                <h3><a href="{{bid.url}}">{{bid.url}}</a></h3>
+                <h3><a href="{{bid.url}}">{{bid.issue.title}}</a></h3>
                 You've asked for {{bid.ask}} to fix this and offered {{bid.offer}} for someone to fix it.
 
             </div>

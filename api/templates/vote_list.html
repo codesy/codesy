@@ -8,12 +8,14 @@
     {% for vote in votes%}
         <div class="row medium-8 large-7 columns">
             <div class="callout primary">
-                {% if vote.approved %}
-                    You approved a fix to
-                {% else %}
-                    You  rejected a fix to
+                {% if vote.approved %}You approved a fix to
+                {% else %}You  rejected a fix to
                 {% endif %}
-                <a href="{{claim.issue.url}}">{{ claim.issue.ti}}</a>
+                <a href="{{vote.claim.issue.url}}">{{vote.claim.issue.title}}</a>
+                <a href="//{{current_site.domain}}{% url 'custom-urls:claim-status' pk=vote.claim.id %}">
+                    Check on the status
+                </a>
+
             </div>
         </div>
     {% endfor %}

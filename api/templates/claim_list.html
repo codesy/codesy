@@ -8,9 +8,10 @@
     {% for claim in claims%}
         <div class="row medium-8 large-7 columns">
             <div class="callout primary">
-
-                
-                <h3><a href="{{bid.url}}">{{claim.issue.url}}</a>{{claim.issue.title}}</h3>
+                <h3><a href="{{claim.issue.url}}">{{claim.issue.title}}</a></h3>
+                <a href="//{{current_site.domain}}{% url 'custom-urls:claim-status' pk=claim.id %}">
+                    Check on the status
+                </a>
             </div>
         </div>
     {% endfor %}
