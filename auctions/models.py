@@ -10,6 +10,7 @@ from django.dispatch import receiver
 
 import requests
 import re
+import HTMLParser
 from mailer import send_mail
 
 
@@ -100,11 +101,14 @@ class Issue(models.Model):
 
 @receiver(post_save, sender=Issue)
 def lookup_title(sender, instance, **kwargs):
-    r = requests.get(instance.url)
-    title_search = re.search('(?:<title.*>)(.*)(?:<\/title>)', r.text)
-    if title_search:
-        Issue.objects.filter(id=instance.id).update(
-            title=title_search.group(1))
+    try:
+        r = requests.get(instance.url)
+        title_search = re.search('(?:<title.*>)(.*)(?:<\/title>)', r.text)
+        if title_search:
+            title = HTMLParser.HTMLParser().unescape(title_search.group(1))
+            Issue.objects.filter(id=instance.id).update(title=title)
+    except:
+        pass
 
 
 class Claim(models.Model):
