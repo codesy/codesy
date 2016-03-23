@@ -16,13 +16,14 @@
   </head>
   <body>
 
-      <div class="nav-bar top-bar">
+  <div class="nav-bar top-bar">
           <a href="/"><img src="{% static "img/codesy_300dpi_323x80.png" %}" width="161" height="40"/></a>
 {% if user.is_authenticated %}
          <div class="top-bar-right">
             <ul class="menu">
-               <li><a href="/bid-list">Your bids</a></li>
-<!-- TODO: Create menus for claims, bids, votes, etc. -->
+               <li><a href="/bid-list">Bids</a></li>
+               <li><a href="/claim-list">Claims</a></li>
+               <li><a href="/vote-list">Votes</a></li>
             </ul>
          </div>
 {% endif %}

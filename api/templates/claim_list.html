@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+    <div class="row medium-8 large-7 columns">
+        <h2>These are your claims:</h2>
+    </div>
+    {% for claim in claims%}
+        <div class="row medium-8 large-7 columns">
+            <div class="callout primary">
+
+                
+                <h3><a href="{{bid.url}}">{{claim.issue.url}}</a>{{claim.issue.title}}</h3>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
+
+{% block scripts %}
+   {% if request.user.is_authenticated %}
+      <script src="{% static "js/home-app.js" %}" ></script>
+   {% endif %}
+{% endblock %}

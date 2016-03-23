@@ -17,7 +17,9 @@ custom_endpoint_url_patterns = patterns(
     url(r'^bid-for-url/', views.BidAPIView.as_view()),
     url(r'^claim-status/(?P<pk>[^/.]+)',
         views.ClaimAPIView.as_view(), name='claim-status'),
-    url(r'^bid-list', views.BidList.as_view(), name='bid-list')
+    url(r'^bid-list', views.BidList.as_view(), name='bid-list'),
+    url(r'^claim-list', views.ClaimList.as_view(), name='claim-list'),
+    url(r'^vote-list', views.VoteList.as_view(), name='vote-list')
 )
 
 urlpatterns = patterns(
