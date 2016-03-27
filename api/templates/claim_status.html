@@ -21,16 +21,16 @@
 
    <div class="callout secondary">
       {% if claim.status == "Submitted"  %}
-         <h3>There have been no votes on this claim yet.</h3>   
+         <h3>There have been no votes on this claim yet.</h3>
       {% elif claim.status == "Pending" %}
          <h3>There are some still votes needed for this claim.</h3>
       {% elif claim.status == "Approved" %}
-         <h3>This claim was approved.</h3>
+          {% include "includes/payout_request.html" %}
       {% elif claim.status == "Rejected" %}
          <h3>This claim was not approved.</h3>
       {% endif %}
-   
-      {% if claim.status != "Approved"  or claim.status != "Rejected" %}
+
+      {% if claim.status != "Approved"  and claim.status != "Rejected" %}
          <div>
            If this claim does not receive enough votes for approval by
            {{ claim.expires|date:"M d, Y" }} it will be closed.
@@ -38,15 +38,15 @@
       {% endif %}
 
    </div>
-   
+
    {% if claim.user != request.user %}
       {% if vote %}
-         {% include "includes/vote_confirmation.html" %}   
+         {% include "includes/vote_confirmation.html" %}
       {% else %}
          {% include "includes/vote_form.html" %}
       {% endif %}
    {% endif %}
-   
+
 {% endblock %}
 
 {% block scripts %}
