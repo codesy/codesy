@@ -42,11 +42,23 @@ class MarketTestCase(TestCase):
         return string.format(url=self.url)
 
 
-class BidTests(MarketTestCase):
+class IssueTest(MarketTestCase):
+
+    def test_unicode(self):
+        self.issue.state = 'unknown'
+        self.assertEqual(
+            str(self.issue), 'Issue for %s (%s)' % (self.url, self.issue.state)
+        )
+
+
+class BidTest(MarketTestCase):
     def test_ask_met(self):
         self.assertFalse(self.bid1.ask_met())
         mommy.make(Bid, ask=0, offer=10, url=self.url)
         self.assertTrue(self.bid1.ask_met())
+
+    def test_zero_ask_return_false(self):
+        self.assertEqual(self.bid3.ask_met(), False)
 
     def test_ask_met_doesnt_include_bidder(self):
         self.assertFalse(self.bid1.ask_met())
@@ -167,9 +179,33 @@ class NotifyMatchersReceiverTest(MarketTestCase):
 
 
 class ClaimTest(TestCase):
+    def setUp(self):
+        """
+        Set up the following claim senarios
+            user1: asks 50
+            user2: offers 25
+            user3: offers 25
+        """
+        self.url = 'http://github.com/codesy/codesy/issues/37'
+        self.issue = mommy.make(Issue, url=self.url)
+
+        self.user1 = mommy.make(settings.AUTH_USER_MODEL,
+                                email='user1@test.com')
+        self.user2 = mommy.make(settings.AUTH_USER_MODEL,
+                                email='user2@test.com')
+        self.user3 = mommy.make(settings.AUTH_USER_MODEL,
+                                email='user3@test.com')
+        self.bid1 = mommy.make(Bid, user=self.user1,
+                               ask=50, offer=0, url=self.url)
+        self.bid2 = mommy.make(Bid, user=self.user2,
+                               ask=0, offer=25, url=self.url)
+        self.bid3 = mommy.make(Bid, user=self.user3,
+                               ask=0, offer=25, url=self.url)
+        self.claim = mommy.make(Claim, user=self.user1, issue=self.issue)
+
     def test_default_values(self):
         test_claim = mommy.make(Claim)
-        self.assertEqual('Pending', test_claim.status)
+        self.assertEqual('Submitted', test_claim.status)
 
     # HACK: ? do we really need to test whether I typed correctly?
     def test_get_absolute_url_returns_claim_status(self):
@@ -180,6 +216,29 @@ class ClaimTest(TestCase):
                     kwargs={'pk': test_claim.id})
             in test_claim.get_absolute_url()
         )
+
+    def test_vote_changes_status_to_pending(self):
+        mommy.make(Vote, user=self.user2, claim=self.claim, approved=True)
+        self.claim = Claim.objects.get(id=self.claim.id)
+        self.assertEqual('Pending', self.claim.status)
+
+    def test_unamimous_approvals_changes_status_to_approved(self):
+        mommy.make(Vote, user=self.user2, claim=self.claim, approved=True)
+        mommy.make(Vote, user=self.user3, claim=self.claim, approved=True)
+        self.claim = Claim.objects.get(id=self.claim.id)
+        self.assertEqual('Approved', self.claim.status)
+
+    def test_unamimous_rejections_changes_status_to_rejected(self):
+        mommy.make(Vote, user=self.user2, claim=self.claim, approved=False)
+        mommy.make(Vote, user=self.user3, claim=self.claim, approved=False)
+        self.claim = Claim.objects.get(id=self.claim.id)
+        self.assertEqual('Rejected', self.claim.status)
+
+    def test_majority_rejections_changes_status_to_rejected(self):
+        mommy.make(Vote, user=self.user2, claim=self.claim, approved=True)
+        mommy.make(Vote, user=self.user3, claim=self.claim, approved=False)
+        self.claim = Claim.objects.get(id=self.claim.id)
+        self.assertEqual('Rejected', self.claim.status)
 
     def test_expires_is_30_days_after_create(self):
         test_claim = mommy.make(Claim)
@@ -289,6 +348,13 @@ class VoteTest(TestCase):
         mommy.make(Bid, user=self.user2, url=url, issue=issue, offer=50)
         mommy.make(Bid, user=self.user3, url=url, issue=issue, offer=50)
         self.claim = mommy.make(Claim, issue=issue, user=self.user1)
+
+    def test_unicode(self):
+        vote = mommy.make(Vote, approved=True)
+        self.assertEqual(
+            str(vote), 'Vote for %s by (%s): %s' %
+            (vote.claim, vote.user, vote.approved)
+        )
 
     def test_save_updates_datetimes(self):
         test_vote = mommy.make(Vote, approved=False)

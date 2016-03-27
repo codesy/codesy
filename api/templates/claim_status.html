@@ -2,65 +2,51 @@
 {% load staticfiles %}
 
 {% block content %}
-
-
-
-{% with YOU="You" SOMEONE="A developer" %}
-
-<div class="row medium-8 large-7 columns">
-
-<div class="callout primary">
-      <h3>
-         {% if claim.user != request.user %}{{SOMEONE}}{% else %}{{YOU}}{% endif %}
-         claimed a fix to this issue:
-         <a target="_blank" href='{{ claim.issue.url }}'>{{ claim.issue.url }}</a>
-      </h3>
-      <h3>and submitted this URL as proof of the fix:
-         <a target="_blank" href='{{ claim.evidence }}'>{{ claim.evidence }}</a>
-      </h3>
-</div>
-
-{% endwith %}
-
-{% with VOTES=votes.length OFFERS=offers.length %}
-
-<div class="callout secondary">
-{% if voted %}
-   {% if VOTES < OFFERS  %}
-   <h3>There are some votes needed for approval.</h3>
-   {% elif VOTES == OFFERS %}
-   <h3>This claim was approved.</h3>
-   {% else %}
-   <h3>This claim was not approved.</h3>
-   {% endif %}
-{% else %}
-   <h3>There have been no votes on this claim yet.</h3>   
-{% endif %}
-   
-   <div>
-     If this claim does not receive enough votes for approval by
-     {{ claim.expires|date:"M d, Y" }} it will be closed.
+   {% with YOU="You claimed a fix to this issue:" SOMEONE="A fix has been claimed for this issue:" %}
+   <div class="row medium-8 large-7 columns">
+   <div class="callout primary">
+         <h3>
+            {% if claim.user != request.user %}
+               {{SOMEONE}}
+            {% else %}
+               {{YOU}}
+            {% endif %}
+            <a target="_blank" href='{{ claim.issue.url }}'>{{ claim.issue.url }}</a>
+         </h3>
+         <h3>This URL was submitted as proof of the fix:
+            <a target="_blank" href='{{ claim.evidence }}'>{{ claim.evidence }}</a>
+         </h3>
    </div>
-</div>   
+   {% endwith %}
 
-{% endwith %}
-
-
-{%  if claim.user != request.user %}
-
-   {% if voted %}
+   <div class="callout secondary">
+      {% if claim.status == "Submitted"  %}
+         <h3>There have been no votes on this claim yet.</h3>   
+      {% elif claim.status == "Pending" %}
+         <h3>There are some still votes needed for this claim.</h3>
+      {% elif claim.status == "Approved" %}
+         <h3>This claim was approved.</h3>
+      {% elif claim.status == "Rejected" %}
+         <h3>This claim was not approved.</h3>
+      {% endif %}
    
-      {% include "includes/vote_confirmation.html" %}   
+      {% if claim.status != "Approved"  or claim.status != "Rejected" %}
+         <div>
+           If this claim does not receive enough votes for approval by
+           {{ claim.expires|date:"M d, Y" }} it will be closed.
+         </div>
+      {% endif %}
 
-   {% else %}
+   </div>
    
-      {% include "includes/vote_form.html" %}
-
+   {% if claim.user != request.user %}
+      {% if vote %}
+         {% include "includes/vote_confirmation.html" %}   
+      {% else %}
+         {% include "includes/vote_form.html" %}
+      {% endif %}
    {% endif %}
-
-{% endif %}
-
-
+   
 {% endblock %}
 
 {% block scripts %}

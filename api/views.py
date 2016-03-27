@@ -97,15 +97,15 @@ class ClaimAPIView(APIView):
     renderer_classes = (TemplateHTMLRenderer,)
 
     def get(self, request, pk, format=None):
-        claim, votes, offers = None, [], []
+        claim = None
         claim = get_object_or_404(Claim, pk=pk)
-        votes = Vote.objects.filter(claim=claim)
-        voted = votes.filter(user=request.user).count() > 0
-        offers = Bid.objects.filter(issue=claim.issue).filter(offer__gt=0)
+        try:
+            vote = Vote.objects.filter(claim=claim, user=self.request.user)[0]
+        except:
+            vote = None
 
-        context = {'claim': claim, "offers": offers, 'voted': voted,
-                   'votes': votes}
-        return Response(context, template_name='claim_status.html')
+        return Response({'claim': claim, 'vote': vote},
+                        template_name='claim_status.html')
 
 
 class VoteViewSet(AutoOwnObjectsModelViewSet):

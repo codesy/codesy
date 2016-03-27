@@ -179,23 +179,14 @@ class ClaimAPIViewTest(TestCase):
         except Http404:
             pass
 
-    def test_get_existant_claim_no_votes_returns_claim_status(self):
-        resp = self.view.get(self.view.request, self.claim1.pk)
-        self.assertEqual(self.claim1, resp.data['claim'])
-        self.assertEqual([], list(resp.data['offers']))
-        self.assertEqual(False, resp.data['voted'])
-        self.assertEqual([], list(resp.data['votes']))
-
-    def test_get_existant_claim_with_votes_returns_claim_status(self):
+    def test_get_existent_claim_returns_claim_and_vote(self):
         user2 = mommy.make(settings.AUTH_USER_MODEL, username='User2')
         vote1 = mommy.make('auctions.Vote', claim=self.claim1, user=user2,
                            approved=True)
         self.view.request = fudge.Fake().has_attr(user=user2)
         resp = self.view.get(self.view.request, self.claim1.pk)
         self.assertEqual(self.claim1, resp.data['claim'])
-        self.assertEqual([], list(resp.data['offers']))
-        self.assertEqual(True, resp.data['voted'])
-        self.assertEqual([vote1], list(resp.data['votes']))
+        self.assertEqual(vote1, resp.data['vote'])
 
 
 class VoteViewSetTest(TestCase):

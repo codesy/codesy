@@ -30,15 +30,18 @@ class Bid(models.Model):
         return u'%s bid on %s' % (self.user, self.url)
 
     def ask_met(self):
-        other_bids = Bid.objects.filter(
-            url=self.url
-        ).exclude(
-            user=self.user
-        ).aggregate(
-            Sum('offer')
-        )
-
-        return other_bids['offer__sum'] >= self.ask
+        # import ipdb;ipdb.set_trace()
+        if self.ask:
+            other_bids = Bid.objects.filter(
+                url=self.url
+            ).exclude(
+                user=self.user
+            ).aggregate(
+                Sum('offer')
+            )
+            return other_bids['offer__sum'] >= self.ask
+        else:
+            return False
 
 
 @receiver(post_save, sender=Bid)
@@ -94,6 +97,7 @@ class Issue(models.Model):
 
 class Claim(models.Model):
     STATUS_CHOICES = (
+        ('Submitted', 'Submitted'),
         ('Pending', 'Pending'),
         ('Approved', 'Approved'),
         ('Rejected', 'Rejected'),
@@ -105,7 +109,7 @@ class Claim(models.Model):
     evidence = models.URLField(blank=True)
     status = models.CharField(max_length=255,
                               choices=STATUS_CHOICES,
-                              default='Pending')
+                              default='Submitted')
 
     class Meta:
         unique_together = (("user", "issue"),)
@@ -114,6 +118,29 @@ class Claim(models.Model):
         return u'%s claim on Issue %s (%s)' % (
             self.user, self.issue.id, self.status
         )
+
+    def votes_by_approval(self, approved):
+        return (Vote.objects
+                    .filter(claim=self, approved=approved)
+                    .exclude(user=self.user))
+
+    @property
+    def num_approvals(self):
+        return self.votes_by_approval(True).count()
+
+    @property
+    def num_rejections(self):
+        return self.votes_by_approval(False).count()
+
+    @property
+    def num_votes(self):
+        return Vote.objects.filter(claim=self).exclude(user=self.user)
+
+    @property
+    def offers(self):
+        return (Bid.objects.filter(issue=self.issue)
+                           .exclude(user=self.user)
+                           .filter(offer__gt=0))
 
     @property
     def expires(self):
@@ -184,22 +211,47 @@ class Vote(models.Model):
 
 
 @receiver(post_save, sender=Vote)
+def update_claim_status(sender, instance, created, **kwargs):
+    claim = instance.claim
+    offers_needed = claim.offers.count()
+
+    if claim.num_votes > 0:
+        claim.status = "Pending"
+        claim.save()
+
+    if claim.num_approvals == offers_needed:
+        claim.status = "Approved"
+        claim.save()
+
+    if offers_needed > 0:
+        if (claim.num_rejections / float(offers_needed)) >= 0.5:
+            claim.status = "Rejected"
+            claim.save()
+
+
+@receiver(post_save, sender=Vote)
 def notify_approved_claim(sender, instance, created, **kwargs):
     claim = instance.claim
-    votes_needed = Bid.objects \
-                      .filter(issue=claim.issue) \
-                      .exclude(user=claim.user) \
-                      .filter(offer__gt=0) \
-                      .count()
+    votes_needed = claim.offers.count()
 
-    approvals = Vote.objects \
-                    .filter(claim=claim, approved=True) \
-                    .exclude(user=claim.user) \
-                    .count()
+    if claim.num_rejections == votes_needed:
+        current_site = Site.objects.get_current()
+        # TODO: make a nicer HTML email template
+        CLAIM_APPROVED_EMAIL_STRING = """
+        Your claim for {url} has been rejected.
+        https://{site}
+        """
+        send_mail(
+            "[codesy] Your claimed has been rejected",
+            CLAIM_APPROVED_EMAIL_STRING.format(
+                url=claim.issue.url,
+                site=current_site,
+            ),
+            settings.DEFAULT_FROM_EMAIL,
+            [claim.user.email]
+        )
 
-    # TODO: notify claimant when claim rejected
-
-    if votes_needed == approvals:
+    if votes_needed == claim.num_approvals:
         current_site = Site.objects.get_current()
         # TODO: make a nicer HTML email template
         CLAIM_APPROVED_EMAIL_STRING = """

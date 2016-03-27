@@ -60,7 +60,7 @@ $(window).load(function () {
       cvc: $('#cvc').val()
     };
 
-    handleResponse = new stripeResponse($('form [name="csrfmiddlewaretoken"]').val())
+    handleResponse = new stripeResponse($('form input[name="csrfmiddlewaretoken"]').val())
     
     // Create credit card
     Stripe.card.createToken(payload, handleResponse);

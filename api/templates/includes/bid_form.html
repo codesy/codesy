@@ -10,21 +10,31 @@
    > <!-- end of FORM tag -->
    {% csrf_token %}
    <input name="url" type="hidden" value="{{ url }}"></input>
-   <label>{% if bid.ask > 0 %}You have asked for{% else %}Ask{% endif %}<input id="ask"
-             name="ask"
-             type="text"
-             placeholder="What you'd want."
-             value="{{ bid.ask }}">
-   </label>
-   <label>{% if bid.offer > 0 %}You have offered{% else %}Offer{% endif %}<input id="offer"
-             name="offer"
-             type="text"
-             placeholder="What you'd pay."
-             value="{{ bid.offer }}">
-   </label>
-   <input type="submit" 
-          class="button expanded" 
-          value="{%  if bid.offer > 0 or bid.ask > 0 %}Change your Bid{% else %}Make a bid{% endif %}" />
+   
+   {% if not bid.ask_met %}
+      <label>{% if bid.ask > 0 %}You have asked for{% else %}You can ask for {% endif %}
+         <input id="ask"
+                name="ask"
+                type="text"
+                placeholder="What you'd want."
+                value="{% if bid.ask > 0 %}{{bid.ask}}{% endif %}">
+      </label>
+   {% endif %}
+   {% if not claim %}
+      <label>{% if bid.offer > 0 %}You have offered{% else %}You can offer{% endif %}
+         <input id="offer"
+                name="offer"
+                type="text"
+                placeholder="What you'd pay."
+                value="{% if bid.offer > 0 %}{{bid.offer}}{% endif %}">
+      </label>
+   {% endif %}
 
-
+   {% if not bid.ask_met or not claim %}
+      <input type="submit" 
+         class="button expanded" 
+         value="{%  if bid.offer > 0 or bid.ask > 0 %}Change your Bid{% else %}Make a bid{% endif %}"
+      />
+   {% endif %}
+   
 </form>

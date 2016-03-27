@@ -13,8 +13,8 @@
    {% else %}
       <h3>3. Connect payments.</h3>
       <form role="form" class="form-horizontal">
-         {% csrf_token %}
    {% endif %}
+        {% csrf_token %}
         <div class="form-group">
           <label for="cc-number">Card Number</label>
           <input type="text" class="form-control" id="cc-number" autocomplete="off" value="4111111111111111" maxlength="16" />
