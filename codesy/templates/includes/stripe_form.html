@@ -5,7 +5,7 @@
       Sign in to connect a payment method
    {% else %}
       <div id="payment-errors"></div>
-   {% if request.user.stripe_card_token %}
+   {% if request.user.stripe_account_token %}
       <h3>3. Payment set. {{OK_ICON}}</h3>
       Card on file; happy bidding!
       <a id="cc-show" >Change your card info.</a>

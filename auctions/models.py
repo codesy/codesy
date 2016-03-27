@@ -5,13 +5,16 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Sum
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 import requests
 import re
 import HTMLParser
 from mailer import send_mail
+
+import stripe
+stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
 
 
 class Bid(models.Model):
@@ -33,7 +36,6 @@ class Bid(models.Model):
         return u'%s bid on %s' % (self.user, self.url)
 
     def ask_met(self):
-        # import ipdb;ipdb.set_trace()
         if self.ask:
             other_bids = Bid.objects.filter(
                 url=self.url
@@ -45,6 +47,29 @@ class Bid(models.Model):
             return other_bids['offer__sum'] >= self.ask
         else:
             return False
+
+
+@receiver(pre_save, sender=Bid)
+def get_payment_for_offer(sender, instance, **kwargs):
+    amount = instance.offer
+    user = instance.user
+    if instance.pk:
+        bid = Bid.objects.filter(id=instance.id)[0]
+        if amount > bid.offer:
+            charge_amount = amount - bid.offer
+    else:
+        charge_amount = instance.offer
+# TODO: HANDLE CARD NOT YET REGISTERED
+
+    charge = stripe.Charge.create(
+        amount=int(charge_amount * 100),
+        currency="usd",
+        customer=user.stripe_account_token,
+        description="Offer for: " + instance.url
+    )
+
+    if charge:
+        pass
 
 
 @receiver(post_save, sender=Bid)
@@ -253,13 +278,13 @@ def notify_approved_claim(sender, instance, created, **kwargs):
     if claim.num_rejections == votes_needed:
         current_site = Site.objects.get_current()
         # TODO: make a nicer HTML email template
-        CLAIM_APPROVED_EMAIL_STRING = """
+        CLAIM_REJECTED_EMAIL_STRING = """
         Your claim for {url} has been rejected.
         https://{site}
         """
         send_mail(
             "[codesy] Your claimed has been rejected",
-            CLAIM_APPROVED_EMAIL_STRING.format(
+            CLAIM_REJECTED_EMAIL_STRING.format(
                 url=claim.issue.url,
                 site=current_site,
             ),
@@ -285,6 +310,42 @@ def notify_approved_claim(sender, instance, created, **kwargs):
         )
 
 
+class Offer(models.Model):
+    PROVIDER_CHOICES = (
+        ('Stripe', 'Stripe'),
+    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    bid = models.ForeignKey(Bid, related_name='payments')
+    amount = models.DecimalField(
+        max_digits=6, decimal_places=2, blank=True, default=0)
+    provider = models.CharField(
+        max_length=255,
+        choices=PROVIDER_CHOICES,
+        default='Stripe')
+    confirmation = models.CharField(max_length=255)
+    created = models.DateTimeField(null=True, blank=True)
+    modified = models.DateTimeField(null=True, blank=True, auto_now=True)
+
+
+class Payout(models.Model):
+    PROVIDER_CHOICES = (
+        ('PayPal', 'PayPal'),
+    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    bid = models.ForeignKey(Bid, related_name='offers')
+    provider = models.CharField(
+        max_length=255,
+        choices=PROVIDER_CHOICES,
+        default='PayPal')
+    amount = models.DecimalField(
+        max_digits=6, decimal_places=2, blank=True, default=0)
+    confirmation = models.CharField(max_length=255)
+    created = models.DateTimeField(null=True, blank=True)
+    modified = models.DateTimeField(null=True, blank=True, auto_now=True)
+
+
+@receiver(post_save, sender=Payout)
+@receiver(post_save, sender=Offer)
 @receiver(post_save, sender=Bid)
 @receiver(post_save, sender=Claim)
 @receiver(post_save, sender=Vote)
