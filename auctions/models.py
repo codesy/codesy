@@ -8,6 +8,9 @@ from django.db.models import Sum
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+import requests
+import re
+import HTMLParser
 from mailer import send_mail
 
 
@@ -88,11 +91,24 @@ def create_issue_for_bid(sender, instance, **kwargs):
 
 class Issue(models.Model):
     url = models.URLField(unique=True, db_index=True)
+    title = models.CharField(max_length=255, null=True)
     state = models.CharField(max_length=255)
     last_fetched = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
         return u'Issue for %s (%s)' % (self.url, self.state)
+
+
+@receiver(post_save, sender=Issue)
+def lookup_title(sender, instance, **kwargs):
+    try:
+        r = requests.get(instance.url)
+        title_search = re.search('(?:<title.*>)(.*)(?:<\/title>)', r.text)
+        if title_search:
+            title = HTMLParser.HTMLParser().unescape(title_search.group(1))
+            Issue.objects.filter(id=instance.id).update(title=title)
+    except:
+        pass
 
 
 class Claim(models.Model):

@@ -114,3 +114,47 @@ class VoteViewSet(AutoOwnObjectsModelViewSet):
     """
     queryset = Vote.objects.all()
     serializer_class = VoteSerializer
+
+
+# List Views
+
+class BidList(APIView):
+    """List of bids for the User
+    """
+    renderer_classes = (TemplateHTMLRenderer,)
+
+    def get(self, request, format=None):
+        try:
+            bids = Bid.objects.filter(user=self.request.user)
+        except:
+            bids = []
+
+        return Response({'bids': bids}, template_name='bid_list.html')
+
+
+class ClaimList(APIView):
+    """List of claims for the User
+    """
+    renderer_classes = (TemplateHTMLRenderer,)
+
+    def get(self, request, format=None):
+        try:
+            claims = Claim.objects.filter(user=self.request.user)
+        except:
+            claims = []
+
+        return Response({'claims': claims}, template_name='claim_list.html')
+
+
+class VoteList(APIView):
+    """List of vote by a User
+    """
+    renderer_classes = (TemplateHTMLRenderer,)
+
+    def get(self, request, format=None):
+        try:
+            votes = Vote.objects.filter(user=self.request.user)
+        except:
+            votes = []
+
+        return Response({'votes': votes}, template_name='vote_list.html')

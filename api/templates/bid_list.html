@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+    <div class="row medium-8 large-7 columns">
+        <h2>These are your bids:</h2>
+    </div>
+    {% for bid in bids%}
+        <div class="row medium-8 large-7 columns">
+            <div class="callout primary">
+                <h3><a href="{{bid.url}}">{{bid.issue.title}}</a></h3>
+                You've asked for {{bid.ask}} to fix this and offered {{bid.offer}} for someone to fix it.
+
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
+
+{% block scripts %}
+   {% if request.user.is_authenticated %}
+      <script src="{% static "js/home-app.js" %}" ></script>
+   {% endif %}
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+    <div class="row medium-8 large-7 columns">
+        <h2>These are your votes:</h2>
+    </div>
+    {% for vote in votes%}
+        <div class="row medium-8 large-7 columns">
+            <div class="callout primary">
+                {% if vote.approved %}You approved a fix to
+                {% else %}You  rejected a fix to
+                {% endif %}
+                <a href="{{vote.claim.issue.url}}">{{vote.claim.issue.title}}</a>
+                <a href="//{{current_site.domain}}{% url 'custom-urls:claim-status' pk=vote.claim.id %}">
+                    Check on the status
+                </a>
+
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
+
+{% block scripts %}
+   {% if request.user.is_authenticated %}
+      <script src="{% static "js/home-app.js" %}" ></script>
+   {% endif %}
+{% endblock %}
