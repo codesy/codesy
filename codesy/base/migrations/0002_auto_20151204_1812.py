@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.RenameField(
             model_name='user',
             old_name='balanced_card_href',
-            new_name='stripe_account_token',
+            new_name='stripe_card_token',
         ),
     ]
