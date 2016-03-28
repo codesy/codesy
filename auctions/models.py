@@ -49,26 +49,36 @@ class Bid(models.Model):
             return False
 
 
-@receiver(pre_save, sender=Bid)
+@receiver(post_save, sender=Bid)
 def get_payment_for_offer(sender, instance, **kwargs):
     amount = instance.offer
     user = instance.user
-    if instance.pk:
-        bid = Bid.objects.filter(id=instance.id)[0]
-        if amount > bid.offer:
-            charge_amount = amount - bid.offer
+    offers = Offer.objects.filter(bid=instance)
+    if offers:
+        sum_offers = offers.aggregate(Sum('amount'))
+        if amount > sum_offers['amount__sum']:
+            charge_amount = amount - sum_offers['amount__sum']
     else:
         charge_amount = instance.offer
 # TODO: HANDLE CARD NOT YET REGISTERED
-
-    charge = stripe.Charge.create(
-        amount=int(charge_amount * 100),
-        currency="usd",
-        customer=user.stripe_account_token,
-        description="Offer for: " + instance.url
+    new_offer = Offer(
+        user=user,
+        amount=charge_amount,
+        bid=instance,
     )
-
-    if charge:
+    try:
+        charge = stripe.Charge.create(
+            amount=int(charge_amount * 100),
+            currency="usd",
+            customer=user.stripe_account_token,
+            description="Offer for: " + instance.url,
+            metadata={'bid_url':instance.url, 'amount':charge_amount}
+        )
+        import ipdb; ipdb.set_trace()
+        if charge:
+            new_offer.confirmation = charge.balance_transaction
+            new_offer.save()
+    except:
         pass
 
 
@@ -112,6 +122,9 @@ def create_issue_for_bid(sender, instance, **kwargs):
     )
     # use .update to avoid recursive signal processing
     Bid.objects.filter(id=instance.id).update(issue=issue)
+
+
+@receiver(post_save, sender=Bid)
 
 
 class Issue(models.Model):
@@ -332,7 +345,7 @@ class Payout(models.Model):
         ('PayPal', 'PayPal'),
     )
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    bid = models.ForeignKey(Bid, related_name='offers')
+    claim = models.ForeignKey(Claim, related_name='payouts')
     provider = models.CharField(
         max_length=255,
         choices=PROVIDER_CHOICES,

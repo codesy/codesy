@@ -23,16 +23,15 @@ class User(AbstractUser):
 
 @receiver(pre_save, sender=settings.AUTH_USER_MODEL)
 def replace_cc_token_with_account_token(sender, instance, **kwargs):
-
     saved_user = User.objects.get(id=instance.id)
-    if not saved_user.stripe_account_token:
+    if saved_user.stripe_account_token:
+        instance.stripe_account_token = saved_user.stripe_account_token
+    else:
         new_customer = stripe.Customer.create(
             source=instance.stripe_account_token,
             description=instance.email
         )
         instance.stripe_account_token = new_customer.id
-    else:
-        instance.stripe_account_token = saved_user.stripe_account_token
 
 
 @receiver(user_signed_up)
