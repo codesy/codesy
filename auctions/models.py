@@ -5,7 +5,7 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Sum
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 import requests
@@ -14,6 +14,7 @@ import HTMLParser
 from mailer import send_mail
 
 import stripe
+from decimal import Decimal
 stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
 
 
@@ -66,17 +67,25 @@ def get_payment_for_offer(sender, instance, **kwargs):
         amount=charge_amount,
         bid=instance,
     )
+
+# TODO:  Apply this to the charge and save it with the Offer
+    stripe_fee = int(
+                    (
+                        (charge_amount * Decimal('0.029'))
+                        + Decimal('0.30')
+                    ) * 100
+    )
+
     try:
         charge = stripe.Charge.create(
             amount=int(charge_amount * 100),
             currency="usd",
             customer=user.stripe_account_token,
             description="Offer for: " + instance.url,
-            metadata={'bid_url':instance.url, 'amount':charge_amount}
+            metadata={'bid_url': instance.url, 'amount': charge_amount}
         )
-        import ipdb; ipdb.set_trace()
         if charge:
-            new_offer.confirmation = charge.balance_transaction
+            new_offer.confirmation = charge.id
             new_offer.save()
     except:
         pass
@@ -122,9 +131,6 @@ def create_issue_for_bid(sender, instance, **kwargs):
     )
     # use .update to avoid recursive signal processing
     Bid.objects.filter(id=instance.id).update(issue=issue)
-
-
-@receiver(post_save, sender=Bid)
 
 
 class Issue(models.Model):
