@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from auctions.models import Bid, Claim, Vote
+from auctions.models import Bid, Claim, Vote, Payout
 from codesy.base.models import User
 from .serializers import (BidSerializer, ClaimSerializer, UserSerializer,
                           VoteSerializer)
@@ -158,3 +158,30 @@ class VoteList(APIView):
             votes = []
 
         return Response({'votes': votes}, template_name='vote_list.html')
+
+
+class PayoutViewSet(APIView):
+    """Users requesting payout
+    """
+    renderer_classes = (TemplateHTMLRenderer,)
+
+    def post(self, request, format=None):
+        import ipdb; ipdb.set_trace()
+        claim =  Claim.objects.get(id=request.POST['claim'])
+
+
+        # create codesy Payout objects
+        new_payout = Payout(
+            user=request.user,
+            claim=claim,
+        )
+        # attempt paypay payout
+
+        # record confirmation in payout
+        new_payout.confirmation = ""
+        new_payout.save()
+
+        claim.status = "Paid"
+        claim.save()
+
+        return Redirect('ClaimAPIView')
