@@ -1,4 +1,5 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
+from django.conf import settings
 
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
@@ -9,6 +10,14 @@ from auctions.models import Bid, Claim, Vote, Payout
 from codesy.base.models import User
 from .serializers import (BidSerializer, ClaimSerializer, UserSerializer,
                           VoteSerializer)
+
+import paypalrestsdk
+from paypalrestsdk import Payout as PaypalPayout
+# TODO: Find a prettier way to authenticate
+paypalrestsdk.configure({"mode": settings.PAYPAL_MODE,
+                         "client_id": settings.PAYPAL_CLIENT_ID,
+                         "client_secret": settings.PAYPAL_CLIENT_SECRET
+                         })
 
 
 class UserViewSet(ModelViewSet):
@@ -166,22 +175,43 @@ class PayoutViewSet(APIView):
     renderer_classes = (TemplateHTMLRenderer,)
 
     def post(self, request, format=None):
-        import ipdb; ipdb.set_trace()
-        claim =  Claim.objects.get(id=request.POST['claim'])
-
-
+        claim = Claim.objects.get(id=request.POST['claim'])
+        user = request.user
+        bid = Bid.objects.get(url=claim.issue.url, user=user)
+        # TODO: Check for previous payout of this claim
         # create codesy Payout objects
         new_payout = Payout(
-            user=request.user,
+            user=user,
             claim=claim,
+            amount=bid.ask,
         )
-        # attempt paypay payout
-
-        # record confirmation in payout
-        new_payout.confirmation = ""
         new_payout.save()
+        # attempt paypay payout
+        # TODO: add GUID generators to Payout and Offer Models
+        paypal_payout = PaypalPayout({
+            "sender_batch_header": {
+                "sender_batch_id": bid.url,
+                "email_subject": "You have a payment"
+            },
+            "items": [
+                {
+                    "recipient_type": "EMAIL",
+                    "amount": {
+                        "value": bid.ask,
+                        "currency": "USD"
+                    },
+                    "receiver": "johnadungan@gmail.com",
+                    "note": "You have a fake payment waiting.",
+                    "sender_item_id": "item_1"
+                }
+            ]
+        })
+        # record confirmation in payout
+        if paypal_payout.create(sync_mode=True):
+            new_payout.confirmation = ""
+            new_payout.save()
 
-        claim.status = "Paid"
-        claim.save()
+            claim.status = "Paid"
+            claim.save()
 
-        return Redirect('ClaimAPIView')
+        return redirect('ClaimAPIView')

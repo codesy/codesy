@@ -161,7 +161,7 @@ class Claim(models.Model):
         ('Pending', 'Pending'),
         ('Approved', 'Approved'),
         ('Rejected', 'Rejected'),
-        ('Paid','Paid')
+        ('Paid', 'Paid')
     )
     issue = models.ForeignKey('Issue')
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
