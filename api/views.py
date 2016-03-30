@@ -202,7 +202,7 @@ class PayoutViewSet(APIView):
                     },
                     "receiver": "johnadungan@gmail.com",
                     "note": "You have a fake payment waiting.",
-                    "sender_item_id": "item_1"
+                    "sender_item_id": new_payout.id
                 }
             ]
         })

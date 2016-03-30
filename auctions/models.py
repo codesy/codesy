@@ -7,6 +7,7 @@ from django.db import models
 from django.db.models import Sum
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+import uuid
 
 import requests
 import re
@@ -62,19 +63,25 @@ def get_payment_for_offer(sender, instance, **kwargs):
     else:
         charge_amount = instance.offer
 # TODO: HANDLE CARD NOT YET REGISTERED
+
+    charge_amount = charge_amount + stripe_fee
+
+    stripe_pct = Decimal('0.29')
+    # this is going to be interesting
+    codesy_pct = Decimal('0.025')
+
+    fee_pct = stripe_pct + codesy_pct
+
+    stripe_fee = (charge_amount + Decimal('0.30'))/(1-fee_pct)
+
     new_offer = Offer(
         user=user,
         amount=charge_amount,
+        fee= stripe_fee,
         bid=instance,
     )
+    new_offer.save()
 
-# TODO:  Apply this to the charge and save it with the Offer
-    stripe_fee = int(
-                    (
-                        (charge_amount * Decimal('0.029'))
-                        + Decimal('0.30')
-                    ) * 100
-    )
 
     try:
         charge = stripe.Charge.create(
@@ -82,7 +89,7 @@ def get_payment_for_offer(sender, instance, **kwargs):
             currency="usd",
             customer=user.stripe_account_token,
             description="Offer for: " + instance.url,
-            metadata={'bid_url': instance.url, 'amount': charge_amount}
+            metadata={'id': new_offer.id}
         )
         if charge:
             new_offer.confirmation = charge.id
@@ -330,39 +337,54 @@ def notify_approved_claim(sender, instance, created, **kwargs):
         )
 
 
-class Offer(models.Model):
+class Payment(models.Model):
     PROVIDER_CHOICES = (
         ('Stripe', 'Stripe'),
+        ('PayPal', 'PayPal'),
     )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False),
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    bid = models.ForeignKey(Bid, related_name='payments')
     amount = models.DecimalField(
         max_digits=6, decimal_places=2, blank=True, default=0)
-    provider = models.CharField(
-        max_length=255,
-        choices=PROVIDER_CHOICES,
-        default='Stripe')
+    fee = models.DecimalField(
+        max_digits=6, decimal_places=2, blank=True, default=0)
     confirmation = models.CharField(max_length=255)
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True, auto_now=True)
 
+    class Meta:
+        abstract = True
 
-class Payout(models.Model):
-    PROVIDER_CHOICES = (
-        ('PayPal', 'PayPal'),
-    )
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+
+class Offer(Payment):
+    bid = models.ForeignKey(Bid, related_name='payments')
+    provider = models.CharField(
+        max_length=255,
+        choices=Payment.PROVIDER_CHOICES,
+        default='Stripe')
+
+
+class Payout(Payment):
     claim = models.ForeignKey(Claim, related_name='payouts')
     provider = models.CharField(
         max_length=255,
-        choices=PROVIDER_CHOICES,
+        choices=Payment.PROVIDER_CHOICES,
         default='PayPal')
+
+
+class Fee(models.Model):
+    FEE_TYPES = (
+        ('PayPal', 'PayPal'),
+        ('Stripe','Stripe'),
+        ('codesy','codesy'),
+    )
+    type = models.CharField(
+        max_length=255,
+        choices=FEE_TYPES,
+        default='')
     amount = models.DecimalField(
         max_digits=6, decimal_places=2, blank=True, default=0)
-    confirmation = models.CharField(max_length=255)
-    created = models.DateTimeField(null=True, blank=True)
-    modified = models.DateTimeField(null=True, blank=True, auto_now=True)
-
+    description = models.CharField(max_length=255,blank=True)
 
 @receiver(post_save, sender=Payout)
 @receiver(post_save, sender=Offer)
