@@ -64,15 +64,13 @@ def get_payment_for_offer(sender, instance, **kwargs):
         charge_amount = instance.offer
 # TODO: HANDLE CARD NOT YET REGISTERED
 
-    charge_amount = charge_amount + stripe_fee
 
     stripe_pct = Decimal('0.29')
     # this is going to be interesting
     codesy_pct = Decimal('0.025')
-
     fee_pct = stripe_pct + codesy_pct
-
     stripe_fee = (charge_amount + Decimal('0.30'))/(1-fee_pct)
+    charge_amount = charge_amount + stripe_fee
 
     new_offer = Offer(
         user=user,
@@ -81,7 +79,6 @@ def get_payment_for_offer(sender, instance, **kwargs):
         bid=instance,
     )
     new_offer.save()
-
 
     try:
         charge = stripe.Charge.create(
