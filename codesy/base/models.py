@@ -27,6 +27,8 @@ def replace_cc_token_with_account_token(sender, instance, **kwargs):
     if saved_user.stripe_account_token:
         instance.stripe_account_token = saved_user.stripe_account_token
     else:
+        if not instance.stripe_account_token:
+            return
         new_customer = stripe.Customer.create(
             source=instance.stripe_account_token,
             description=instance.email
