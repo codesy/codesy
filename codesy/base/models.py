@@ -1,4 +1,5 @@
 import requests
+import stripe
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -11,8 +12,6 @@ from rest_framework.authtoken.models import Token
 
 
 EMAIL_URL = 'https://api.github.com/user/emails'
-
-import stripe
 stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
 
 
@@ -23,17 +22,20 @@ class User(AbstractUser):
 
 @receiver(pre_save, sender=settings.AUTH_USER_MODEL)
 def replace_cc_token_with_account_token(sender, instance, **kwargs):
-    saved_user = User.objects.get(id=instance.id)
-    if saved_user.stripe_account_token:
-        instance.stripe_account_token = saved_user.stripe_account_token
+    if not instance.stripe_account_token:
+        # this is not an update concerning stripe
+        return
     else:
-        if not instance.stripe_account_token:
-            return
-        new_customer = stripe.Customer.create(
-            source=instance.stripe_account_token,
-            description=instance.email
-        )
-        instance.stripe_account_token = new_customer.id
+        saved_user = User.objects.get(id=instance.id)
+        if saved_user.stripe_account_token:
+            # TODO:  This prevents new card accounts must change
+            instance.stripe_account_token = saved_user.stripe_account_token
+        else:
+            new_customer = stripe.Customer.create(
+                source=instance.stripe_account_token,
+                description=instance.email
+            )
+            instance.stripe_account_token = new_customer.id
 
 
 @receiver(user_signed_up)

@@ -53,29 +53,27 @@ class Bid(models.Model):
 
 @receiver(post_save, sender=Bid)
 def get_payment_for_offer(sender, instance, **kwargs):
-    amount = instance.offer
+    charge_amount = instance.offer
     user = instance.user
     offers = Offer.objects.filter(bid=instance)
     if offers:
         sum_offers = offers.aggregate(Sum('amount'))
-        if amount > sum_offers['amount__sum']:
-            charge_amount = amount - sum_offers['amount__sum']
-    else:
-        charge_amount = instance.offer
-# TODO: HANDLE CARD NOT YET REGISTERED
+        if charge_amount > sum_offers['amount__sum']:
+            charge_amount = charge_amount - sum_offers['amount__sum']
 
+# TODO: HANDLE CARD NOT YET REGISTERED
 
     stripe_pct = Decimal('0.29')
     # this is going to be interesting
     codesy_pct = Decimal('0.025')
     fee_pct = stripe_pct + codesy_pct
-    stripe_fee = (charge_amount + Decimal('0.30'))/(1-fee_pct)
+    stripe_fee = (charge_amount + Decimal('0.30')) / (1 - fee_pct)
     charge_amount = charge_amount + stripe_fee
 
     new_offer = Offer(
         user=user,
         amount=charge_amount,
-        fee= stripe_fee,
+        fee=stripe_fee,
         bid=instance,
     )
     new_offer.save()
@@ -106,11 +104,7 @@ def notify_matching_askers(sender, instance, **kwargs):
     """
 
     unnotified_asks = Bid.objects.filter(
-        url=instance.url,
-        ask_match_sent=None
-    ).exclude(
-        ask__lte=0,
-    )
+        url=instance.url, ask_match_sent=None).exclude(ask__lte=0)
 
     for bid in unnotified_asks:
         if bid.ask_met():
@@ -339,7 +333,8 @@ class Payment(models.Model):
         ('Stripe', 'Stripe'),
         ('PayPal', 'PayPal'),
     )
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False),
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4(), editable=False),
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     amount = models.DecimalField(
         max_digits=6, decimal_places=2, blank=True, default=0)
@@ -372,8 +367,8 @@ class Payout(Payment):
 class Fee(models.Model):
     FEE_TYPES = (
         ('PayPal', 'PayPal'),
-        ('Stripe','Stripe'),
-        ('codesy','codesy'),
+        ('Stripe', 'Stripe'),
+        ('codesy', 'codesy'),
     )
     type = models.CharField(
         max_length=255,
@@ -381,7 +376,8 @@ class Fee(models.Model):
         default='')
     amount = models.DecimalField(
         max_digits=6, decimal_places=2, blank=True, default=0)
-    description = models.CharField(max_length=255,blank=True)
+    description = models.CharField(max_length=255, blank=True)
+
 
 @receiver(post_save, sender=Payout)
 @receiver(post_save, sender=Offer)

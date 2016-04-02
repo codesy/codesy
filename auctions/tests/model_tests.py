@@ -11,7 +11,7 @@ from django.db import IntegrityError
 
 from model_mommy import mommy
 
-from ..models import Bid, Claim, Issue, Vote
+from ..models import Bid, Claim, Issue, Vote, Offer
 
 
 class MarketTestCase(TestCase):
@@ -399,3 +399,17 @@ class VoteTest(TestCase):
         mock_send_mail.is_callable().times_called(0)
         mommy.make(Vote, claim=self.claim, user=self.user2, approved=False)
         mommy.make(Vote, claim=self.claim, user=self.user3, approved=True)
+
+
+class OfferTest(TestCase):
+    def setUp(self):
+        self.user1 = mommy.make(settings.AUTH_USER_MODEL,
+                                email='user1@test.com')
+        url = 'http://test.com/bug/123'
+        issue = mommy.make(Issue, url=url)
+        mommy.make(Bid, user=self.user1, url=url, issue=issue, offer=50)
+
+    @fudge.patch('stripe.Charge.create')
+    def test_uuid_created(self, mock_stripe_create):
+        offer = mommy.make(Offer)
+        self.assertIsNotNone(offer.id)

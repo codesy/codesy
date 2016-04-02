@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
 
@@ -13,10 +15,13 @@ from .serializers import (BidSerializer, ClaimSerializer, UserSerializer,
 
 import paypalrestsdk
 from paypalrestsdk import Payout as PaypalPayout
+
+
 # TODO: Find a prettier way to authenticate
 paypalrestsdk.configure({"mode": settings.PAYPAL_MODE,
                          "client_id": settings.PAYPAL_CLIENT_ID,
-                         "client_secret": settings.PAYPAL_CLIENT_SECRET
+                         "client_secret": settings.PAYPAL_CLIENT_SECRET,
+                        #  "ssl_options":{"cert": "./api/g5-cacert.pem"},
                          })
 
 
@@ -180,27 +185,32 @@ class PayoutViewSet(APIView):
         bid = Bid.objects.get(url=claim.issue.url, user=user)
         # TODO: Check for previous payout of this claim
         # create codesy Payout objects
+
+        # TODO: create Fee object for this payout
+
+        paypal_fee = Decimal('0.25')
+        codesy_fee = bid.ask * Decimal('0.025')
+
         new_payout = Payout(
             user=user,
             claim=claim,
-            amount=bid.ask,
+            amount=bid.ask - paypal_fee - codesy_fee,
         )
         new_payout.save()
         # attempt paypay payout
-        # TODO: add GUID generators to Payout and Offer Models
         paypal_payout = PaypalPayout({
             "sender_batch_header": {
-                "sender_batch_id": bid.url,
-                "email_subject": "You have a payment"
+                "sender_batch_id": new_payout.id,
+                "email_subject": "Your codesy payout is here!"
             },
             "items": [
                 {
                     "recipient_type": "EMAIL",
                     "amount": {
-                        "value": bid.ask,
+                        "value": int(new_payout.amount),
                         "currency": "USD"
                     },
-                    "receiver": "johnadungan@gmail.com",
+                    "receiver": "DevGirl@mozilla.org",
                     "note": "You have a fake payment waiting.",
                     "sender_item_id": new_payout.id
                 }
@@ -208,10 +218,13 @@ class PayoutViewSet(APIView):
         })
         # record confirmation in payout
         if paypal_payout.create(sync_mode=True):
-            new_payout.confirmation = ""
-            new_payout.save()
+            for item in paypal_payout.items:
+                if item.transaction_status == "SUCCESS":
+                    new_payout.confirmation = item.payout_item_id
+                new_payout.save()
+                claim.status = "Paid"
+                claim.save()
+        else:
+            pass
 
-            claim.status = "Paid"
-            claim.save()
-
-        return redirect('ClaimAPIView')
+        return redirect('/claim-status/' + str(claim.id))

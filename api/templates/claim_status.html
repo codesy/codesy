@@ -21,8 +21,11 @@
     <div class="callout secondary">
         {% if claim.status == "Submitted"  %}
             <h3>There have been no votes on this claim yet.</h3>
+            {% include "includes/expiration_note.html" %}
+
         {% elif claim.status == "Pending" %}
             <h3>There are some still votes needed for this claim.</h3>
+            {% include "includes/expiration_note.html" %}
         {% elif claim.status == "Approved" %}
             {% include "includes/payout_request.html" %}
         {% elif claim.status == "Rejected" %}
@@ -30,13 +33,6 @@
         {% elif claim.status == "Paid" %}
             {% include "includes/payout_confirmation.html" %}
 
-        {% endif %}
-
-        {% if claim.status != "Approved"  and claim.status != "Rejected" %}
-             <div>
-               If this claim does not receive enough votes for approval by
-               {{ claim.expires|date:"M d, Y" }} it will be closed.
-             </div>
         {% endif %}
    </div>
 
