@@ -181,38 +181,50 @@ class PayoutViewSet(APIView):
 
     def post(self, request, format=None):
         claim = Claim.objects.get(id=request.POST['claim'])
+
+        # leave if claim already paid
+        if claim.status == 'Paid':
+            return redirect('/claim-status/' + str(claim.id))
+
         user = request.user
         bid = Bid.objects.get(url=claim.issue.url, user=user)
-        # TODO: Check for previous payout of this claim
-        # create codesy Payout objects
 
-        # TODO: create Fee object for this payout
-
+        # TODO: create Fee objects for this payout
         paypal_fee = Decimal('0.25')
         codesy_fee = bid.ask * Decimal('0.025')
 
-        new_payout = Payout(
-            user=user,
-            claim=claim,
-            amount=bid.ask - paypal_fee - codesy_fee,
-        )
-        new_payout.save()
+        codesy_payout = Payout.objects.filter(claim=claim)[0]
+        if codesy_payout:
+            if codesy_payout.confirmation:
+                claim.status = 'Paid'
+                claim.save()
+                return redirect('/claim-status/' + str(claim.id))
+        else:
+            codesy_payout = Payout(
+                user=user,
+                claim=claim,
+                amount=bid.ask - codesy_fee,
+            )
+
+        codesy_payout.fee = paypal_fee + codesy_fee
+        codesy_payout.save()
+
         # attempt paypay payout
         paypal_payout = PaypalPayout({
             "sender_batch_header": {
-                "sender_batch_id": new_payout.id,
+                "sender_batch_id": codesy_payout.id,
                 "email_subject": "Your codesy payout is here!"
             },
             "items": [
                 {
                     "recipient_type": "EMAIL",
                     "amount": {
-                        "value": int(new_payout.amount),
+                        "value": int(codesy_payout.amount),
                         "currency": "USD"
                     },
                     "receiver": "DevGirl@mozilla.org",
                     "note": "You have a fake payment waiting.",
-                    "sender_item_id": new_payout.id
+                    "sender_item_id": codesy_payout.id
                 }
             ]
         })
@@ -220,8 +232,8 @@ class PayoutViewSet(APIView):
         if paypal_payout.create(sync_mode=True):
             for item in paypal_payout.items:
                 if item.transaction_status == "SUCCESS":
-                    new_payout.confirmation = item.payout_item_id
-                new_payout.save()
+                    codesy_payout.confirmation = item.payout_item_id
+                codesy_payout.save()
                 claim.status = "Paid"
                 claim.save()
         else:
