@@ -118,8 +118,12 @@ class ClaimAPIView(APIView):
         except:
             vote = None
 
-        return Response({'claim': claim, 'vote': vote},
-                        template_name='claim_status.html')
+        if request.user == claim.user:
+            return Response({'claim': claim, 'vote': vote},
+                            template_name='claim_status_claimaint.html')
+        else:
+            return Response({'claim': claim, 'vote': vote},
+                            template_name='claim_status_anyone.html')
 
 
 class VoteViewSet(AutoOwnObjectsModelViewSet):

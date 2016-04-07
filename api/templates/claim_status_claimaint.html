@@ -5,15 +5,10 @@
    {% with YOU="You claimed a fix to this issue:" SOMEONE="A fix has been claimed for this issue:" %}
        <div class="row medium-8 large-7 columns">
        <div class="callout primary">
-             <h3>
-                {% if claim.user != request.user %}
-                   {{SOMEONE}}
-                {% else %}
-                   {{YOU}}
-                {% endif %}
+             <h3>You claimed a fix to this issue:
                 <a target="_blank" href='{{ claim.issue.url }}'>{{ claim.issue.url }}</a>
              </h3>
-             <h3>This URL was submitted as proof of the fix:
+             <h3>You submitted this URL as proof of the fix:
                 <a target="_blank" href='{{ claim.evidence }}'>{{ claim.evidence }}</a>
              </h3>
        </div>
@@ -22,7 +17,6 @@
         {% if claim.status == "Submitted"  %}
             <h3>There have been no votes on this claim yet.</h3>
             {% include "includes/expiration_note.html" %}
-
         {% elif claim.status == "Pending" %}
             <h3>There are some still votes needed for this claim.</h3>
             {% include "includes/expiration_note.html" %}
@@ -32,17 +26,8 @@
             <h3>This claim was not approved.</h3>
         {% elif claim.status == "Paid" %}
             {% include "includes/payout_confirmation.html" %}
-
         {% endif %}
    </div>
-
-   {% if claim.user != request.user %}
-      {% if vote %}
-         {% include "includes/vote_confirmation.html" %}
-      {% else %}
-         {% include "includes/vote_form.html" %}
-      {% endif %}
-   {% endif %}
 
 {% endblock %}
 
