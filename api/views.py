@@ -1,6 +1,7 @@
 from decimal import Decimal
 
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
+from django.core.urlresolvers import reverse
 from django.conf import settings
 
 from rest_framework.renderers import TemplateHTMLRenderer
@@ -188,7 +189,7 @@ class PayoutViewSet(APIView):
 
         # leave if claim already paid
         if claim.status == 'Paid':
-            return reverse('claim-status', pk=claim.id)
+            return reverse('claim-status', kwargs={'pk': claim.id})
 
         user = request.user
         bid = Bid.objects.get(url=claim.issue.url, user=user)
@@ -202,7 +203,7 @@ class PayoutViewSet(APIView):
             if codesy_payout.confirmation:
                 claim.status = 'Paid'
                 claim.save()
-                return reverse('claim-status', pk=claim.id)
+                return reverse('claim-status', kwargs={'pk': claim.id})
 
         else:
             codesy_payout = Payout(
@@ -244,4 +245,4 @@ class PayoutViewSet(APIView):
         else:
             pass
 
-        return reverse('claim-status', pk=claim.id)
+        return reverse('claim-status', kwargs={'pk': claim.id})
