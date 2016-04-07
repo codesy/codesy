@@ -18,6 +18,8 @@ import stripe
 from decimal import Decimal
 stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
 
+def uuid_please (self):
+    return uuid.uuid4()
 
 class Bid(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
@@ -328,13 +330,15 @@ def notify_approved_claim(sender, instance, created, **kwargs):
         )
 
 
+
+
 class Payment(models.Model):
     PROVIDER_CHOICES = (
         ('Stripe', 'Stripe'),
         ('PayPal', 'PayPal'),
     )
     id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4(), editable=False),
+        primary_key=True, default=uuid_please, editable=False),
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     amount = models.DecimalField(
         max_digits=6, decimal_places=2, blank=True, default=0)
@@ -377,6 +381,8 @@ class Fee(models.Model):
     amount = models.DecimalField(
         max_digits=6, decimal_places=2, blank=True, default=0)
     description = models.CharField(max_length=255, blank=True)
+
+
 
 
 @receiver(post_save, sender=Payout)

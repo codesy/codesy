@@ -184,7 +184,7 @@ class PayoutViewSet(APIView):
 
         # leave if claim already paid
         if claim.status == 'Paid':
-            return redirect('/claim-status/' + str(claim.id))
+            return reverse('claim-status', pk=claim.id)
 
         user = request.user
         bid = Bid.objects.get(url=claim.issue.url, user=user)
@@ -198,7 +198,8 @@ class PayoutViewSet(APIView):
             if codesy_payout.confirmation:
                 claim.status = 'Paid'
                 claim.save()
-                return redirect('/claim-status/' + str(claim.id))
+                return reverse('claim-status', pk=claim.id)
+
         else:
             codesy_payout = Payout(
                 user=user,
@@ -239,4 +240,4 @@ class PayoutViewSet(APIView):
         else:
             pass
 
-        return redirect('/claim-status/' + str(claim.id))
+        return reverse('claim-status', pk=claim.id)
