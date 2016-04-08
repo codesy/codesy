@@ -1,29 +1,15 @@
-from decimal import Decimal
-
-from django.shortcuts import get_object_or_404
-from django.core.urlresolvers import reverse
-from django.conf import settings
+from django.shortcuts import get_object_or_404, redirect
+# from django.core.urlresolvers import reverse
 
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from auctions.models import Bid, Claim, Vote, Payout
+from auctions.models import Bid, Claim, Vote
 from codesy.base.models import User
 from .serializers import (BidSerializer, ClaimSerializer, UserSerializer,
                           VoteSerializer)
-
-import paypalrestsdk
-from paypalrestsdk import Payout as PaypalPayout
-
-
-# TODO: Find a prettier way to authenticate
-paypalrestsdk.configure({"mode": settings.PAYPAL_MODE,
-                         "client_id": settings.PAYPAL_CLIENT_ID,
-                         "client_secret": settings.PAYPAL_CLIENT_SECRET,
-                        #  "ssl_options":{"cert": "./api/g5-cacert.pem"},
-                         })
 
 
 class UserViewSet(ModelViewSet):
@@ -114,6 +100,7 @@ class ClaimAPIView(APIView):
     def get(self, request, pk, format=None):
         claim = None
         claim = get_object_or_404(Claim, pk=pk)
+        # TODO: keep user without offers from seeing a vote form
         try:
             vote = Vote.objects.filter(claim=claim, user=self.request.user)[0]
         except:
@@ -186,63 +173,10 @@ class PayoutViewSet(APIView):
 
     def post(self, request, format=None):
         claim = Claim.objects.get(id=request.POST['claim'])
-
-        # leave if claim already paid
-        if claim.status == 'Paid':
-            return reverse('claim-status', kwargs={'pk': claim.id})
-
-        user = request.user
-        bid = Bid.objects.get(url=claim.issue.url, user=user)
-
-        # TODO: create Fee objects for this payout
-        paypal_fee = Decimal('0.25')
-        codesy_fee = bid.ask * Decimal('0.025')
-
-        codesy_payout = Payout.objects.filter(claim=claim)[0]
-        if codesy_payout:
-            if codesy_payout.confirmation:
-                claim.status = 'Paid'
-                claim.save()
-                return reverse('claim-status', kwargs={'pk': claim.id})
-
-        else:
-            codesy_payout = Payout(
-                user=user,
-                claim=claim,
-                amount=bid.ask - codesy_fee,
-            )
-
-        codesy_payout.fee = paypal_fee + codesy_fee
-        codesy_payout.save()
-
-        # attempt paypay payout
-        paypal_payout = PaypalPayout({
-            "sender_batch_header": {
-                "sender_batch_id": codesy_payout.id,
-                "email_subject": "Your codesy payout is here!"
-            },
-            "items": [
-                {
-                    "recipient_type": "EMAIL",
-                    "amount": {
-                        "value": int(codesy_payout.amount),
-                        "currency": "USD"
-                    },
-                    "receiver": "DevGirl@mozilla.org",
-                    "note": "You have a fake payment waiting.",
-                    "sender_item_id": codesy_payout.id
-                }
-            ]
-        })
-        # record confirmation in payout
-        if paypal_payout.create(sync_mode=True):
-            for item in paypal_payout.items:
-                if item.transaction_status == "SUCCESS":
-                    codesy_payout.confirmation = item.payout_item_id
-                codesy_payout.save()
-                claim.status = "Paid"
-                claim.save()
-        else:
-            pass
-
-        return reverse('claim-status', kwargs={'pk': claim.id})
+        if request.user == claim.user:
+            claim.request_payout()
+        # these do not work
+        # return reverse('claim-status', pk=claim.id)
+        # return reverse('claim-status', args=[claim.id])
+        # return reverse('claim-status', kwargs={pk=claim.id})
+        return redirect('/claim-status/' + str(claim.id))

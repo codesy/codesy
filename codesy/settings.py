@@ -175,10 +175,8 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 # Payment provider settings
-STRIPE_TEST_SECRET_KEY = config('STRIPE_TEST_SECRET_KEY', default='')
-STRIPE_TEST_PUBLIC_KEY = config('STRIPE_TEST_PUBLIC_KEY', default='')
-STRIPE_LIVE_SECRET_KEY = ""
-STRIPE_LIVE_PUBLIC_KEY = ""
+STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='')
+STRIPE_PUBLIC_KEY = config('STRIPE_PUBLIC_KEY', default='')
 PAYPAL_MODE = config('PAYPAL_MODE', default='sandbox')   # sandbox or live
 PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID', default='')
 PAYPAL_CLIENT_SECRET = config('PAYPAL_CLIENT_SECRET', default='')

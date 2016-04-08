@@ -1,5 +1,12 @@
-from datetime import datetime, timedelta
+import uuid
+import requests
+import re
+import HTMLParser
+import stripe
+import paypalrestsdk
+from paypalrestsdk import Payout as PaypalPayout
 
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -7,20 +14,22 @@ from django.db import models
 from django.db.models import Sum
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-import uuid
 
-import requests
-import re
-import HTMLParser
+from decimal import Decimal
 from mailer import send_mail
 
-import stripe
-from decimal import Decimal
-stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+# TODO: Find a prettier way to authenticate
+paypalrestsdk.configure({"mode": settings.PAYPAL_MODE,
+                         "client_id": settings.PAYPAL_CLIENT_ID,
+                         "client_secret": settings.PAYPAL_CLIENT_SECRET,
+                         })
 
 
 def uuid_please(self):
-    return uuid.uuid4()
+    full_uuid = uuid.uuid4()
+    return str(full_uuid)[:25]
 
 
 class Bid(models.Model):
@@ -212,6 +221,68 @@ class Claim(models.Model):
     def get_absolute_url(self):
         return reverse('custom-urls:claim-status', kwargs={'pk': self.id})
 
+    def request_payout(self):
+        if self.status == 'Paid':
+            return False
+
+        bid = Bid.objects.get(url=self.issue.url, user=self.user)
+
+        codesy_payout = Payout(
+            user=self.user,
+            claim=self,
+            amount=bid.ask,
+        )
+        codesy_payout.save()
+
+        paypal_fee = PayoutFee(
+            payout=codesy_payout,
+            fee_type='PayPal',
+            amount=Decimal('0.25')
+        )
+        paypal_fee.save()
+
+        codesy_fee = PayoutFee(
+            payout=codesy_payout,
+            fee_type='codesy',
+            amount=bid.ask * Decimal('0.025'),
+        )
+        codesy_fee.save()
+
+        total_fees = paypal_fee.amount + codesy_fee.amount
+        codesy_payout.amount = codesy_payout.amount - total_fees
+        codesy_payout.save()
+        # attempt paypay payout
+        paypal_payout = PaypalPayout({
+            "sender_batch_header": {
+                "sender_batch_id": codesy_payout.id,
+                "email_subject": "Your codesy payout is here!"
+            },
+            "items": [
+                {
+                    "recipient_type": "EMAIL",
+                    "amount": {
+                        "value": int(codesy_payout.amount),
+                        "currency": "USD"
+                    },
+                    "receiver": "DevGirl@mozilla.org",
+                    "note": "You have a fake payment waiting.",
+                    "sender_item_id": codesy_payout.id
+                }
+            ]
+        })
+        # record confirmation in payout
+        if paypal_payout.create(sync_mode=True):
+            for item in paypal_payout.items:
+                if item.transaction_status == "SUCCESS":
+                    codesy_payout.api_success = True
+                    codesy_payout.confirmation = item.payout_item_id
+                codesy_payout.save()
+                self.status = "Paid"
+                self.save()
+            return True
+        else:
+            return False
+
 
 @receiver(post_save, sender=Claim)
 def notify_matching_offerers(sender, instance, created, **kwargs):
@@ -344,7 +415,8 @@ class Payment(models.Model):
         max_digits=6, decimal_places=2, blank=True, default=0)
     fee = models.DecimalField(
         max_digits=6, decimal_places=2, blank=True, default=0)
-    confirmation = models.CharField(max_length=255)
+    api_success = models.BooleanField(default=False)
+    confirmation = models.CharField(max_length=255, blank=True)
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True, auto_now=True)
 
@@ -374,13 +446,24 @@ class Fee(models.Model):
         ('Stripe', 'Stripe'),
         ('codesy', 'codesy'),
     )
-    type = models.CharField(
+    fee_type = models.CharField(
         max_length=255,
         choices=FEE_TYPES,
         default='')
     amount = models.DecimalField(
         max_digits=6, decimal_places=2, blank=True, default=0)
     description = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        abstract = True
+
+
+class OfferFee(Fee):
+    offer = models.ForeignKey(Offer, related_name="offer_fees", null=True)
+
+
+class PayoutFee(Fee):
+    payout = models.ForeignKey(Payout, related_name="payout_fees", null=True)
 
 
 @receiver(post_save, sender=Payout)

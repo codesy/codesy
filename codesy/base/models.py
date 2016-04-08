@@ -12,7 +12,7 @@ from rest_framework.authtoken.models import Token
 
 
 EMAIL_URL = 'https://api.github.com/user/emails'
-stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 class User(AbstractUser):
