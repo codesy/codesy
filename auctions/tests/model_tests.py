@@ -8,10 +8,12 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.db import IntegrityError
+from django.db.models import Sum
 
 from model_mommy import mommy
 
-from ..models import Bid, Claim, Issue, Vote, Offer
+from ..models import Bid, Claim, Issue, Vote
+from ..models import Offer, OfferFee
 
 
 class MarketTestCase(TestCase):
@@ -402,14 +404,35 @@ class VoteTest(TestCase):
 
 
 class OfferTest(TestCase):
+
     def setUp(self):
         self.user1 = mommy.make(settings.AUTH_USER_MODEL,
                                 email='user1@test.com')
-        url = 'http://test.com/bug/123'
-        issue = mommy.make(Issue, url=url)
-        mommy.make(Bid, user=self.user1, url=url, issue=issue, offer=50)
+        self.url = 'http://test.com/bug/123'
+        self.issue = mommy.make(Issue, url=self.url)
+        self.bid = mommy.make(
+            Bid, user=self.user1,
+            url=self.url, issue=self.issue, offer=50)
+
+    def test_key_created(self):
+        offer = mommy.make(Offer, bid=self.bid)
+        self.assertIsNotNone(offer.transaction_key)
 
     @fudge.patch('stripe.Charge.create')
-    def test_uuid_created(self, mock_stripe_create):
-        offer = mommy.make(Offer)
-        self.assertIsNotNone(offer.id)
+    def test_bid_fees(self, mock_stripe_create):
+        offer = Offer.objects.get(bid=self.bid)
+        self.assertEqual(offer.amount, 50)
+        fees = OfferFee.objects.filter(offer=offer)
+        self.assertEqual(len(fees), 2)
+        sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
+        offer_with_fees = offer.amount + sum_fees
+        self.assertEqual(offer_with_fees, offer.charge_amount)
+
+    @fudge.patch('stripe.Charge.create')
+    def test_new_offer(self, mock_stripe_create):
+        self.bid.offer = 60
+        self.bid.save()
+        offers = Offer.objects.filter(bid=self.bid)
+        self.assertEqual(len(offers), 2)
+        sum_offers = offers.aggregate(Sum('amount'))['amount__sum']
+        self.assertEqual(sum_offers, 60)

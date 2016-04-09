@@ -27,8 +27,9 @@ paypalrestsdk.configure({"mode": settings.PAYPAL_MODE,
                          })
 
 
-def uuid_please(self):
+def uuid_please():
     full_uuid = uuid.uuid4()
+    # uuid is truncated because paypal must be <30
     return str(full_uuid)[:25]
 
 
@@ -66,40 +67,62 @@ class Bid(models.Model):
 
 @receiver(post_save, sender=Bid)
 def get_payment_for_offer(sender, instance, **kwargs):
-    charge_amount = instance.offer
+    offer_amount = instance.offer
     user = instance.user
     offers = Offer.objects.filter(bid=instance)
     if offers:
         sum_offers = offers.aggregate(Sum('amount'))
-        if charge_amount > sum_offers['amount__sum']:
-            charge_amount = charge_amount - sum_offers['amount__sum']
+        if offer_amount > sum_offers['amount__sum']:
+            offer_amount = offer_amount - sum_offers['amount__sum']
 
 # TODO: HANDLE CARD NOT YET REGISTERED
 
-    stripe_pct = Decimal('0.29')
-    # this is going to be interesting
+    stripe_pct = Decimal('0.029')
+    stripe_transaction = Decimal('0.30')
     codesy_pct = Decimal('0.025')
-    fee_pct = stripe_pct + codesy_pct
-    stripe_fee = (charge_amount + Decimal('0.30')) / (1 - fee_pct)
-    charge_amount = charge_amount + stripe_fee
 
     new_offer = Offer(
         user=user,
-        amount=charge_amount,
-        fee=stripe_fee,
+        amount=offer_amount,
         bid=instance,
     )
     new_offer.save()
 
+    codesy_fee = OfferFee(
+        offer=new_offer,
+        fee_type='codesy',
+        amount=new_offer.amount * codesy_pct
+    )
+    codesy_fee.save()
+
+    stripe_charge = (
+        (offer_amount + codesy_fee.amount + stripe_transaction)
+        / (1 - stripe_pct)
+    )
+
+    stripe_fee = stripe_charge - (new_offer.amount + codesy_fee.amount)
+
+    stripe_fee = OfferFee(
+        offer=new_offer,
+        fee_type='Stripe',
+        amount=stripe_fee
+    )
+    stripe_fee.save()
+
+    # TODO: removed with proper stripe mocking in tests
+    new_offer.charge_amount = stripe_charge
+    new_offer.save()
+
     try:
         charge = stripe.Charge.create(
-            amount=int(charge_amount * 100),
+            amount=int(stripe_charge * 100),
             currency="usd",
             customer=user.stripe_account_token,
             description="Offer for: " + instance.url,
             metadata={'id': new_offer.id}
         )
         if charge:
+            new_offer.charge_amount = stripe_charge
             new_offer.confirmation = charge.id
             new_offer.save()
     except:
@@ -252,9 +275,12 @@ class Claim(models.Model):
         codesy_payout.amount = codesy_payout.amount - total_fees
         codesy_payout.save()
         # attempt paypay payout
+        # paypal id are limited to 30 chars
+        # TODO: Fix this potential non-unique key
+        paypay_key = codesy_payout.transaction_key[:30]
         paypal_payout = PaypalPayout({
             "sender_batch_header": {
-                "sender_batch_id": codesy_payout.id,
+                "sender_batch_id": paypay_key,
                 "email_subject": "Your codesy payout is here!"
             },
             "items": [
@@ -266,7 +292,7 @@ class Claim(models.Model):
                     },
                     "receiver": "DevGirl@mozilla.org",
                     "note": "You have a fake payment waiting.",
-                    "sender_item_id": codesy_payout.id
+                    "sender_item_id": paypay_key
                 }
             ]
         })
@@ -408,14 +434,16 @@ class Payment(models.Model):
         ('Stripe', 'Stripe'),
         ('PayPal', 'PayPal'),
     )
-    id = models.UUIDField(
-        primary_key=True, default=uuid_please, editable=False),
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     amount = models.DecimalField(
         max_digits=6, decimal_places=2, blank=True, default=0)
     fee = models.DecimalField(
         max_digits=6, decimal_places=2, blank=True, default=0)
+    transaction_key = models.CharField(
+        max_length=255, default=uuid.uuid4, blank=True)
     api_success = models.BooleanField(default=False)
+    charge_amount = models.DecimalField(
+        max_digits=6, decimal_places=2, blank=True, default=0)
     confirmation = models.CharField(max_length=255, blank=True)
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True, auto_now=True)
