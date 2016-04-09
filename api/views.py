@@ -172,9 +172,12 @@ class PayoutViewSet(APIView):
     renderer_classes = (TemplateHTMLRenderer,)
 
     def post(self, request, format=None):
-        claim = Claim.objects.get(id=request.POST['claim'])
-        if request.user == claim.user:
-            claim.request_payout()
+        try:
+            claim = Claim.objects.get(id=request.POST['claim'])
+            if request.user == claim.user:
+                claim.request_payout()
+        except:
+            pass
         # these do not work
         # return reverse('claim-status', pk=claim.id)
         # return reverse('claim-status', args=[claim.id])
