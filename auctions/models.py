@@ -277,7 +277,7 @@ class Claim(models.Model):
         # attempt paypay payout
         # paypal id are limited to 30 chars
         # TODO: Fix this potential non-unique key
-        paypay_key = codesy_payout.transaction_key[:30]
+        paypay_key = str(codesy_payout.transaction_key)[:30]
         paypal_payout = PaypalPayout({
             "sender_batch_header": {
                 "sender_batch_id": paypay_key,

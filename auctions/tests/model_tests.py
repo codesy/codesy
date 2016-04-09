@@ -13,7 +13,7 @@ from django.db.models import Sum
 from model_mommy import mommy
 
 from ..models import Bid, Claim, Issue, Vote
-from ..models import Offer, OfferFee
+from ..models import Offer, OfferFee, Payout, PayoutFee
 
 
 class MarketTestCase(TestCase):
@@ -420,6 +420,7 @@ class OfferTest(TestCase):
 
     @fudge.patch('stripe.Charge.create')
     def test_bid_fees(self, mock_stripe_create):
+        mock_stripe_create.is_callable()
         offer = Offer.objects.get(bid=self.bid)
         self.assertEqual(offer.amount, 50)
         fees = OfferFee.objects.filter(offer=offer)
@@ -430,9 +431,42 @@ class OfferTest(TestCase):
 
     @fudge.patch('stripe.Charge.create')
     def test_new_offer(self, mock_stripe_create):
+        mock_stripe_create.is_callable()
         self.bid.offer = 60
         self.bid.save()
         offers = Offer.objects.filter(bid=self.bid)
         self.assertEqual(len(offers), 2)
         sum_offers = offers.aggregate(Sum('amount'))['amount__sum']
         self.assertEqual(sum_offers, 60)
+
+
+class PayoutTest(TestCase):
+
+    def setUp(self):
+        self.user1 = mommy.make(settings.AUTH_USER_MODEL,
+                                email='user1@test.com')
+        self.user2 = mommy.make(settings.AUTH_USER_MODEL,
+                                email='user2@test.com')
+        self.url = 'http://test.com/bug/123'
+        self.issue = mommy.make(Issue, url=self.url)
+
+        self.bid1 = mommy.make(
+            Bid, user=self.user1,
+            url=self.url, issue=self.issue, ask=50)
+
+        self.bid2 = mommy.make(
+            Bid, user=self.user2,
+            url=self.url, issue=self.issue, offer=50)
+
+    @fudge.patch('paypalrestsdk.Payout.create')
+    def test_request_payout(self, mock_paypal):
+        mock_paypal.is_callable()
+        claim = mommy.make(Claim, user=self.user1, issue=self.issue)
+        claim.request_payout()
+        payouts = Payout.objects.filter(claim=claim)
+        self.assertEqual(len(payouts), 1)
+        payout = payouts[0]
+        fees = PayoutFee.objects.filter(payout=payout)
+        self.assertEqual(len(fees), 2)
+        sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
+        self.assertEqual(sum_fees + payout.amount, self.bid1.ask)
