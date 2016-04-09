@@ -12,6 +12,8 @@ from auctions import models
 
 from .. import serializers, views
 
+from rest_framework.views import APIView
+
 
 class UserViewSetTest(TestCase):
     def setUp(self):
@@ -200,3 +202,14 @@ class VoteViewSetTest(TestCase):
         self.assertEqual(self.viewset.queryset.model, models.Vote)
         self.assertEqual(
             self.viewset.serializer_class, serializers.VoteSerializer)
+
+
+class ListViewTests(TestCase):
+
+    def test_list_views(self):
+        bid_list, claim_list, vote_list = (
+            [views.BidList(), views.ClaimList(), views.VoteList()]
+        )
+        self.assertIsInstance(bid_list, APIView)
+        self.assertIsInstance(claim_list, APIView)
+        self.assertIsInstance(vote_list, APIView)
