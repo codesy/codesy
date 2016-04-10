@@ -53,6 +53,14 @@ class IssueTest(MarketTestCase):
         )
 
 
+class SimpleBidTest(TestCase):
+
+    def test_no_charge_for_zero_offer(self):
+        bid = mommy.make(Bid, ask=50)
+        offers = Offer.objects.filter(bid=bid)
+        self.assertEqual(len(offers), 0)
+
+
 class BidTest(MarketTestCase):
     def test_ask_met(self):
         self.assertFalse(self.bid1.ask_met())

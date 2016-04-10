@@ -70,6 +70,9 @@ class Bid(models.Model):
 
 @receiver(post_save, sender=Bid)
 def get_payment_for_offer(sender, instance, **kwargs):
+    if not instance.offer:
+        return
+
     offer_amount = instance.offer
     user = instance.user
     offers = Offer.objects.filter(bid=instance)
