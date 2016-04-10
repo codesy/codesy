@@ -36,6 +36,7 @@ def uuid_please():
 class Bid(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     url = models.URLField()
+    title = models.CharField(max_length=255, null=True, blank=True)
     issue = models.ForeignKey('Issue', null=True)
     ask = models.DecimalField(max_digits=6, decimal_places=2, blank=True,
                               default=0)
@@ -175,24 +176,12 @@ def create_issue_for_bid(sender, instance, **kwargs):
 
 class Issue(models.Model):
     url = models.URLField(unique=True, db_index=True)
-    title = models.CharField(max_length=255, null=True)
+    title = models.CharField(max_length=255, null=True, blank=True)
     state = models.CharField(max_length=255)
     last_fetched = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
         return u'Issue for %s (%s)' % (self.url, self.state)
-
-
-@receiver(post_save, sender=Issue)
-def lookup_title(sender, instance, **kwargs):
-    try:
-        r = requests.get(instance.url)
-        title_search = re.search('(?:<title.*>)(.*)(?:<\/title>)', r.text)
-        if title_search:
-            title = HTMLParser.HTMLParser().unescape(title_search.group(1))
-            Issue.objects.filter(id=instance.id).update(title=title)
-    except:
-        pass
 
 
 class Claim(models.Model):
@@ -208,6 +197,7 @@ class Claim(models.Model):
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True, auto_now=True)
     evidence = models.URLField(blank=True)
+    title = models.CharField(max_length=255, null=True, blank=True)
     status = models.CharField(max_length=255,
                               choices=STATUS_CHOICES,
                               default='Submitted')
@@ -362,6 +352,25 @@ def notify_matching_offerers(sender, instance, created, **kwargs):
         )
 
 
+@receiver(post_save, sender=Bid)
+@receiver(post_save, sender=Issue)
+@receiver(post_save, sender=Claim)
+def save_title(sender, instance, **kwargs):
+    if isinstance(instance, Claim):
+        url = instance.evidence
+    else:
+        url = instance.url
+
+    try:
+        r = requests.get(url)
+        title_search = re.search('(?:<title.*>)(.*)(?:<\/title>)', r.text)
+        if title_search:
+            title = HTMLParser.HTMLParser().unescape(title_search.group(1))
+            type(instance).objects.filter(id=instance.id).update(title=title)
+    except:
+        pass
+
+
 class Vote(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     claim = models.ForeignKey(Claim)
@@ -445,8 +454,6 @@ class Payment(models.Model):
     )
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     amount = models.DecimalField(
-        max_digits=6, decimal_places=2, blank=True, default=0)
-    fee = models.DecimalField(
         max_digits=6, decimal_places=2, blank=True, default=0)
     transaction_key = models.CharField(
         max_length=255, default=uuid.uuid4, blank=True)
