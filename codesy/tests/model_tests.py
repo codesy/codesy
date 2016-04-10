@@ -2,6 +2,8 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 
 import fudge
+from model_mommy import mommy
+
 
 from ..base.models import EMAIL_URL, User, add_email_from_signup
 
@@ -101,3 +103,12 @@ class SignUpReceiverTest(TestCase):
                               self.user,
                               **self.kwargs)
         self.assertEquals(VERIFIED_PRIMARY_EMAIL, self.user.email)
+
+    class SignUpReceiverTest(TestCase):
+
+        @fudge.patch('stripe.Customer')
+        def test_save_cc_token(self, mock_stripe):
+            mock_stripe.provides('create').returns_fake().has_attr(id='dammit')
+            user = mommy.make(User)
+            user.stripe_account_token = "howdy"
+            user.save()
