@@ -1,3 +1,8 @@
+
+$(document).ready(function(){
+    $(document).foundation();
+});
+
 $(window).load(function () {
   var codesy = {user:{}}
 

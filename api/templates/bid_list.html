@@ -3,21 +3,45 @@
 
 {% block content %}
     <div class="row medium-8 large-7 columns">
-        <h2>These are your bids:</h2>
+        <h3>These are your bids:</h3>
     </div>
     {% for bid in bids%}
         <div class="row medium-8 large-7 columns">
             <div class="callout primary">
-                <h3><a href="{{bid.url}}">{{bid.issue.title}}</a></h3>
-                You've asked for {{bid.ask}} to fix this and offered {{bid.offer}} for someone to fix it.
+                <h4><a href="{{bid.url}}">{{bid.issue.title}}</a></h4>
+
+                <ul class="accordion" data-accordion>
+                        <li class="accordion-item is-active" data-accordion-item>
+                            <a href="#" class="accordion-title">Summary</a>
+                            <div class="accordion-content" data-tab-content>
+                                You've asked for {{bid.ask}} to fix this and offered {{bid.offer}} for someone to fix it.
+                            </div>
+                        </li>
+                    {% for offer in bid.offers %}
+                        <li class="accordion-item" data-accordion-item>
+                            <a href="#" class="accordion-title">Offer</a>
+                            <div class="accordion-content" data-tab-content>
+                                You paid {{ offer.amount }} on {{ offer.created }}
+                                <div>Fees
+                                {% for fee in offer.fees %}
+                                    <div class="">
+                                        {{fee.fee_type}}:{{fee.amount}}
+                                    </div>
+                                {% endfor %}
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+
 
             </div>
         </div>
     {% endfor %}
 {% endblock %}
-
 {% block scripts %}
    {% if request.user.is_authenticated %}
+      <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
       <script src="{% static "js/home-app.js" %}" ></script>
    {% endif %}
 {% endblock %}

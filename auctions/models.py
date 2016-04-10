@@ -64,6 +64,9 @@ class Bid(models.Model):
         else:
             return False
 
+    def offers(self):
+        return Offer.objects.filter(bid=self)
+
 
 @receiver(post_save, sender=Bid)
 def get_payment_for_offer(sender, instance, **kwargs):
@@ -458,6 +461,9 @@ class Offer(Payment):
         max_length=255,
         choices=Payment.PROVIDER_CHOICES,
         default='Stripe')
+
+    def fees(self):
+        return OfferFee.objects.filter(offer=self)
 
 
 class Payout(Payment):
