@@ -220,6 +220,9 @@ class Claim(models.Model):
             self.user, self.issue.id, self.status
         )
 
+    def payouts(self):
+        return Payout.objects.filter(claim=self).all()
+
     def votes_by_approval(self, approved):
         return (Vote.objects
                     .filter(claim=self, approved=approved)
@@ -468,6 +471,11 @@ class Offer(Payment):
     def fees(self):
         return OfferFee.objects.filter(offer=self)
 
+    def __unicode__(self):
+        return u'Offer payment for bid (%s) paid' % (
+            self.bid.id
+        )
+
 
 class Payout(Payment):
     claim = models.ForeignKey(Claim, related_name='payouts')
@@ -475,6 +483,14 @@ class Payout(Payment):
         max_length=255,
         choices=Payment.PROVIDER_CHOICES,
         default='PayPal')
+
+    def __unicode__(self):
+        return u'Payout to %s for claim (%s)' % (
+            self.user, self.claim.id
+        )
+
+    def fees(self):
+        return PayoutFee.objects.filter(payout=self)
 
 
 class Fee(models.Model):
