@@ -9,7 +9,7 @@ body {
 }
 
 #codesy_widget a {
-  font-weight: 900;  
+  font-weight: 900;
 }
 
 #codesy_widget img {
@@ -27,4 +27,9 @@ body {
   margin-top: 5px;
   padding: 5px;
   font-weight: 900;
+}
+
+.codesy_confirm{
+    font-size: 0.75em;
+    margin: 0.25em
 }
