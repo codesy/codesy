@@ -2,23 +2,29 @@
 {% load staticfiles %}
 
 {% block content %}
-    <div class="row medium-8 large-7 columns">
-        <h2>These are your votes:</h2>
-    </div>
-    {% for vote in votes%}
+    {% if votes %}
         <div class="row medium-8 large-7 columns">
-            <div class="callout primary">
-                {% if vote.approved %}You approved a fix to
-                {% else %}You  rejected a fix to
-                {% endif %}
-                <a href="{{vote.claim.issue.url}}">{{vote.claim.issue.title}}</a>
-                <a href="//{{current_site.domain}}{% url 'custom-urls:claim-status' pk=vote.claim.id %}">
-                    Check on the status
-                </a>
-
-            </div>
+            <h3>These are your votes:</h3>
         </div>
-    {% endfor %}
+        {% for vote in votes%}
+            <div class="row medium-8 large-7 columns">
+                <div class="callout primary">
+                    {% if vote.approved %}You approved a fix to
+                    {% else %}You  rejected a fix to
+                    {% endif %}
+                    <a href="{{vote.claim.issue.url}}">{{vote.claim.issue.title}}</a>
+                    <a href="//{{current_site.domain}}{% url 'custom-urls:claim-status' pk=vote.claim.id %}">
+                        Check on the status
+                    </a>
+
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="row medium-8 large-7 columns">
+            <h3>You haven't voted yet.</h3>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block scripts %}

@@ -10,8 +10,8 @@
             <div class="callout primary">
                 <h4><a href="{{bid.url}}">{{bid.issue.title}}</a></h4>
 
-                <ul class="accordion" data-accordion>
-                        <li class="accordion-item is-active" data-accordion-item>
+                <ul class="accordion" data-accordion data-allow-all-closed="true">
+                        <li class="accordion-item" data-accordion-item>
                             <a href="#" class="accordion-title">Summary</a>
                             <div class="accordion-content" data-tab-content>
                                 You've asked for {{bid.ask}} to fix this and offered {{bid.offer}} for someone to fix it.
