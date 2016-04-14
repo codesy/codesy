@@ -19,5 +19,6 @@ requests==2.9.1
 requests-oauthlib==0.6.1
 static==1.1.1
 wsgiref==0.1.2
-stripe==1.31.1
+cffi==1.5.2
+stripe==1.32.2
 paypalrestsdk==1.11.5
