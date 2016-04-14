@@ -33,6 +33,9 @@ Deploy your own
 
     heroku run python manage.py createsuperuser
 
+#. Set the site domain name: Go to /admin/sites/site/1/change/ and make it
+   match ``codesy-username.herokuapp.com``
+
 #. To enable GitHub sign-ins on your heroku domain, use the following settings
    to `register your own GitHub App`_:
 
