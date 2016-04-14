@@ -173,3 +173,11 @@ EMAIL_HOST_USER = config('SENDGRID_USERNAME', default='')
 EMAIL_HOST_PASSWORD = config('SENDGRID_PASSWORD', default='')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+# Payment provider settings
+STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='')
+STRIPE_PUBLIC_KEY = config('STRIPE_PUBLIC_KEY', default='')
+PAYPAL_MODE = config('PAYPAL_MODE', default='sandbox')   # sandbox or live
+PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID', default='')
+PAYPAL_CLIENT_SECRET = config('PAYPAL_CLIENT_SECRET', default='')
+# TODO: create PAYPAL_SANDBOX_CLIENT_SECRET in .env

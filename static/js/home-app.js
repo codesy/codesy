@@ -1,10 +1,15 @@
+
+$(document).ready(function(){
+    $(document).foundation();
+});
+
 $(window).load(function () {
   var codesy = {user:{}}
 
   Stripe.setPublishableKey('pk_test_NBTdQSXW5HcsEVNgzOZmmZng');
 
   $('#refreshing').hide();
-  
+
   if ($("#codesy_user_id").length > 0) {
     codesy.user.id = $("#codesy_user_id").val();
   }
@@ -26,7 +31,7 @@ $(window).load(function () {
                     xhr.setRequestHeader('X-CSRFToken', _this.csrf_token);
                   },
                   data: {
-                    stripe_card_token: token
+                    stripe_account_token: token
                   },
                   success: function(data, status, jqXHR) {
                     console.log("Updated user.");
@@ -61,7 +66,7 @@ $(window).load(function () {
     };
 
     handleResponse = new stripeResponse($('form input[name="csrfmiddlewaretoken"]').val())
-    
+
     // Create credit card
     Stripe.card.createToken(payload, handleResponse);
   });

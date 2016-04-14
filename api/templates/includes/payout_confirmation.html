@@ -1,0 +1,25 @@
+<div class="callout warning">
+    {% for payout in claim.payouts.all %}
+        <ul class="accordion" data-accordion data-allow-all-closed="true">
+               <li class="accordion-item" data-accordion-item>
+                   <a href="#" class="accordion-title">Your payment was sent.</a>
+                   <div class="accordion-content" data-tab-content>
+                       This claim was approved and your payout was {{ payout.amount }} on {{ payout.created }}
+                   </div>
+               </li>
+               <li class="accordion-item" data-accordion-item>
+                   <a href="#" class="accordion-title">Payout Details</a>
+                   <div class="accordion-content" data-tab-content>
+                       You received {{ payout.amount }} on {{ payout.created }}
+                       <div>Fees
+                       {% for fee in payout.fees %}
+                           <div class="">
+                               {{fee.fee_type}}:{{fee.amount}}
+                           </div>
+                       {% endfor %}
+                       </div>
+                   </div>
+               </li>
+        </ul>
+     {% endfor %}
+</div>

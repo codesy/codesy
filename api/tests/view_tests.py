@@ -12,6 +12,8 @@ from auctions import models
 
 from .. import serializers, views
 
+from rest_framework.views import APIView
+
 
 class UserViewSetTest(TestCase):
     def setUp(self):
@@ -200,3 +202,42 @@ class VoteViewSetTest(TestCase):
         self.assertEqual(self.viewset.queryset.model, models.Vote)
         self.assertEqual(
             self.viewset.serializer_class, serializers.VoteSerializer)
+
+
+class ListViewTests(TestCase):
+    def setUp(self):
+        self.user, url, issue, self.claim = _make_test_claim()
+
+        self.viewset = views.VoteViewSet()
+
+    def test_list_views(self):
+        bid_list, claim_list, vote_list = (
+            [views.BidList(), views.ClaimList(), views.VoteList()]
+        )
+        self.assertIsInstance(bid_list, APIView)
+        self.assertIsInstance(claim_list, APIView)
+        self.assertIsInstance(vote_list, APIView)
+
+        response = bid_list.get({})
+        self.assertEqual(response.status_code, 200)
+
+        response = claim_list.get({})
+        self.assertEqual(response.status_code, 200)
+
+        response = vote_list.get({})
+        self.assertEqual(response.status_code, 200)
+
+
+class PayoutViewTests(TestCase):
+    def setUp(self):
+        self.user, url, issue, self.claim = _make_test_claim()
+
+    def test_payout_view(self):
+        payout_view = views.PayoutViewSet()
+        self.assertIsInstance(payout_view, APIView)
+        request = fudge.Fake().has_attr(
+            claim=self.claim, POST={'claim': self.claim.id}
+        ).is_a_stub()
+
+        response = payout_view.post(request)
+        self.assertEqual(response.status_code, 302)

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+   <div class="row medium-8 large-7 columns">
+   <div class="callout primary">
+         <h3>You claimed a fix to this issue:
+            <a target="_blank" href='{{ claim.issue.url }}'>{{ claim.issue.title }}</a>
+         </h3>
+         <h3>You submitted this URL as proof of the fix:
+            <a target="_blank" href='{{ claim.evidence }}'>{{ claim.title }}</a>
+         </h3>
+   </div>
+    <div class="callout secondary">
+        {% if claim.status == "Submitted"  %}
+            <h3>There have been no votes on this claim yet.</h3>
+            {% include "includes/expiration_note.html" %}
+        {% elif claim.status == "Pending" %}
+            <h3>There are some still votes needed for this claim.</h3>
+            {% include "includes/expiration_note.html" %}
+        {% elif claim.status == "Approved" %}
+            {% include "includes/payout_request.html" %}
+        {% elif claim.status == "Rejected" %}
+            <h3>This claim was not approved.</h3>
+        {% elif claim.status == "Paid" %}
+            {% include "includes/payout_confirmation.html" %}
+        {% endif %}
+   </div>
+
+{% endblock %}
+
+{% block scripts %}
+   {% if request.user.is_authenticated %}
+      <script src="{% static "js/home-app.js" %}" ></script>
+   {% endif %}
+{% endblock %}
