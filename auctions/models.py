@@ -273,13 +273,13 @@ class Claim(models.Model):
         total_fees = paypal_fee.amount + codesy_fee.amount
         codesy_payout.amount = codesy_payout.amount - total_fees
         codesy_payout.save()
-        # attempt paypay payout
+        # attempt paypal payout
         # paypal id are limited to 30 chars
         # TODO: Fix this potential non-unique key
-        paypay_key = str(codesy_payout.transaction_key)[:30]
+        paypal_key = str(codesy_payout.transaction_key)[:30]
         paypal_payout = PaypalPayout({
             "sender_batch_header": {
-                "sender_batch_id": paypay_key,
+                "sender_batch_id": paypal_key,
                 "email_subject": "Your codesy payout is here!"
             },
             "items": [
@@ -291,7 +291,7 @@ class Claim(models.Model):
                     },
                     "receiver": "DevGirl@mozilla.org",
                     "note": "You have a fake payment waiting.",
-                    "sender_item_id": paypay_key
+                    "sender_item_id": paypal_key
                 }
             ]
         })
