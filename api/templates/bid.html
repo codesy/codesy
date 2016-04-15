@@ -2,9 +2,7 @@
 
 {% block widget_content %}
 
-{% if bid.ask_met %}
-   {% include "includes/claim_form.html" %}
-{% elif claim %}
+{% if bid.ask_met or claim %}
    {% include "includes/claim_form.html" %}
 {% endif %}
 
@@ -15,14 +13,13 @@
 <!-- IS THE USER ASKING OR OFFERING -->
    {% elif bid.ask > 0 %}
 <!-- HANDLE ASKS -->
-      {% include "includes/bid_form.html" %}      
+      {% include "includes/bid_form.html" %}
    {% elif bid.offer > 0 %}
 <!-- HANDLE OFFERS -->
       {% include "includes/bid_form.html" %}
    {% endif %}
-  
+
 {% endblock %}
 
-<!--TO DO: DONT ALLOW BIDS AFTER VOTING STARTS -->
-<!--TO DO: HANDLE CLOSED CLAIMS -->
-<!--TO DO: HANDLE ASK MET -->
+<!--TODO: DONT ALLOW BIDS AFTER VOTING STARTS -->
+<!--TODO: HANDLE CLOSED CLAIMS -->
