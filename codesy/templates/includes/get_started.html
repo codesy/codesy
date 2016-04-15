@@ -10,28 +10,36 @@
          </h2>
 <!-- ADDON NEEDS TO BE INSTALLED -->
         <div class="install-step small-4 columns">
-                <h3>1. Install. {{TAKE_ACTION_ICON}}</h3>
+                <h3>1. Install {{TAKE_ACTION_ICON}}</h3>
 {% if browser == 'chrome' %}
                 <p id="add-to-chrome">
                    <img src="{% static "img/chrome.png" %}" 
                       width="32" height="32"/> 
                    <a id="chrome-install-button" 
                       class="button large success" 
-                   onclick="chrome.webstore.install()" 
-                   role="button">Add to Chrome</a>
+                      href="https://github.com/codesy/widgets/raw/publish-to-build-dir/build/codesy.zip"
+                      role="button">Download for Chrome</a>
                 </p>
 {% elif browser == 'firefox' %}
                 <p id="add-to-firefox">
                    <img src="{% static "img/firefox.png" %}" 
                       width="32" height="32"/> 
                    <a class="button large success" 
-                      href="codesy.xpi" 
-                   role="button">Add to Firefox</a>
+                      href="https://github.com/codesy/widgets/raw/publish-to-build-dir/build/codesy.xpi" 
+                      role="button">Download for Firefox</a>
+                </p>
+{% elif browser == 'opera' %}
+                <p id="add-to-opera">
+                   <img src="{% static "img/opera.png" %}" 
+                      width="32" height="32"/> 
+                   <a class="button large success" 
+                      href="https://github.com/codesy/widgets/raw/publish-to-build-dir/build/codesy.zip" 
+                      role="button">Download for Opera</a>
                 </p>
 {% else %}
                 <p id="unknown-browser">
-                   Unknown browser. The codesy widget currently only works with Firefox and Chrome. We want to add it to others soon. Want to help? 
-                   <a href="https://github.com/codesy">Catch us on GitHub</a>.
+                Unknown browser. The codesy widgets are <a href="https://wiki.mozilla.org/WebExtensions" target="_blank">WebExtensions</a> that work with Firefox, Chrome, and Opera. We want to add it to others soon. Want to help? 
+                   <a href="https://github.com/codesy/widgets">Check the widgets code on GitHub</a>.
                 </p>
  {% endif %}
         </div>
