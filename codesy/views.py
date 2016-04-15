@@ -28,6 +28,8 @@ class Home(TemplateView):
         agent = self.request.META.get('HTTP_USER_AGENT', '')
         if 'Firefox' in agent:
             browser = 'firefox'
+        elif 'OPR' in agent:
+            browser = 'opera'
         elif 'Chrome' in agent:
             browser = 'chrome'
         return browser
