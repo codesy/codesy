@@ -178,4 +178,5 @@ class PayoutViewSet(APIView):
                 claim.request_payout()
         except:
             pass
-        return redirect(reverse('claim-status', pk=claim.id))
+        return redirect(reverse('custom-urls:claim-status',
+                                kwargs={'pk': claim.id}))
