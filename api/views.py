@@ -102,7 +102,7 @@ class ClaimAPIView(APIView):
         claim = get_object_or_404(Claim, pk=pk)
         # TODO: keep user without offers from seeing a vote form
         try:
-            vote = Vote.objects.filter(claim=claim, user=self.request.user)[0]
+            vote = Vote.objects.get(claim=claim, user=self.request.user)
         except:
             vote = None
 
