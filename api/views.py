@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect
-# from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse
 
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
@@ -178,8 +178,4 @@ class PayoutViewSet(APIView):
                 claim.request_payout()
         except:
             pass
-        # these do not work
-        # return reverse('claim-status', pk=claim.id)
-        # return reverse('claim-status', args=[claim.id])
-        # return reverse('claim-status', kwargs={pk=claim.id})
-        return redirect('/claim-status/' + str(claim.id))
+        return redirect(reverse('claim-status', pk=claim.id))
