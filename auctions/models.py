@@ -274,12 +274,11 @@ class Claim(models.Model):
         codesy_payout.amount = codesy_payout.amount - total_fees
         codesy_payout.save()
         # attempt paypal payout
-        # paypal id are limited to 30 chars
-        # TODO: Fix this potential non-unique key
-        paypal_key = str(codesy_payout.transaction_key)[:30]
+        # user generated id sent to paypal is limited to 30 chars
+        sender_id = codesy_payout.short_key()
         paypal_payout = PaypalPayout({
             "sender_batch_header": {
-                "sender_batch_id": paypal_key,
+                "sender_batch_id": sender_id,
                 "email_subject": "Your codesy payout is here!"
             },
             "items": [
@@ -291,7 +290,7 @@ class Claim(models.Model):
                     },
                     "receiver": "DevGirl@mozilla.org",
                     "note": "You have a fake payment waiting.",
-                    "sender_item_id": paypal_key
+                    "sender_item_id": sender_id
                 }
             ]
         })
@@ -463,6 +462,10 @@ class Payment(models.Model):
     confirmation = models.CharField(max_length=255, blank=True)
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True, auto_now=True)
+
+    def short_key(self):
+        return (self.transaction_key
+                .bytes.encode('base64').rstrip('=\n').replace('/', '_'))
 
     class Meta:
         abstract = True
