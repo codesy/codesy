@@ -12,10 +12,10 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Sum
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
-from decimal import Decimal
+from decimal import Decimal, ROUND_UP
 from mailer import send_mail
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -213,6 +213,20 @@ class Claim(models.Model):
     def payouts(self):
         return Payout.objects.filter(claim=self).all()
 
+    def request_payout(self):
+        if self.status == 'Paid':
+            return False
+
+        bid = Bid.objects.get(url=self.issue.url, user=self.user)
+
+        payout = Payout(
+            user=self.user,
+            claim=self,
+            amount=bid.ask,
+        )
+        payout.save()
+        payout.request()
+
     def votes_by_approval(self, approved):
         return (Vote.objects
                     .filter(claim=self, approved=approved)
@@ -242,70 +256,6 @@ class Claim(models.Model):
 
     def get_absolute_url(self):
         return reverse('custom-urls:claim-status', kwargs={'pk': self.id})
-
-    def request_payout(self):
-        if self.status == 'Paid':
-            return False
-
-        bid = Bid.objects.get(url=self.issue.url, user=self.user)
-
-        codesy_payout = Payout(
-            user=self.user,
-            claim=self,
-            amount=bid.ask,
-        )
-        codesy_payout.save()
-
-        paypal_fee = PayoutFee(
-            payout=codesy_payout,
-            fee_type='PayPal',
-            amount=Decimal('0.25')
-        )
-        paypal_fee.save()
-
-        codesy_fee = PayoutFee(
-            payout=codesy_payout,
-            fee_type='codesy',
-            amount=bid.ask * Decimal('0.025'),
-        )
-        codesy_fee.save()
-
-        total_fees = paypal_fee.amount + codesy_fee.amount
-        codesy_payout.amount = codesy_payout.amount - total_fees
-        codesy_payout.save()
-        # attempt paypal payout
-        # user generated id sent to paypal is limited to 30 chars
-        sender_id = codesy_payout.short_key()
-        paypal_payout = PaypalPayout({
-            "sender_batch_header": {
-                "sender_batch_id": sender_id,
-                "email_subject": "Your codesy payout is here!"
-            },
-            "items": [
-                {
-                    "recipient_type": "EMAIL",
-                    "amount": {
-                        "value": int(codesy_payout.amount),
-                        "currency": "USD"
-                    },
-                    "receiver": "DevGirl@mozilla.org",
-                    "note": "You have a fake payment waiting.",
-                    "sender_item_id": sender_id
-                }
-            ]
-        })
-        # record confirmation in payout
-        if paypal_payout.create(sync_mode=True):
-            for item in paypal_payout.items:
-                if item.transaction_status == "SUCCESS":
-                    codesy_payout.api_success = True
-                    codesy_payout.confirmation = item.payout_item_id
-                codesy_payout.save()
-                self.status = "Paid"
-                self.save()
-            return True
-        else:
-            return False
 
 
 @receiver(post_save, sender=Claim)
@@ -502,6 +452,59 @@ class Payout(Payment):
     def fees(self):
         return PayoutFee.objects.filter(payout=self)
 
+    def request(self):
+
+        paypal_fee = PayoutFee(
+            payout=self,
+            fee_type='PayPal',
+            amount=Decimal('0.25')
+        )
+        paypal_fee.save()
+
+        codesy_fee = PayoutFee(
+            payout=self,
+            fee_type='codesy',
+            amount=self.amount * Decimal('0.025'),
+        )
+        codesy_fee.save()
+
+        total_fees = paypal_fee.amount + codesy_fee.amount
+        self.amount = self.amount - total_fees
+        self.save()
+        # attempt paypal payout
+        # user generated id sent to paypal is limited to 30 chars
+        sender_id = self.short_key()
+        paypal_payout = PaypalPayout({
+            "sender_batch_header": {
+                "sender_batch_id": sender_id,
+                "email_subject": "Your codesy payout is here!"
+            },
+            "items": [
+                {
+                    "recipient_type": "EMAIL",
+                    "amount": {
+                        "value": int(self.amount),
+                        "currency": "USD"
+                    },
+                    "receiver": "DevGirl@mozilla.org",
+                    "note": "You have a fake payment waiting.",
+                    "sender_item_id": sender_id
+                }
+            ]
+        })
+        # record confirmation in payout
+        if paypal_payout.create(sync_mode=True):
+            for item in paypal_payout.items:
+                if item.transaction_status == "SUCCESS":
+                    self.api_success = True
+                    self.confirmation = item.payout_item_id
+                self.save()
+                self.claim.status = "Paid"
+                self.claim.save()
+            return True
+        else:
+            return False
+
 
 class Fee(models.Model):
     FEE_TYPES = (
@@ -527,6 +530,13 @@ class OfferFee(Fee):
 
 class PayoutFee(Fee):
     payout = models.ForeignKey(Payout, related_name="payout_fees", null=True)
+
+
+@receiver(pre_save, sender=OfferFee)
+@receiver(pre_save, sender=PayoutFee)
+def roundup_penny(sender, instance, *args, **kwargs):
+    instance.amount = (instance.amount.quantize(Decimal('.01'),
+                       rounding=ROUND_UP))
 
 
 @receiver(post_save, sender=Payout)
