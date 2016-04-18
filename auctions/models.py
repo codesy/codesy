@@ -83,9 +83,6 @@ def get_payment_for_offer(sender, instance, **kwargs):
             offer_amount = offer_amount - sum_offers['amount__sum']
 
 # TODO: HANDLE CARD NOT YET REGISTERED
-
-    stripe_pct = Decimal('0.029')
-    stripe_transaction = Decimal('0.30')
     codesy_pct = Decimal('0.025')
 
     new_offer = Offer(
@@ -102,6 +99,9 @@ def get_payment_for_offer(sender, instance, **kwargs):
     )
     codesy_fee.save()
 
+    stripe_pct = Decimal('0.029')
+    stripe_transaction = Decimal('0.30')
+
     stripe_charge = (
         (offer_amount + codesy_fee.amount + stripe_transaction)
         / (1 - stripe_pct)
@@ -115,6 +115,12 @@ def get_payment_for_offer(sender, instance, **kwargs):
         amount=stripe_fee
     )
     stripe_fee.save()
+
+    # get rounded fee values
+    fees = OfferFee.objects.filter(offer=new_offer)
+    sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
+
+    stripe_charge = offer_amount + sum_fees
 
     # TODO: removed with proper stripe mocking in tests
     new_offer.charge_amount = stripe_charge
