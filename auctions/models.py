@@ -475,7 +475,7 @@ class Payout(Payment):
         codesy_fee.save()
 
         total_fees = paypal_fee.amount + codesy_fee.amount
-        self.amount = self.amount - total_fees
+        self.charge_amount = self.amount - total_fees
         self.save()
         # attempt paypal payout
         # user generated id sent to paypal is limited to 30 chars
@@ -489,7 +489,7 @@ class Payout(Payment):
                 {
                     "recipient_type": "EMAIL",
                     "amount": {
-                        "value": int(self.amount),
+                        "value": int(self.charge_amount),
                         "currency": "USD"
                     },
                     "receiver": "DevGirl@mozilla.org",
