@@ -508,14 +508,14 @@ class PayoutTest(TestCase):
         mock_request.provides('get').returns("<title>howdy</title>")
 
         claim = mommy.make(Claim, user=self.user1, issue=self.issue)
-        claim.request_payout()
+        claim.payout_request()
         payouts = Payout.objects.filter(claim=claim)
         self.assertEqual(len(payouts), 1)
         payout = payouts[0]
         fees = PayoutFee.objects.filter(payout=payout)
         self.assertEqual(len(fees), 2)
         sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
-        self.assertEqual(sum_fees + payout.amount, self.bid1.ask)
+        self.assertEqual(sum_fees + payout.charge_amount, self.bid1.ask)
 
     @fudge.patch('auctions.models.requests')
     @fudge.patch('auctions.models.PaypalPayout')
@@ -534,4 +534,4 @@ class PayoutTest(TestCase):
             payout.request()
             fees = PayoutFee.objects.filter(payout=payout)
             sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
-            self.assertEqual(sum_fees + payout.amount, amount)
+            self.assertEqual(sum_fees + payout.charge_amount, amount)
