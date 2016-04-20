@@ -219,7 +219,7 @@ class Claim(models.Model):
     def payouts(self):
         return Payout.objects.filter(claim=self).all()
 
-    def request_payout(self):
+    def payout_request(self):
         if self.status == 'Paid':
             return False
 
@@ -231,7 +231,7 @@ class Claim(models.Model):
             amount=bid.ask,
         )
         payout.save()
-        payout.request()
+        return payout.request()
 
     def votes_by_approval(self, approved):
         return (Vote.objects
@@ -498,18 +498,23 @@ class Payout(Payment):
                 }
             ]
         })
-        # record confirmation in payout
-        if paypal_payout.create(sync_mode=True):
-            for item in paypal_payout.items:
-                if item.transaction_status == "SUCCESS":
-                    self.api_success = True
-                    self.confirmation = item.payout_item_id
-                self.save()
-                self.claim.status = "Paid"
-                self.claim.save()
-            return True
-        else:
-            return False
+        try:
+            payout_attempt = paypal_payout.create(sync_mode=True)
+        except:
+            payout_attempt = False
+
+        if payout_attempt:
+            if paypal_payout.items:
+                for item in paypal_payout.items:
+                    if item.transaction_status == "SUCCESS":
+                        self.api_success = True
+                        self.confirmation = item.payout_item_id
+                        self.save()
+                        self.claim.status = "Paid"
+                        self.claim.save()
+                    else:
+                        payout_attempt = False
+        return payout_attempt
 
 
 class Fee(models.Model):

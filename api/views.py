@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.core.urlresolvers import reverse
+from django.contrib import messages
 
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
@@ -172,11 +173,14 @@ class PayoutViewSet(APIView):
     renderer_classes = (TemplateHTMLRenderer,)
 
     def post(self, request, format=None):
+
         try:
             claim = Claim.objects.get(id=request.POST['claim'])
             if request.user == claim.user:
-                claim.request_payout()
+                if claim.payout_request():
+                    messages.success(request._request, 'Your payout was sent')
         except:
-            pass
+            messages.error(request._request, "Sorry please try later")
+
         return redirect(reverse('custom-urls:claim-status',
                                 kwargs={'pk': claim.id}))
