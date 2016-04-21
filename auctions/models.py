@@ -217,7 +217,7 @@ class Claim(models.Model):
         )
 
     def payouts(self):
-        return Payout.objects.filter(claim=self).all()
+        return Payout.objects.filter(claim=self)
 
     def payout_request(self):
         if self.status == 'Paid':

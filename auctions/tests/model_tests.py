@@ -441,6 +441,7 @@ class OfferTest(TestCase):
         self.assertEqual(offer.amount, 50)
         fees = OfferFee.objects.filter(offer=offer)
         self.assertEqual(len(fees), 2)
+        self.assertEqual(len(fees), len(offer.fees()))
         sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
         offer_with_fees = offer.amount + sum_fees
         self.assertEqual(offer_with_fees, offer.charge_amount)
@@ -454,6 +455,7 @@ class OfferTest(TestCase):
         self.bid.save()
         offers = Offer.objects.filter(bid=self.bid)
         self.assertEqual(len(offers), 2)
+        self.assertEqual(len(self.bid.offers()), 2)
         sum_offers = offers.aggregate(Sum('amount'))['amount__sum']
         self.assertEqual(sum_offers, 60)
 
@@ -473,6 +475,14 @@ class OfferTest(TestCase):
 
 
 class PayoutTest(TestCase):
+
+    def test_payouts_property(self):
+        claim = mommy.make(Claim)
+        mommy.make(Payout, claim=claim)
+        mommy.make(Payout, claim=claim)
+        mommy.make(Payout, claim=claim)
+        payouts = Payout.objects.all()
+        self.assertEqual(len(claim.payouts.all()), len(payouts))
 
     @fudge.patch('auctions.models.requests')
     @fudge.patch('auctions.models.stripe.Charge.create')
@@ -508,19 +518,26 @@ class PayoutTest(TestCase):
         mock_request.provides('get').returns("<title>howdy</title>")
 
         claim = mommy.make(Claim, user=self.user1, issue=self.issue)
-        claim.payout_request()
-        payouts = Payout.objects.filter(claim=claim)
-        self.assertEqual(len(payouts), 1)
+        api_request = claim.payout_request()
+        if api_request:
+            self.assertEqual(claim.status, 'Paid')
+            self.assertFalse(claim.payout_request)
+        payouts = claim.payouts.all()
         payout = payouts[0]
+        self.assertEqual(len(payouts), 1)
         fees = PayoutFee.objects.filter(payout=payout)
         self.assertEqual(len(fees), 2)
+        self.assertEqual(len(payout.fees()), len(fees))
         sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
         self.assertEqual(sum_fees + payout.charge_amount, self.bid1.ask)
 
     @fudge.patch('auctions.models.requests')
     @fudge.patch('auctions.models.PaypalPayout')
     def test_payout_fee_calculations(self, mock_request, mock_paypal):
-        fake_items = [fudge.Fake().is_a_stub(), ]
+        fake_items = [fudge.Fake().has_attr(
+            transaction_status='SUCCESS',
+            payout_item_id='Howdy'),
+        ]
         mock_paypal.is_callable().returns(
             fudge.Fake().provides('create')
                         .returns(True)
