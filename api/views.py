@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect
-# from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse
+from django.contrib import messages
 
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
@@ -102,7 +103,7 @@ class ClaimAPIView(APIView):
         claim = get_object_or_404(Claim, pk=pk)
         # TODO: keep user without offers from seeing a vote form
         try:
-            vote = Vote.objects.filter(claim=claim, user=self.request.user)[0]
+            vote = Vote.objects.get(claim=claim, user=self.request.user)
         except:
             vote = None
 
@@ -172,14 +173,14 @@ class PayoutViewSet(APIView):
     renderer_classes = (TemplateHTMLRenderer,)
 
     def post(self, request, format=None):
+
         try:
             claim = Claim.objects.get(id=request.POST['claim'])
             if request.user == claim.user:
-                claim.request_payout()
+                if claim.payout_request():
+                    messages.success(request._request, 'Your payout was sent')
         except:
-            pass
-        # these do not work
-        # return reverse('claim-status', pk=claim.id)
-        # return reverse('claim-status', args=[claim.id])
-        # return reverse('claim-status', kwargs={pk=claim.id})
-        return redirect('/claim-status/' + str(claim.id))
+            messages.error(request._request, "Sorry please try later")
+
+        return redirect(reverse('custom-urls:claim-status',
+                                kwargs={'pk': claim.id}))

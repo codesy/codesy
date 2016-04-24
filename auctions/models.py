@@ -12,10 +12,10 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Sum
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
-from decimal import Decimal
+from decimal import Decimal, ROUND_UP
 from mailer import send_mail
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -83,9 +83,6 @@ def get_payment_for_offer(sender, instance, **kwargs):
             offer_amount = offer_amount - sum_offers['amount__sum']
 
 # TODO: HANDLE CARD NOT YET REGISTERED
-
-    stripe_pct = Decimal('0.029')
-    stripe_transaction = Decimal('0.30')
     codesy_pct = Decimal('0.025')
 
     new_offer = Offer(
@@ -102,6 +99,9 @@ def get_payment_for_offer(sender, instance, **kwargs):
     )
     codesy_fee.save()
 
+    stripe_pct = Decimal('0.029')
+    stripe_transaction = Decimal('0.30')
+
     stripe_charge = (
         (offer_amount + codesy_fee.amount + stripe_transaction)
         / (1 - stripe_pct)
@@ -115,6 +115,12 @@ def get_payment_for_offer(sender, instance, **kwargs):
         amount=stripe_fee
     )
     stripe_fee.save()
+
+    # get rounded fee values
+    fees = OfferFee.objects.filter(offer=new_offer)
+    sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
+
+    stripe_charge = offer_amount + sum_fees
 
     # TODO: removed with proper stripe mocking in tests
     new_offer.charge_amount = stripe_charge
@@ -211,7 +217,21 @@ class Claim(models.Model):
         )
 
     def payouts(self):
-        return Payout.objects.filter(claim=self).all()
+        return Payout.objects.filter(claim=self)
+
+    def payout_request(self):
+        if self.status == 'Paid':
+            return False
+
+        bid = Bid.objects.get(url=self.issue.url, user=self.user)
+
+        payout = Payout(
+            user=self.user,
+            claim=self,
+            amount=bid.ask,
+        )
+        payout.save()
+        return payout.request()
 
     def votes_by_approval(self, approved):
         return (Vote.objects
@@ -242,71 +262,6 @@ class Claim(models.Model):
 
     def get_absolute_url(self):
         return reverse('custom-urls:claim-status', kwargs={'pk': self.id})
-
-    def request_payout(self):
-        if self.status == 'Paid':
-            return False
-
-        bid = Bid.objects.get(url=self.issue.url, user=self.user)
-
-        codesy_payout = Payout(
-            user=self.user,
-            claim=self,
-            amount=bid.ask,
-        )
-        codesy_payout.save()
-
-        paypal_fee = PayoutFee(
-            payout=codesy_payout,
-            fee_type='PayPal',
-            amount=Decimal('0.25')
-        )
-        paypal_fee.save()
-
-        codesy_fee = PayoutFee(
-            payout=codesy_payout,
-            fee_type='codesy',
-            amount=bid.ask * Decimal('0.025'),
-        )
-        codesy_fee.save()
-
-        total_fees = paypal_fee.amount + codesy_fee.amount
-        codesy_payout.amount = codesy_payout.amount - total_fees
-        codesy_payout.save()
-        # attempt paypay payout
-        # paypal id are limited to 30 chars
-        # TODO: Fix this potential non-unique key
-        paypay_key = str(codesy_payout.transaction_key)[:30]
-        paypal_payout = PaypalPayout({
-            "sender_batch_header": {
-                "sender_batch_id": paypay_key,
-                "email_subject": "Your codesy payout is here!"
-            },
-            "items": [
-                {
-                    "recipient_type": "EMAIL",
-                    "amount": {
-                        "value": int(codesy_payout.amount),
-                        "currency": "USD"
-                    },
-                    "receiver": "DevGirl@mozilla.org",
-                    "note": "You have a fake payment waiting.",
-                    "sender_item_id": paypay_key
-                }
-            ]
-        })
-        # record confirmation in payout
-        if paypal_payout.create(sync_mode=True):
-            for item in paypal_payout.items:
-                if item.transaction_status == "SUCCESS":
-                    codesy_payout.api_success = True
-                    codesy_payout.confirmation = item.payout_item_id
-                codesy_payout.save()
-                self.status = "Paid"
-                self.save()
-            return True
-        else:
-            return False
 
 
 @receiver(post_save, sender=Claim)
@@ -464,6 +419,10 @@ class Payment(models.Model):
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True, auto_now=True)
 
+    def short_key(self):
+        return (self.transaction_key
+                .bytes.encode('base64').rstrip('=\n').replace('/', '_'))
+
     class Meta:
         abstract = True
 
@@ -499,6 +458,64 @@ class Payout(Payment):
     def fees(self):
         return PayoutFee.objects.filter(payout=self)
 
+    def request(self):
+
+        paypal_fee = PayoutFee(
+            payout=self,
+            fee_type='PayPal',
+            amount=Decimal('0.25')
+        )
+        paypal_fee.save()
+
+        codesy_fee = PayoutFee(
+            payout=self,
+            fee_type='codesy',
+            amount=self.amount * Decimal('0.025'),
+        )
+        codesy_fee.save()
+
+        total_fees = paypal_fee.amount + codesy_fee.amount
+        self.charge_amount = self.amount - total_fees
+        self.save()
+        # attempt paypal payout
+        # user generated id sent to paypal is limited to 30 chars
+        sender_id = self.short_key()
+        paypal_payout = PaypalPayout({
+            "sender_batch_header": {
+                "sender_batch_id": sender_id,
+                "email_subject": "Your codesy payout is here!"
+            },
+            "items": [
+                {
+                    "recipient_type": "EMAIL",
+                    "amount": {
+                        "value": int(self.charge_amount),
+                        "currency": "USD"
+                    },
+                    "receiver": "DevGirl@mozilla.org",
+                    "note": "You have a fake payment waiting.",
+                    "sender_item_id": sender_id
+                }
+            ]
+        })
+        try:
+            payout_attempt = paypal_payout.create(sync_mode=True)
+        except:
+            payout_attempt = False
+
+        if payout_attempt:
+            if paypal_payout.items:
+                for item in paypal_payout.items:
+                    if item.transaction_status == "SUCCESS":
+                        self.api_success = True
+                        self.confirmation = item.payout_item_id
+                        self.save()
+                        self.claim.status = "Paid"
+                        self.claim.save()
+                    else:
+                        payout_attempt = False
+        return payout_attempt
+
 
 class Fee(models.Model):
     FEE_TYPES = (
@@ -524,6 +541,13 @@ class OfferFee(Fee):
 
 class PayoutFee(Fee):
     payout = models.ForeignKey(Payout, related_name="payout_fees", null=True)
+
+
+@receiver(pre_save, sender=OfferFee)
+@receiver(pre_save, sender=PayoutFee)
+def roundup_penny(sender, instance, *args, **kwargs):
+    instance.amount = (instance.amount.quantize(Decimal('.01'),
+                       rounding=ROUND_UP))
 
 
 @receiver(post_save, sender=Payout)
