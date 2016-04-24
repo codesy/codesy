@@ -18,6 +18,8 @@ from django.dispatch import receiver
 from decimal import Decimal, ROUND_UP
 from mailer import send_mail
 
+from .managers import ClaimManager
+
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # TODO: Find a prettier way to authenticate
@@ -207,6 +209,8 @@ class Claim(models.Model):
     status = models.CharField(max_length=255,
                               choices=STATUS_CHOICES,
                               default='Submitted')
+
+    objects = ClaimManager()
 
     class Meta:
         unique_together = (("user", "issue"),)

@@ -147,10 +147,12 @@ class ClaimList(APIView):
     def get(self, request, format=None):
         try:
             claims = Claim.objects.filter(user=self.request.user)
+            voted_claims = Claim.objects.voted_on_by_user(self.request.user)
         except:
             claims = []
 
-        return Response({'claims': claims}, template_name='claim_list.html')
+        return Response({'claims': claims, 'voted_claims': voted_claims},
+                        template_name='claim_list.html')
 
 
 class VoteList(APIView):
