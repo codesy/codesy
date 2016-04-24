@@ -30,8 +30,8 @@ Resources
 .. image:: https://travis-ci.org/codesy/codesy.png?branch=master
    :target: https://travis-ci.org/codesy/codesy
    :alt: Travis-CI Build Status
-.. image:: https://coveralls.io/repos/codesy/codesy/badge.png
-    :target: https://coveralls.io/r/codesy/codesy 
+.. image:: https://codecov.io/github/codesy/codesy/badge.png
+    :target: https://codecov.io/github/codesy/codesy
 .. image:: https://requires.io/github/codesy/codesy/requirements.png?branch=master
    :target: https://requires.io/github/codesy/codesy/requirements/?branch=master
    :alt: Requirements Status
