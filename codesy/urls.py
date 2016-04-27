@@ -22,6 +22,9 @@ urlpatterns = patterns(
     # admin site
     url(r'^admin/', include(admin.site.urls)),
 
+    # auction and widget
+    url(r'^', include('auctions.urls')),
+
     # API docs
     url(r'^api/docs/', include('rest_framework_swagger.urls')),
 

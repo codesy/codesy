@@ -185,5 +185,5 @@ class PayoutViewSet(APIView):
         except:
             messages.error(request._request, "Sorry please try later")
 
-        return redirect(reverse('custom-urls:claim-status',
+        return redirect(reverse('claim-status',
                                 kwargs={'pk': claim.id}))

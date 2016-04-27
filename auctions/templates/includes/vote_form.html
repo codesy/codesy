@@ -1,9 +1,8 @@
 <div class="callout warning">
    <h3>You haven't voted yet. Do you approve this claim?.</h3>
    <form id="codesy_vote"
-      class="ajaxSubmit"
       action="{% url 'vote-list' %}"
-      data-method="POST" >
+      method="POST" >
       {% csrf_token %}
       <input name = "claim"  type="hidden" value="{{claim.id}}"></iinput>
       <div class="switch large">
@@ -17,4 +16,4 @@
       <input type="submit" class="button expanded" value="Vote"></input>
    </form>
    </div>
-
+  

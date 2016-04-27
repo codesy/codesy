@@ -172,7 +172,7 @@ class ClaimTest(MarketWithClaimTestCase):
         test_claim = mommy.make(Claim)
         test_claim = Claim.objects.get(pk=test_claim.pk)
         self.assertTrue(
-            reverse('custom-urls:claim-status',
+            reverse('claim-status',
                     kwargs={'pk': test_claim.id})
             in test_claim.get_absolute_url()
         )

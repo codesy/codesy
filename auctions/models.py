@@ -265,7 +265,7 @@ class Claim(models.Model):
         return self.created + timedelta(days=30)
 
     def get_absolute_url(self):
-        return reverse('custom-urls:claim-status', kwargs={'pk': self.id})
+        return reverse('claim-status', kwargs={'pk': self.id})
 
 
 @receiver(post_save, sender=Claim)

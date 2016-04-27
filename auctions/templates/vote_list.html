@@ -13,7 +13,7 @@
                     {% else %}You  rejected a fix to
                     {% endif %}
                     <a href="{{vote.claim.issue.url}}">{{vote.claim.issue.title}}</a>
-                    <a href="//{{current_site.domain}}{% url 'custom-urls:claim-status' pk=vote.claim.id %}">
+                    <a href="//{{current_site.domain}}{% url 'claim-status' pk=vote.claim.id %}">
                         Check on the status
                     </a>
 
