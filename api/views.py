@@ -1,7 +1,4 @@
-from django.shortcuts import get_object_or_404, redirect
-from django.core.urlresolvers import reverse
-from django.contrib import messages
-
+from django.shortcuts import get_object_or_404
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -121,69 +118,3 @@ class VoteViewSet(AutoOwnObjectsModelViewSet):
     """
     queryset = Vote.objects.all()
     serializer_class = VoteSerializer
-
-
-# List Views
-
-class BidList(APIView):
-    """List of bids for the User
-    """
-    renderer_classes = (TemplateHTMLRenderer,)
-
-    def get(self, request, format=None):
-        try:
-            bids = Bid.objects.filter(user=self.request.user)
-        except:
-            bids = []
-
-        return Response({'bids': bids}, template_name='bid_list.html')
-
-
-class ClaimList(APIView):
-    """List of claims for the User
-    """
-    renderer_classes = (TemplateHTMLRenderer,)
-
-    def get(self, request, format=None):
-        try:
-            claims = Claim.objects.filter(user=self.request.user)
-            voted_claims = Claim.objects.voted_on_by_user(self.request.user)
-        except:
-            claims = []
-            voted_claims = []
-
-        return Response({'claims': claims, 'voted_claims': voted_claims},
-                        template_name='claim_list.html')
-
-
-class VoteList(APIView):
-    """List of vote by a User
-    """
-    renderer_classes = (TemplateHTMLRenderer,)
-
-    def get(self, request, format=None):
-        try:
-            votes = Vote.objects.filter(user=self.request.user)
-        except:
-            votes = []
-
-        return Response({'votes': votes}, template_name='vote_list.html')
-
-
-class PayoutViewSet(APIView):
-    """Users requesting payout
-    """
-    renderer_classes = (TemplateHTMLRenderer,)
-
-    def post(self, request, format=None):
-
-        try:
-            claim = Claim.objects.get(id=request.POST['claim'])
-            if request.user == claim.user:
-                if claim.payout_request():
-                    messages.success(request._request, 'Your payout was sent')
-        except:
-            messages.error(request._request, "Sorry please try later")
-
-        return redirect(reverse('claim-status',
-                                kwargs={'pk': claim.id}))
