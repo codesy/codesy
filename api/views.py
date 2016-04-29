@@ -75,7 +75,7 @@ class BidAPIView(APIView):
         resp = Response({'bid': bid,
                          'claim': claim,
                          'url': url},
-                        template_name='bid.html')
+                        template_name='addon/widget.html')
         return resp
 
 
