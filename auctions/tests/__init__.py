@@ -5,6 +5,42 @@ from django.test import TestCase
 
 from ..models import Bid, Claim, Issue
 
+import fudge
+
+
+def setUpPackage(self):
+    self.patch_request = fudge.patch_object(
+        'auctions.models.requests', 'get', '<title>Howdy Dammit</title>')
+
+    mock_stripe = (
+        fudge.Fake().provides('create')
+        .returns_fake().has_attr(id='dammit')
+    )
+    self.patch_stripe = fudge.patch_object(
+        'auctions.models.stripe', 'Charge', mock_stripe)
+
+    fake_items = [fudge.Fake().has_attr(
+        transaction_status='SUCCESS',
+        payout_item_id='Howdy'),
+    ]
+
+    mock_paypal = (
+        fudge.Fake().is_callable().returns(
+            fudge.Fake().provides('create').returns(True)
+            .has_attr(items=fake_items)
+        )
+    )
+
+    self.patch_paypal = fudge.patch_object(
+        'auctions.models', 'PaypalPayout', mock_paypal
+    )
+
+
+def tearDownPackage(self):
+    self.patch_request.restore()
+    self.patch_stripe.restore()
+    self.patch_paypal.restore()
+
 
 class MarketWithBidsTestCase(TestCase):
     def setUp(self):
