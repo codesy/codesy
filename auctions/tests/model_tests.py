@@ -27,6 +27,16 @@ class IssueTest(MarketWithBidsTestCase):
         )
 
 
+class SignalTest(TestCase):
+
+    def test_save_title(self):
+        ModelsWithURL = ['Bid', 'Claim', 'Issue']
+        for model_name in ModelsWithURL:
+            model = mommy.make(model_name)
+            retrieve_model = type(model).objects.get(pk=model.id)
+            self.assertEqual(retrieve_model.title, 'Howdy Dammit')
+
+
 class SimpleBidTest(TestCase):
 
     def test_no_charge_for_zero_offer(self):

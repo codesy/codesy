@@ -9,8 +9,14 @@ import fudge
 
 
 def setUpPackage(self):
+
+    mock_get = fudge.Fake().is_callable().returns(
+        fudge.Fake().has_attr(text='<title>Howdy Dammit</title>')
+    )
+
     self.patch_request = fudge.patch_object(
-        'auctions.models.requests', 'get', '<title>Howdy Dammit</title>')
+        'auctions.models.requests', 'get', mock_get
+    )
 
     mock_stripe = (
         fudge.Fake().provides('create')
