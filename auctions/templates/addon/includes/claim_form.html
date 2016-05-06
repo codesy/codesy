@@ -4,7 +4,7 @@
    <div>
       <a class="small button success expanded"
          target="_blank" 
-         href="//{{current_site.domain}}{% url 'custom-urls:claim-status' pk=claim.pk %}">
+         href="//{{current_site.domain}}{% url 'claim-status' pk=claim.pk %}">
          {% if claim.user != request.user %}{{SOMEONE}}{% else %}{{YOU}}{% endif %}
          <i class='fi-fast-forward'></i>
       </a> 
