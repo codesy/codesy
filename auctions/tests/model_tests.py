@@ -27,6 +27,16 @@ class IssueTest(MarketWithBidsTestCase):
         )
 
 
+class SignalTest(TestCase):
+
+    def test_save_title(self):
+        ModelsWithURL = ['Bid', 'Claim', 'Issue']
+        for model_name in ModelsWithURL:
+            model = mommy.make(model_name)
+            retrieve_model = type(model).objects.get(pk=model.id)
+            self.assertEqual(retrieve_model.title, 'Howdy Dammit')
+
+
 class SimpleBidTest(TestCase):
 
     def test_no_charge_for_zero_offer(self):
@@ -36,6 +46,7 @@ class SimpleBidTest(TestCase):
 
 
 class BidTest(MarketWithBidsTestCase):
+
     def test_ask_met(self):
         self.assertFalse(self.bid1.ask_met())
         mommy.make(Bid, ask=0, offer=10, url=self.url)
@@ -99,7 +110,7 @@ class NotifyMatchersReceiverTest(MarketWithBidsTestCase):
         mock_send_mail.is_callable().times_called(0)
         user = mommy.make(settings.AUTH_USER_MODEL)
         url = 'https://github.com/codesy/codesy/issues/149'
-        offer_bid = mommy.prepare(
+        offer_bid = mommy.make(
             Bid, user=user, url=url, offer=100, ask=10
         )
         offer_bid.save()
@@ -121,7 +132,7 @@ class NotifyMatchersReceiverTest(MarketWithBidsTestCase):
             ['user2@test.com']
         )
 
-        offer_bid = mommy.prepare(
+        offer_bid = mommy.make(
             Bid, offer=100, user=user, ask=1000, url=self.url
         )
         offer_bid.save()
@@ -139,7 +150,7 @@ class NotifyMatchersReceiverTest(MarketWithBidsTestCase):
             ['user2@test.com']
         )
 
-        offer_bid = mommy.prepare(
+        offer_bid = mommy.make(
             Bid, offer=100, user=user, ask=1000, url=self.url
         )
         offer_bid.save()
@@ -363,13 +374,7 @@ class VoteTest(TestCase):
 
 class OfferTest(TestCase):
 
-    @fudge.patch('auctions.models.requests')
-    @fudge.patch('auctions.models.stripe.Charge.create')
-    def setUp(self, mock_request, mock_stripe):
-        mock_request.provides('get').returns("<title>howdy</title>")
-        mock_stripe.is_callable().returns(
-            fudge.Fake().is_callable().has_attr(id="howdy")
-        )
+    def setUp(self):
         self.user1 = mommy.make(settings.AUTH_USER_MODEL,
                                 email='user1@test.com')
         self.url = 'http://test.com/bug/123'
@@ -382,11 +387,7 @@ class OfferTest(TestCase):
         offer = mommy.make(Offer, bid=self.bid)
         self.assertIsNotNone(offer.transaction_key)
 
-    @fudge.patch('auctions.models.stripe.Charge.create')
-    def test_bid_fees(self, mock_stripe):
-        mock_stripe.is_callable().returns(
-            fudge.Fake().is_callable().has_attr(id="howdy")
-        )
+    def test_bid_fees(self):
         offer = Offer.objects.get(bid=self.bid)
         self.assertEqual(offer.amount, 50)
         fees = OfferFee.objects.filter(offer=offer)
@@ -396,11 +397,7 @@ class OfferTest(TestCase):
         offer_with_fees = offer.amount + sum_fees
         self.assertEqual(offer_with_fees, offer.charge_amount)
 
-    @fudge.patch('auctions.models.stripe.Charge.create')
-    def test_new_offer(self, mock_stripe):
-        mock_stripe.is_callable().returns(
-            fudge.Fake().is_callable().has_attr(id="howdy")
-        )
+    def test_new_offer(self):
         self.bid.offer = 60
         self.bid.save()
         offers = Offer.objects.filter(bid=self.bid)
@@ -409,12 +406,7 @@ class OfferTest(TestCase):
         sum_offers = offers.aggregate(Sum('amount'))['amount__sum']
         self.assertEqual(sum_offers, 60)
 
-    @fudge.patch('auctions.models.requests')
-    @fudge.patch('auctions.models.stripe.Charge.create')
-    def test_offer_fee_calculatons(self, mock_request, mock_stripe):
-        mock_stripe.is_callable().returns(
-            fudge.Fake().is_callable().has_attr(id="howdy")
-        )
+    def test_offer_fee_calculatons(self):
         AMOUNTS = [333, 22, 357, 1000, 50, 999, 1, ]
         for amount in AMOUNTS:
             new_bid = mommy.make(Bid, offer=amount)
@@ -426,21 +418,7 @@ class OfferTest(TestCase):
 
 class PayoutTest(TestCase):
 
-    def test_payouts_property(self):
-        claim = mommy.make(Claim)
-        mommy.make(Payout, claim=claim)
-        mommy.make(Payout, claim=claim)
-        mommy.make(Payout, claim=claim)
-        payouts = Payout.objects.all()
-        self.assertEqual(len(claim.payouts.all()), len(payouts))
-
-    @fudge.patch('auctions.models.requests')
-    @fudge.patch('auctions.models.stripe.Charge.create')
-    def setUp(self, mock_request, mock_stripe):
-        mock_request.provides('get').returns("<title>howdy</title>")
-        mock_stripe.is_callable().returns(
-            fudge.Fake().is_callable().has_attr(id="howdy")
-        )
+    def setUp(self):
         self.user1 = mommy.make(settings.AUTH_USER_MODEL,
                                 email='user1@test.com')
         self.user2 = mommy.make(settings.AUTH_USER_MODEL,
@@ -456,22 +434,20 @@ class PayoutTest(TestCase):
             Bid, user=self.user2,
             url=self.url, issue=self.issue, offer=50)
 
-    @fudge.patch('auctions.models.requests')
-    @fudge.patch('auctions.models.PaypalPayout')
-    def test_payout_request(self, mock_request, mock_paypal):
-        fake_items = [fudge.Fake().is_a_stub(), ]
-        mock_paypal.is_callable().returns(
-            fudge.Fake().provides('create')
-                        .returns(True)
-                        .has_attr(items=fake_items)
-        )
-        mock_request.provides('get').returns("<title>howdy</title>")
+    def test_payouts_property(self):
+        claim = mommy.make(Claim)
+        mommy.make(Payout, claim=claim)
+        mommy.make(Payout, claim=claim)
+        mommy.make(Payout, claim=claim)
+        payouts = Payout.objects.all()
+        self.assertEqual(len(claim.payouts.all()), len(payouts))
 
+    def test_payout_request(self):
         claim = mommy.make(Claim, user=self.user1, issue=self.issue)
         api_request = claim.payout_request()
         if api_request:
             self.assertEqual(claim.status, 'Paid')
-            self.assertFalse(claim.payout_request)
+            self.assertFalse(claim.payout_request())
         payouts = claim.payouts.all()
         payout = payouts[0]
         self.assertEqual(len(payouts), 1)
@@ -481,20 +457,7 @@ class PayoutTest(TestCase):
         sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
         self.assertEqual(sum_fees + payout.charge_amount, self.bid1.ask)
 
-    @fudge.patch('auctions.models.requests')
-    @fudge.patch('auctions.models.PaypalPayout')
-    def test_payout_fee_calculations(self, mock_request, mock_paypal):
-        fake_items = [fudge.Fake().has_attr(
-            transaction_status='SUCCESS',
-            payout_item_id='Howdy'),
-        ]
-        mock_paypal.is_callable().returns(
-            fudge.Fake().provides('create')
-                        .returns(True)
-                        .has_attr(items=fake_items)
-        )
-        mock_request.provides('get').returns("<title>howdy</title>")
-
+    def test_payout_fee_calculations(self):
         AMOUNTS = [333, 22, 357, 1000, 50, 999, 1, ]
         for amount in AMOUNTS:
             payout = mommy.make(Payout, amount=amount)
