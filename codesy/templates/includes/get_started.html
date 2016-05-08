@@ -1,15 +1,9 @@
 {% load staticfiles %}
+{% load socialaccount %}
 
-<div class="row medium-8 large-7 columns">
+<div class="row column text-center">
 {% if not request.user.is_authenticated %}
-         <h2>
-            Sign in to get started
-         </h2>
-
-         <h3><img width="32" height="32" src="{{OCTO_CAT}}"/></h3>
-         <a href="/accounts/github/login/?process=login">
-          Sign in with GitHub
-         </a>
+         <a class="button" href="{% provider_login_url "github" %}"><i class="fi-social-github medium"></i> Sign in with GitHub to get started</a>
 {% else %}
               <div class="install-step">
                 <h2>Install the Browser Extension</h2>

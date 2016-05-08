@@ -36,3 +36,11 @@ ol {
 .installed {
   display: none;
 }
+
+.fi-social-github {
+  font-size: 2em;
+}
+
+.menu-text {
+  padding: 0;
+}
