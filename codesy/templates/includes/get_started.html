@@ -1,17 +1,19 @@
 {% load staticfiles %}
 
-{% with TAKE_ACTION_ICON="<i class='fi-fast-forward'></i>" OK_ICON="<i class='fi-check'></i>" OCTO_CAT="https://raw.githubusercontent.com/github/media/master/octocats/blacktocat-32.png" %}
-
-
 <div class="row medium-8 large-7 columns">
-<div class="blog-post">
+{% if not request.user.is_authenticated %}
          <h2>
-            Get Started
+            Sign in to get started
          </h2>
-<!-- ADDON NEEDS TO BE INSTALLED -->
-        <div class="install-step small-4 columns">
-                <h3>1. Install {{TAKE_ACTION_ICON}}</h3>
-{% if browser == 'chrome' %}
+
+         <h3><img width="32" height="32" src="{{OCTO_CAT}}"/></h3>
+         <a href="/accounts/github/login/?process=login">
+          Sign in with GitHub
+         </a>
+{% else %}
+              <div class="install-step">
+                <h2>Install the Browser Extension</h2>
+  {% if browser == 'chrome' %}
                 <p id="add-to-chrome">
                    <img src="{% static "img/chrome.png" %}" 
                       width="32" height="32"/> 
@@ -20,7 +22,7 @@
                       href="https://github.com/codesy/widgets/raw/master/build/codesy.zip"
                       role="button">Download for Chrome</a>
                 </p>
-{% elif browser == 'firefox' %}
+  {% elif browser == 'firefox' %}
                 <p id="add-to-firefox">
                    <img src="{% static "img/firefox.png" %}" 
                       width="32" height="32"/> 
@@ -28,7 +30,7 @@
                       href="https://github.com/codesy/widgets/raw/master/build/codesy.xpi"
                       role="button">Download for Firefox</a>
                 </p>
-{% elif browser == 'opera' %}
+  {% elif browser == 'opera' %}
                 <p id="add-to-opera">
                    <img src="{% static "img/opera.png" %}" 
                       width="32" height="32"/> 
@@ -36,65 +38,18 @@
                       href="https://github.com/codesy/widgets/raw/master/build/codesy.zip"
                       role="button">Download for Opera</a>
                 </p>
-{% else %}
+  {% else %}
                 <p id="unknown-browser">
                 Unknown browser. The codesy widgets are <a href="https://wiki.mozilla.org/WebExtensions" target="_blank">WebExtensions</a> that work with Firefox, Chrome, and Opera. We want to add it to others soon. Want to help? 
                    <a href="https://github.com/codesy/widgets">Check the widgets code on GitHub</a>.
                 </p>
- {% endif %}
+  {% endif %} {# end 'browser' if #}
         </div>
-
-<!-- ADDON IS INSTALLED -->
-        <div class="installed small-4 columns" hidden="true">
-              <h3>1. Installed. {{OK_ICON}}</h3></i>
-        </div>
-
-{% if request.user.is_authenticated %}
-      <div id="signed-in" class="small-4 columns">
-          <h3>2. Signed in. {{OK_ICON}}</h3>
-          <p>Welcome 
-             <img src="{{ gravatar_url }}"/> {{ request.user.username }}</p>
-             <input id="codesy_user_id" 
-                    type="hidden" 
-                    name="codesy_user_id" 
-                    value="{{ request.user.id }}"/>
-             <input id="api_token_pass" 
-                    type="hidden" 
-                    name="api_token_pass" 
-                    value="{{ request.user.auth_token }}"/>
-            
-          <a class="button" href="/accounts/logout/">Sign out</a>
-          </p>
-      </div>
-{% else %}
-<!-- ADDON NOT INSTALLED -->
-      <div id="sign-in-step" class="install-step small-4 columns">
-            <h3>2. 
-               <img width="32" height="32" src="{{OCTO_CAT}}"/>
-               Sign in.{{TAKE_ACTION_ICON}}
-            </h3 class="install-step" >Install Codesy to sign in.</h3>
-      </div>
-<!--ADDON INSTALLED -->
-      <div class="installed small-4 columns" hidden="true">
-         <h3>2. 
-            <img width="32" height="32" src="{{OCTO_CAT}}"/>
-         </h3>
-         <a href="/accounts/github/login/?process=login">
-          Sign in.{{TAKE_ACTION_ICON}}
-         </a>
-      </div>
-
-{% endif %}
-        <div id="connect-payment-step" class="small-4 columns">
               {% include "includes/stripe_form.html" %}
-        </div>
+
+{% endif %} {# end request.user.is_authenticated if #}
 
       </div>
    </div>
-
-
  
-</div><!-- END BLOG POST -->
 </div><!-- END ROW -->
-
-{% endwith %}

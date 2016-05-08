@@ -33,3 +33,6 @@ ol {
   to { transform: rotate(360deg); }
 }
 
+.installed {
+  display: none;
+}

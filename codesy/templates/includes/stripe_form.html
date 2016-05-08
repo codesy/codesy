@@ -1,17 +1,18 @@
 {% block cc_form %}
 
+  <div class="installed">
    {% if not request.user.is_authenticated %}
-      <h3>3. Set up payments {{TAKE_ACTION_ICON}}.</h3>
+      <h3>Set up payments {{TAKE_ACTION_ICON}}.</h3>
       Sign in to connect a payment method
    {% else %}
       <div id="payment-errors"></div>
    {% if request.user.stripe_account_token %}
-      <h3>3. Payment set. {{OK_ICON}}</h3>
+      <h3>Payment set. {{OK_ICON}}</h3>
       Card on file; happy bidding!
       <a id="cc-show" >Change your card info.</a>
       <form id="cc-entry" role="form" class="form-horizontal" hidden="true">
    {% else %}
-      <h3>3. Connect payments.</h3>
+      <h3>Connect payments.</h3>
       <form role="form" class="form-horizontal">
    {% endif %}
         {% csrf_token %}
@@ -34,4 +35,6 @@
       </form>
 
    {% endif %}
+
+  </div>
 {% endblock %}
