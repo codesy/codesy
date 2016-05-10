@@ -2,29 +2,51 @@
 {% load staticfiles %}
 
 {% block content %}
-   <div class="row medium-8 large-7 columns">
-   <div class="callout primary">
-         <h3>You claimed a fix to this issue:
-            <a target="_blank" href='{{ claim.issue.url }}'>{{ claim.issue.title }}</a>
-         </h3>
-         <h3>You submitted this URL as proof of the fix:
-            <a target="_blank" href='{{ claim.evidence }}'>{{ claim.title }}</a>
-         </h3>
-   </div>
-    <div class="callout secondary">
-        {% if claim.status == "Submitted"  %}
-            <h3>There have been no votes on this claim yet.</h3>
-            {% include "includes/expiration_note.html" %}
-        {% elif claim.status == "Pending" %}
-            <h3>There are some still votes needed for this claim.</h3>
-            {% include "includes/expiration_note.html" %}
-        {% elif claim.status == "Approved" %}
-            {% include "includes/payout_request.html" %}
-        {% elif claim.status == "Rejected" %}
-            <h3>This claim was not approved.</h3>
-        {% elif claim.status == "Paid" %}
-            {% include "includes/payout_confirmation.html" %}
-        {% endif %}
+    <div class="row">
+        <div class="medium-10 columns">
+            <h3><a target="_blank" href='{{ claim.issue.url }}'>{{ claim.issue.title }}</a></h3>
+            <h4>Evidence: <a target="_blank" href='{{ claim.evidence }}'>{{ claim.title }}</a></h4>
+        </div>
+        <div class="medium-2 columns claim-status">
+            {% if claim.status == 'Paid' %}
+            <i class="fi-paypal large"></i>
+            {% elif claim.status == 'Submitted' %}
+            <i class="fi-next large"></i>
+            {% endif %}
+            <br/>
+            {{ claim.status }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="medium-2 columns">
+            <div class="date">
+                <p class="date-label">Created</p>
+                <p class="date-details">{{ claim.created|date:"M" }}<br/>{{ claim.created|date:"j" }}</p>
+            </div>
+        </div>
+        <div class="medium-8 columns">
+            {% if claim.status == "Submitted"  %}
+                <h3>There have been no votes on this claim yet.</h3>
+                {% include "includes/expiration_note.html" %}
+            {% elif claim.status == "Pending" %}
+                <h3>There are some still votes needed for this claim.</h3>
+                {% include "includes/expiration_note.html" %}
+            {% elif claim.status == "Approved" %}
+                {% include "includes/payout_request.html" %}
+            {% elif claim.status == "Rejected" %}
+                <h3>This claim was not approved.</h3>
+            {% elif claim.status == "Paid" %}
+                {% include "includes/payout_confirmation.html" %}
+            {% endif %}
+        </div>
+        <div class="medium-2 columns">
+            <div class="date">
+                <p class="date-label">Expires</p>
+                <p class="date-details">{{ claim.expires|date:"M" }}<br/>{{ claim.expires|date:"j" }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="row">
    </div>
 
 {% endblock %}
