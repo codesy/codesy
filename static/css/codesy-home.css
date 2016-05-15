@@ -86,3 +86,7 @@ table {
   text-align: center;
   font-size: 2em;
 }
+
+.payout {
+  text-align: left;
+}

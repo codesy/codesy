@@ -1,0 +1,34 @@
+{% if claim.status == "Approved" %}
+   <h3>Your claim was approved.</h3>
+   <form id="codesy_payout"
+      action="//{{current_site.domain}}{% url 'claim-status' pk=claim.pk %}"
+      method="POST" >
+      {% csrf_token %}
+      <input type="submit" class="button expanded" value="Pay Me!"></input>
+   </form>
+
+{% elif claim.status == "Paid" %}
+  {% for payout in claim.successful_payouts.all %}
+    <div class="payout row">
+      <div class="medium-6 columns">
+        <dl>
+          <dt>Provider</dt>
+          <dd>{{ payout.provider }}</dd>
+          <dt>Transaction ID</dt>
+          <dd>{{ payout.transaction_key }}</dd>
+        </dl>
+      </div>
+      <div class="medium-6 columns">
+        <table>
+          <tbody>
+            <tr><td>Ask</td><td>{{ payout.amount }}</td></tr>
+            {% for fee in payout.fees %}
+              <tr><td>{{ fee.fee_type }}</td><td>{{ fee.amount }}</td></tr>
+            {% endfor %}
+            <tr><td>Final payout</td><td>{{ payout.charge_amount }}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endfor %}
+{% endif %}

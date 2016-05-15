@@ -223,6 +223,9 @@ class Claim(models.Model):
     def payouts(self):
         return Payout.objects.filter(claim=self)
 
+    def successful_payouts(self):
+        return Payout.objects.filter(claim=self, api_success=True)
+
     def payout_request(self):
         if self.status == 'Paid':
             return False
