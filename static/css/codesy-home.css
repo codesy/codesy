@@ -13,6 +13,10 @@ dt {
   font-weight: 700;
 }
 
+tr.total {
+  border: solid 1px #000;
+}
+
 /* foundation icon styles */
 .fi-fast-forward {
   color: red;
