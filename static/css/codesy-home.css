@@ -1,20 +1,31 @@
 /* codesy site styles */
 
+a {
+  color: #4078C0;
+}
+
 ol {
   padding:1em;
 }
 
-/* foundation icon styles */
-.fi-check {
-  color: #5CB85C;
+dt {
+  margin-bottom: .3rem;
+  font-weight: 700;
 }
 
+/* foundation icon styles */
 .fi-fast-forward {
   color: red;
 }
 
 .fi-loop {
   color:red;
+}
+
+/* top-bar */
+
+.top-bar, .top-bar ul {
+  background-color: #F5F5F5;
 }
 
 .spin {
@@ -33,3 +44,41 @@ ol {
   to { transform: rotate(360deg); }
 }
 
+.installed {
+  display: none;
+}
+
+.fi-social-github {
+  font-size: 2em;
+}
+
+.menu-text {
+  padding: 0;
+}
+
+table {
+  width: 100%;
+}
+
+#claim-status-container {
+  padding-top: 1em;
+  text-align: center;
+}
+
+.date-label {
+  background: #F7F7F7;
+  padding: .5em 2em;
+  text-align: center;
+  margin-bottom: 0;
+}
+
+.date-details {
+  border: 1px solid #eeeeec;
+  text-align: center;
+  font-size: 2em;
+}
+
+.claim-status {
+  text-align: center;
+  font-size: 2em;
+}

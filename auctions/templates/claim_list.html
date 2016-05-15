@@ -2,33 +2,49 @@
 {% load staticfiles %}
 
 {% block content %}
-    <div class="row medium-8 large-7 columns">
-        <h3>These are your claims:</h3>
+    <div class="row">
+        <h2>Your Claims</h2>
     </div>
-    {% for claim in claims%}
-        <div class="row medium-8 large-7 columns">
-            <div class="callout primary">
-                <h3><a href="{{claim.issue.url}}">{{claim.issue.title}}</a></h3>
-                <a href="//{{current_site.domain}}{% url 'claim-status' pk=claim.id %}">
-                    Check on the status
-                </a>
-            </div>
-        </div>
-    {% endfor %}
+    <div class="row">
+        <table class="hover">
+            <thead>
+                <tr>
+                    <th>Issue</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for claim in claims%}
+                <tr>
+                    <td><a href="{{claim.issue.url}}">{{claim.issue.title}}</a></td>
+                    <td><a href="//{{current_site.domain}}{% url 'claim-status' pk=claim.id %}">{{ claim.status }}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-    <div class="row medium-8 large-7 columns">
-        <h3>You have voted on these claims:</h3>
+    <div class="row">
+        <h2>Voted Claims</h2>
     </div>
-    {% for claim in voted_claims %}
-        <div class="row medium-8 large-7 columns">
-            <div class="callout primary">
-                <h3><a href="{{claim.issue.url}}">{{claim.issue.title}}</a></h3>
-                <a href="//{{current_site.domain}}{% url 'claim-status' pk=claim.id %}">
-                    Check on the status
-                </a>
-            </div>
-        </div>
-    {% endfor %}
+    <div class="row">
+        <table class="hover">
+            <thead>
+                <tr>
+                    <th>Issue</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for claim in voted_claims %}
+                <tr>
+                    <td><a href="{{claim.issue.url}}">{{claim.issue.title}}</a></td>
+                    <td><a href="//{{current_site.domain}}{% url 'claim-status' pk=claim.id %}">{{ claim.status }}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
 
 {% block scripts %}
