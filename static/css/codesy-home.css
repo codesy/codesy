@@ -1,20 +1,31 @@
 /* codesy site styles */
 
+a {
+  color: #4078C0;
+}
+
 ol {
   padding:1em;
 }
 
-/* foundation icon styles */
-.fi-check {
-  color: #5CB85C;
+dt {
+  margin-bottom: .3rem;
+  font-weight: 700;
 }
 
+/* foundation icon styles */
 .fi-fast-forward {
   color: red;
 }
 
 .fi-loop {
   color:red;
+}
+
+/* top-bar */
+
+.top-bar, .top-bar ul {
+  background-color: #F5F5F5;
 }
 
 .spin {
@@ -49,12 +60,13 @@ table {
   width: 100%;
 }
 
-.date {
-  display: table-cell;
+#claim-status-container {
+  padding-top: 1em;
+  text-align: center;
 }
 
 .date-label {
-  background: #eeeeec;
+  background: #F7F7F7;
   padding: .5em 2em;
   text-align: center;
   margin-bottom: 0;
@@ -62,7 +74,6 @@ table {
 
 .date-details {
   border: 1px solid #eeeeec;
-  padding: 0 2em;
   text-align: center;
   font-size: 2em;
 }

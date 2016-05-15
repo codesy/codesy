@@ -2,22 +2,13 @@
 {% load staticfiles %}
 
 {% block content %}
-    <div class="row">
-        <div class="medium-10 columns">
-            <h3><a target="_blank" href='{{ claim.issue.url }}'>{{ claim.issue.title }}</a></h3>
-            <h4>Evidence: <a target="_blank" href='{{ claim.evidence }}'>{{ claim.title }}</a></h4>
-        </div>
-        <div class="medium-2 columns claim-status">
-            {% if claim.status == 'Paid' %}
-            <i class="fi-paypal large"></i>
-            {% elif claim.status == 'Submitted' %}
-            <i class="fi-next large"></i>
-            {% endif %}
-            <br/>
-            {{ claim.status }}
-        </div>
-    </div>
-    <div class="row">
+    <div class="row" id="claim-status-container">
+        <h3><img src="{{ claim.user.get_gravatar_url}}"> <a href="https://github.com/{{ claim.user.username }}">{{ claim.user.username }}</a></h3>
+        claimed to fix:
+        <h2><i class="fi-link"></i> <a target="_blank" href='{{ claim.issue.url }}'>{{ claim.issue.title }}</a></h2>
+        with this evidence:
+        <h3><i class="fi-link"></i> <a target="_blank" href='{{ claim.evidence }}'>{{ claim.title }}</a></h3>
+        <hr/>
         <div class="medium-2 columns">
             <div class="date">
                 <p class="date-label">Created</p>

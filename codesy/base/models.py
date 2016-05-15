@@ -1,3 +1,4 @@
+import hashlib
 import requests
 import stripe
 
@@ -18,6 +19,10 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 class User(AbstractUser):
     stripe_account_token = models.CharField(max_length=100, blank=True)
     USERNAME_FIELD = 'username'
+
+    def get_gravatar_url(self):
+        email_hash = hashlib.md5(self.email).hexdigest()
+        return "//www.gravatar.com/avatar/{}?s=40".format(email_hash)
 
 
 @receiver(pre_save, sender=settings.AUTH_USER_MODEL)
