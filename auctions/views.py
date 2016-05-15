@@ -37,7 +37,7 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
     id -- id of claim
     """
 
-    template_name = 'claim_status_anyone.html'
+    template_name = 'claim_status.html'
 
     def get_context_data(self, **kwargs):
         claim = None
@@ -49,8 +49,6 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
             pass
 
         context = dict({'claim': claim, 'vote': vote})
-        if self.request.user == claim.user:
-            self.template_name = 'claim_status_claimaint.html'
 
         return context
 

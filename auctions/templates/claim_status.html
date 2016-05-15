@@ -22,12 +22,23 @@
             {% elif claim.status == "Pending" %}
                 <h3>There are some still votes needed for this claim.</h3>
                 {% include "includes/expiration_note.html" %}
-            {% elif claim.status == "Approved" %}
-                {% include "includes/payout_request.html" %}
+            {% elif claim.status == "Approved" or claim.status == "Paid"  %}
+                <h3>This claim was approved.</h3>
             {% elif claim.status == "Rejected" %}
                 <h3>This claim was not approved.</h3>
-            {% elif claim.status == "Paid" %}
-                {% include "includes/payout_confirmation.html" %}
+            {% endif %}
+            {% if request.user == claim.user %}
+                {% if claim.status == "Approved" %}
+                    {% include "includes/payout_request.html" %}
+                {% elif claim.status == "Paid" %}
+                    {% include "includes/payout_confirmation.html" %}
+                {% endif %}
+            {% else %}
+                {% if vote %}
+                    {% include "includes/vote_confirmation.html" %}
+                {% else %}
+                    {% include "includes/vote_form.html" %}
+                {% endif %}
             {% endif %}
         </div>
         <div class="medium-2 columns">
