@@ -17,8 +17,7 @@ class BidStatusView(LoginRequiredMixin, TemplateView):
     """
     template_name = "addon/widget.html"
 
-    def get_context_data(self, **kwargs):
-        url = self.request.GET['url']
+    def _get_bid_and_claim(self, url):
         bid = None
         claim = None
         try:
@@ -26,7 +25,33 @@ class BidStatusView(LoginRequiredMixin, TemplateView):
             claim = Claim.objects.get(issue=bid.issue)
         except:
             pass
+        return (bid, claim)
+
+    def get_context_data(self, **kwargs):
+        url = self.request.GET['url']
+        bid, claim = self._get_bid_and_claim(url)
         return dict({'bid': bid, 'claim': claim, 'url': url})
+
+    def post(self):
+        """
+        Save changes to bid and get payment for offer
+        """
+        url = self.request.POST['url']
+        bid, claim = self._get_bid_and_claim(url)
+
+        new_ask = self.request.POST['ask']
+        new_offer = self.request.POST['offer']
+
+        if not bid:
+            bid = Bid(user=self.request.user, url=url, ask=new_ask)
+            bid.save()
+
+        if bid.payment_request(new_offer):
+            messages.success(self.request, "yep")
+        else:
+            messages.error(self.request, "nope")
+
+        # return redirect("%s/?url=%s",reverse('bid-status'), url)
 
 
 class ClaimStatusView(LoginRequiredMixin, TemplateView):

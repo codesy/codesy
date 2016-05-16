@@ -1,13 +1,8 @@
 <form id="codesy_bid"
-      class="ajaxSubmit"
-      {% if bid %}
-         action = "//{{current_site.domain}}{% url 'bid-detail' bid.id %}"
-         data-method="PUT"
-      {% else %}
-         action="//{{current_site.domain}}{% url 'bid-list' %}"
-         data-method="POST"
-      {% endif %}
-   > <!-- end of FORM tag -->
+    class="ajaxSubmit"
+    action="//{{current_site.domain}}{% url 'bid-status' %}"
+    data-method="POST"
+    > <!-- end of FORM tag -->
    {% csrf_token %}
    <input name="url" type="hidden" value="{{ url }}"></input>
 
