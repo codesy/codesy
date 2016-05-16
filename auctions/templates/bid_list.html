@@ -17,7 +17,6 @@
         </thead>
         <tbody>
     {% for bid in bids %}
-            {% for offer in bid.offers %}
             <tr>
                 <td>
                     <span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" title="{{ bid.created|date:"c" }}">{{ bid.created|date:"M j" }}</span></td>
@@ -27,7 +26,9 @@
                     {% if bid.ask_met %}
                         data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" title="Your ask has been met"
                     {% endif %}
-                    >{{ bid.ask }}</span>{% if bid.ask_met %} <i class="fi-check"></i>{% endif %}</td>
+                    >{{ bid.ask }}</span>{% if bid.ask_met %} <i class="fi-check"></i>{% endif %}
+                </td>
+            {% for offer in bid.offers %}
                 <td>
                     <table>
                         <tr><td>Offer</td><td>{{ bid.offer }}</td></tr>
