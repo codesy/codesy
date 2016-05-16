@@ -1,7 +1,16 @@
 /* codesy site styles */
 
+body {
+  color: #444;
+}
+
+.home-section {
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+}
+
 a {
-  color: #4078C0;
+  color: #666;
 }
 
 ol {
@@ -17,6 +26,22 @@ tr.total {
   border: solid 1px #000;
 }
 
+.button {
+  background-color: #111;
+}
+
+.button:focus, .button:hover {
+  background-color: #222;
+}
+
+.download-button {
+  background-color: #60b044;
+}
+
+.browser-install-icon {
+  margin-right: .25rem;
+}
+
 /* foundation icon styles */
 .fi-fast-forward {
   color: red;
@@ -30,6 +55,10 @@ tr.total {
 
 .top-bar, .top-bar ul {
   background-color: #F5F5F5;
+}
+
+img#top-bar-gravatar {
+  height: 1em;
 }
 
 .spin {
@@ -54,6 +83,8 @@ tr.total {
 
 .fi-social-github {
   font-size: 2em;
+  vertical-align: middle;
+  margin-right: .25rem;
 }
 
 .menu-text {

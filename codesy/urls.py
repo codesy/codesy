@@ -11,6 +11,7 @@ urlpatterns = patterns(
     '',
     # Static home/ explanation pages
     url(r'^$', views.Home.as_view(), name='home'),
+    url(r'^card-info$', views.CardInfo.as_view(), name='card-info'),
 
     # allauth
     (

@@ -9,9 +9,8 @@
         <meta name="description" content="{% block description %}codesy is a pay-what-you-want market for the open source community where we can tip each other to fix important bugs.{% endblock %}">
         <title>{% if request.user.is_authenticated %}{{ request.user.username }} | {% endif %}codesy.io</title>
         <link rel="shortcut icon" href="{% static "img/favicon.png" %}">
-        <link rel="stylesheet" href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/foundation/6.1.2/foundation.min.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/foundation-icons/3.0/foundation-icons.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/motion-ui/1.1.1/motion-ui.min.css" />
         <link rel="stylesheet" href="{% static "css/codesy-home.css" %}">
     </head>
 
@@ -20,21 +19,24 @@
     <div class="top-bar">
         <div class="row">
             <div class="top-bar-left">
-                <ul class="menu">
-                    <li class="menu-text"><a href="/"><img src="{% static "img/codesy_300dpi_323x80.png" %}" width="161" height="40"/></a></li>
-                {% if user.is_authenticated %}
-                    <li><a href="/bid-list">Bids</a></li>
-                    <li><a href="/claim-list">Claims</a></li>
-                    <li><a href="/vote-list">Votes</a></li>
-                {% endif %}
-                </ul>
+                <a href="/"><img src="{% static "img/codesy_300dpi_323x80.png" %}" width="161" height="40"/></a>
             </div>
             <div class="top-bar-right">
-                <ul class="menu">
+                <ul class="dropdown menu" data-dropdown-menu="data-dropdown-menu">
                 {% if user.is_authenticated %}
-                {% get_social_accounts request.user as accounts %}
-                    <li><a href="/">{{ user.username }}</a></li>
-                    <li><a class="button" href="{% url 'account_logout' %}">Sign out</a></li>
+                    {% get_social_accounts request.user as accounts %}
+                    <li>
+                    <a href="#"><img id="top-bar-gravatar" src="{{ user.get_gravatar_url }}">{{ user.username }}</a>
+                        <ul class="menu">
+                            <li><a href="/bid-list">Bids</a></li>
+                            <li><a href="/claim-list">Claims</a></li>
+                            <li><a href="/vote-list">Votes</a></li>
+                            <hr/>
+                            <li><a href="{% url 'card-info' %}">Change Credit Card</a></li>
+                            <hr/>
+                            <li><a href="{% url 'account_logout' %}">Sign out</a></li>
+                        </ul>
+                    </li>
                 {% else %}
                     <li><a class="button" href="{% provider_login_url "github" %}"><i class="fi-social-github medium"></i> Sign in with GitHub</a></li>
                 {% endif %}
@@ -75,8 +77,8 @@
         </div>
       </footer>
 
-    <script src="//cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/foundation/6.2.0/foundation.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery/2.2.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/foundation/6.1.2/foundation.min.js"></script>
     <script src="{% static "js/widget-app.js" %}" ></script>
 
 
