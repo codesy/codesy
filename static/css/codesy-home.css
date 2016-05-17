@@ -34,6 +34,15 @@ tr.total {
   background-color: #222;
 }
 
+.button.success {
+  background-color: #60b044;
+}
+
+.button.alert {
+  background-color: #df3e3e;
+}
+
+
 .download-button {
   background-color: #60b044;
 }

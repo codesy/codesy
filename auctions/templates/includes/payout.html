@@ -1,10 +1,14 @@
-{% if claim.status == "Approved" %}
-   <h3>Your claim was approved.</h3>
+{% if claim.status == "Submitted" or claim.status == "Pending" %}
+  <h3>Your claim is submitted.</h3>
+  <p>We are collecting votes for your claim.</p>
+
+{% elif claim.status == "Approved" %}
+   <h3>Your claim was approved</h3>
    <form id="codesy_payout"
       action="//{{current_site.domain}}{% url 'claim-status' pk=claim.pk %}"
       method="POST" >
       {% csrf_token %}
-      <input type="submit" class="button expanded" value="Pay Me!"></input>
+      <input type="submit" class="button success expanded" value="Pay Me!"></input>
    </form>
 
 {% elif claim.status == "Paid" %}
