@@ -6,28 +6,38 @@
         <h2>Bids</h2>
     </div>
     <div class="row">
-    <table class="hover">
+    <table>
         <thead>
             <tr>
+                <th width="100">Created</th>
                 <th>Issue</th>
-                <th>Ask</th>
-                <th>Offer</th>
-                <th>Fees</th>
-                <th>Total Charge</th>
+                <th width="100">Ask</th>
+                <th width="200">Offer</th>
             </tr>
         </thead>
         <tbody>
     {% for bid in bids %}
-            {% for offer in bid.offers %}
             <tr>
+                <td>
+                    <span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" title="{{ bid.created|date:"c" }}">{{ bid.created|date:"M j" }}</span></td>
                 <td><a href="{{bid.url}}">{{bid.issue.title}}</a></td>
-                <td>{{ bid.ask }}</td>
-                <td>{{ bid.offer }}</td>
-                <td>{% for fee in offer.fees %}
-                    <strong>{{ fee.fee_type }}</strong>: {{ fee.amount }}<br/>
-                    {% endfor %}
+                <td>
+                    <span
+                    {% if bid.ask_met %}
+                        data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" title="Your ask has been met"
+                    {% endif %}
+                    >{{ bid.ask }}</span>{% if bid.ask_met %} <i class="fi-check"></i>{% endif %}
                 </td>
-                <td>{{ offer.charge_amount }}</td>
+            {% for offer in bid.offers %}
+                <td>
+                    <table>
+                        <tr><td>Offer</td><td>{{ bid.offer }}</td></tr>
+                        {% for fee in offer.fees %}
+                            <tr><td>{{ fee.fee_type }}</td><td>{{ fee.amount }}</td></tr>
+                        {% endfor %}
+                        <tr class="total"><td>Total</td><td>{{ offer.charge_amount }}</td></tr>
+                    </table>
+                </td>
             </tr>
             {% endfor %}
     {% endfor %}

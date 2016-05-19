@@ -3,11 +3,23 @@
 
 {% block content %}
     <div class="row" id="claim-status-container">
-        <h3><img src="{{ claim.user.get_gravatar_url}}"> <a href="https://github.com/{{ claim.user.username }}">{{ claim.user.username }}</a></h3>
+        <div class="medium-2 columns">
+            <img src="{{ claim.user.get_big_gravatar}}"><br/>
+            <a href="https://github.com/{{ claim.user.username }}">
+                {% if request.user == claim.user %}
+                    You
+                {% else %}
+                    {{ claim.user.username }}
+                {% endif %}
+            </a>
+        </div>
+        <div class="medium-10 columns">
         claimed to fix:
-        <h2><i class="fi-link"></i> <a target="_blank" href='{{ claim.issue.url }}'>{{ claim.issue.title }}</a></h2>
+        <h3><i class="fi-link"></i> <a target="_blank" href='{{ claim.issue.url }}'>{{ claim.issue.title }}</a></h3>
+        <hr/>
         with this evidence:
-        <h3><i class="fi-link"></i> <a target="_blank" href='{{ claim.evidence }}'>{{ claim.title }}</a></h3>
+        <h4><i class="fi-link"></i> <a target="_blank" href='{{ claim.evidence }}'>{{ claim.title }}</a></h4>
+        </div>
         <hr/>
         <div class="medium-2 columns">
             <div class="date">
@@ -16,23 +28,8 @@
             </div>
         </div>
         <div class="medium-8 columns">
-            {% if claim.status == "Submitted"  %}
-                <h3>There have been no votes on this claim yet.</h3>
-                {% include "includes/expiration_note.html" %}
-            {% elif claim.status == "Pending" %}
-                <h3>There are some still votes needed for this claim.</h3>
-                {% include "includes/expiration_note.html" %}
-            {% elif claim.status == "Approved" or claim.status == "Paid"  %}
-                <h3>This claim was approved.</h3>
-            {% elif claim.status == "Rejected" %}
-                <h3>This claim was not approved.</h3>
-            {% endif %}
             {% if request.user == claim.user %}
-                {% if claim.status == "Approved" %}
-                    {% include "includes/payout_request.html" %}
-                {% elif claim.status == "Paid" %}
-                    {% include "includes/payout_confirmation.html" %}
-                {% endif %}
+                {% include "includes/payout.html" %}
             {% else %}
                 {% if vote %}
                     {% include "includes/vote_confirmation.html" %}
@@ -43,7 +40,7 @@
         </div>
         <div class="medium-2 columns">
             <div class="date">
-                <p class="date-label">Expires</p>
+                <p class="date-label">Pays out</p>
                 <p class="date-details">{{ claim.expires|date:"M" }}<br/>{{ claim.expires|date:"j" }}</p>
             </div>
         </div>

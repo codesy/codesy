@@ -1,7 +1,16 @@
 /* codesy site styles */
 
+body {
+  color: #444;
+}
+
+.home-section {
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+}
+
 a {
-  color: #4078C0;
+  color: #666;
 }
 
 ol {
@@ -11,6 +20,35 @@ ol {
 dt {
   margin-bottom: .3rem;
   font-weight: 700;
+}
+
+tr.total {
+  border: solid 1px #000;
+}
+
+.button {
+  background-color: #111;
+}
+
+.button:focus, .button:hover {
+  background-color: #222;
+}
+
+.button.success {
+  background-color: #60b044;
+}
+
+.button.alert {
+  background-color: #df3e3e;
+}
+
+
+.download-button {
+  background-color: #60b044;
+}
+
+.browser-install-icon {
+  margin-right: .25rem;
 }
 
 /* foundation icon styles */
@@ -26,6 +64,10 @@ dt {
 
 .top-bar, .top-bar ul {
   background-color: #F5F5F5;
+}
+
+img#top-bar-gravatar {
+  height: 1em;
 }
 
 .spin {
@@ -50,6 +92,8 @@ dt {
 
 .fi-social-github {
   font-size: 2em;
+  vertical-align: middle;
+  margin-right: .25rem;
 }
 
 .menu-text {
@@ -81,4 +125,8 @@ table {
 .claim-status {
   text-align: center;
   font-size: 2em;
+}
+
+.payout {
+  text-align: left;
 }

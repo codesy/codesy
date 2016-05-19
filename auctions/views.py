@@ -85,7 +85,8 @@ class BidList(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         try:
-            bids = Bid.objects.filter(user=self.request.user)
+            bids = (Bid.objects.filter(user=self.request.user)
+                    .order_by('-created'))
         except:
             bids = []
 
@@ -99,8 +100,10 @@ class ClaimList(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         try:
-            claims = Claim.objects.filter(user=self.request.user)
-            voted_claims = Claim.objects.voted_on_by_user(self.request.user)
+            claims = (Claim.objects.filter(user=self.request.user)
+                      .order_by('-created'))
+            voted_claims = (Claim.objects.voted_on_by_user(self.request.user)
+                            .order_by('-created'))
         except:
             claims = []
             voted_claims = []
@@ -115,7 +118,8 @@ class VoteList(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         try:
-            votes = Vote.objects.filter(user=self.request.user)
+            votes = (Vote.objects.filter(user=self.request.user)
+                     .order_by('-created'))
         except:
             votes = []
 

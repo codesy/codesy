@@ -1,19 +1,17 @@
 {% extends "base.html" %}
 {% load staticfiles %}
-   
+
 {% block description %}
 
 codesy is a pay-what-you-want market for the open source community where we can tip each other to fix important bugs.
 
 {% endblock %}
 
+
 {% block jumbotron %}
 
    <div class="callout">
       <div class="row column text-center">
-         <h1>
-            codesy.io
-         </h1>
          <p>
             every day, <strong>millions</strong> of us coders work around bugs in open-source software.
          </p>
@@ -23,14 +21,25 @@ codesy is a pay-what-you-want market for the open source community where we can 
       </div>
    </div>
 
-
 {% endblock %}
+
 
 {% block content %}
+  <div class="row">
    {% include "includes/get_started.html" %}
+   <hr/>
    {% include "includes/how_it_works.html" %}
+   <hr/>
+   {% include "includes/cross_browser.html" %}
+   <hr/>
+   {% include "includes/open_source.html" %}
+   <hr/>
+   {% include "includes/closed_bids.html" %}
+   <hr/>
    {% include "includes/faq.html" %}
+  </div>
 {% endblock %}
+
 
 {% block scripts %}
    {% if request.user.is_authenticated %}

@@ -1,9 +1,0 @@
-<div class="callout warning">
-   <h3>Your claim was approved.  Would you like to get paid?<h3>
-   <form id="codesy_payout"
-      action="//{{current_site.domain}}{% url 'claim-status' pk=claim.pk %}"
-      method="POST" >
-      {% csrf_token %}
-      <input type="submit" class="button expanded" value="Pay Me!"></input>
-   </form>
-   </div>

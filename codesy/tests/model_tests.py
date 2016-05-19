@@ -104,11 +104,17 @@ class SignUpReceiverTest(TestCase):
                               **self.kwargs)
         self.assertEquals(VERIFIED_PRIMARY_EMAIL, self.user.email)
 
-    class SignUpReceiverTest(TestCase):
+    @fudge.patch('stripe.Customer')
+    def test_save_cc_token(self, mock_stripe):
+        mock_stripe.provides('create').returns_fake().has_attr(id='dammit')
+        user = mommy.make(User)
+        user.stripe_account_token = "howdy"
+        user.save()
 
-        @fudge.patch('stripe.Customer')
-        def test_save_cc_token(self, mock_stripe):
-            mock_stripe.provides('create').returns_fake().has_attr(id='dammit')
-            user = mommy.make(User)
-            user.stripe_account_token = "howdy"
-            user.save()
+    def test_get_gravatar_url(self):
+        user = mommy.make(User, email='fake@email.com')
+
+        self.assertEqual(
+            user.get_gravatar_url(),
+            '//www.gravatar.com/avatar/724f95667e2fbe903ee1b4cffcae3b25?s=40'
+        )

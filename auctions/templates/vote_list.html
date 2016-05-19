@@ -7,18 +7,21 @@
     </div>
 
     <div class="row">
-        <table class="hover">
+        <table>
             <thead>
                 <tr>
+                    <th>Date</th>
                     <th>Issue</th>
-                    <th>Approved</th>
+                    <th>Vote</th>
                 </tr>
             </thead>
             <tbody>
             {% for vote in votes %}
             <tr>
-                <td><a href="{{ vote.claim.issue.url }}">{{ vote.claim.issue.title }}</a></td>
-                <td><a href="{% url 'claim-status' pk=vote.claim.id %}">{{ vote.approved }}</a></td>
+                <td>
+                    <span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" title="{{ vote.created|date:"r" }}">{{ vote.created|date:"M j" }}</span></td>
+                <td><a href="{% url 'claim-status' vote.claim.id %}">{{ vote.claim.issue.title }}</a></td>
+                <td>{% if vote.approved %}Approved{% else %}Rejected{% endif %}</td>
             </tr>
             {% endfor %}
         </table>
