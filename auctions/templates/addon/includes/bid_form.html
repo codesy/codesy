@@ -1,7 +1,6 @@
 <form id="codesy_bid"
-    class="ajaxSubmit"
     action="//{{current_site.domain}}{% url 'bid-status' %}"
-    data-method="POST"
+    method="POST"
     > <!-- end of FORM tag -->
    {% csrf_token %}
    <input name="url" type="hidden" value="{{ url }}"></input>
