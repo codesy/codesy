@@ -32,26 +32,36 @@ class BidStatusView(LoginRequiredMixin, TemplateView):
         bid, claim = self._get_bid_and_claim(url)
         return dict({'bid': bid, 'claim': claim, 'url': url})
 
-    def post(self):
+    def post(self, *args, **kwargs):
         """
         Save changes to bid and get payment for offer
         """
         url = self.request.POST['url']
+        new_ask_amount = self.request.POST['ask']
+        new_offer_amount = self.request.POST['offer']
+
+        if not(new_ask_amount) and not(new_offer_amount):
+            return
         bid, claim = self._get_bid_and_claim(url)
 
-        new_ask = self.request.POST['ask']
-        new_offer = self.request.POST['offer']
-
         if not bid:
-            bid = Bid(user=self.request.user, url=url, ask=new_ask)
+            bid = Bid(user=self.request.user, url=url)
             bid.save()
 
-        if bid.payment_request(new_offer):
-            messages.success(self.request, "yep")
-        else:
-            messages.error(self.request, "nope")
+        if new_ask_amount:
+            bid.ask = new_ask_amount
+            bid.save()
 
-        # return redirect("%s/?url=%s",reverse('bid-status'), url)
+        if new_offer_amount > bid.offer:
+            new_offer = bid.make_offer(new_offer_amount)
+            if new_offer.request():
+                messages.success(self.request, "Thanks for the offer!")
+                bid.offer = new_offer_amount
+                bid.save()
+            else:
+                messages.error(self.request, new_offer.error_message)
+
+        # return redirect("%s?url=%s" % (reverse('bid-status'), url))
 
 
 class ClaimStatusView(LoginRequiredMixin, TemplateView):

@@ -70,80 +70,24 @@ class Bid(models.Model):
     def offers(self):
         return Offer.objects.filter(bid=self)
 
-    def payment_request(self, offer_amount):
-        user = self.user
-        offers = Offer.objects.filter(bid=self)
+    def make_offer(self, offer_amount):
+        if not offer_amount:
+            return False
+        offer_amount = Decimal(offer_amount)
+        offers = Offer.objects.filter(bid=self, api_success=True)
         if offers:
-            sum_offers = offers.aggregate(Sum('amount'))
-            if offer_amount > sum_offers['amount__sum']:
-                offer_amount = offer_amount - sum_offers['amount__sum']
-
-    # TODO: HANDLE CARD NOT YET REGISTERED
-        codesy_pct = Decimal('0.025')
-
+            sum_offers = offers.aggregate(Sum('amount'))['amount__sum']
+            if offer_amount > sum_offers:
+                offer_amount = offer_amount - sum_offers
+            else:
+                return False
         new_offer = Offer(
-            user=user,
+            user=self.user,
             amount=offer_amount,
             bid=self,
         )
         new_offer.save()
-
-        codesy_fee = OfferFee(
-            offer=new_offer,
-            fee_type='codesy',
-            amount=new_offer.amount * codesy_pct
-        )
-        codesy_fee.save()
-
-        stripe_pct = Decimal('0.029')
-        stripe_transaction = Decimal('0.30')
-
-        stripe_charge = (
-            (offer_amount + codesy_fee.amount + stripe_transaction)
-            / (1 - stripe_pct)
-        )
-
-        stripe_fee = stripe_charge - (new_offer.amount + codesy_fee.amount)
-
-        stripe_fee = OfferFee(
-            offer=new_offer,
-            fee_type='Stripe',
-            amount=stripe_fee
-        )
-        stripe_fee.save()
-
-        # get rounded fee values
-        fees = OfferFee.objects.filter(offer=new_offer)
-        sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
-
-        stripe_charge = offer_amount + sum_fees
-
-        # TODO: removed with proper stripe mocking in tests
-        new_offer.charge_amount = stripe_charge
-        new_offer.save()
-
-        try:
-            import ipdb; ipdb.set_trace()
-            charge = stripe.Charge.create(
-                amount=int(stripe_charge * 100),
-                currency="usd",
-                customer=user.stripe_account_token,
-                description="Offer for: " + self.url,
-                metadata={'id': new_offer.id}
-            )
-            if charge:
-                import ipdb; ipdb.set_trace()
-                new_offer.charge_amount = stripe_charge
-                new_offer.confirmation = charge.id
-                new_offer.save()
-                self.offer = new_offer
-                self.save()
-            else:
-                return False
-        except:
-            return False
-
-        return True
+        return new_offer
 
 
 @receiver(post_save, sender=Bid)
@@ -151,7 +95,6 @@ def notify_matching_askers(sender, instance, **kwargs):
     # TODO: make a nicer HTML email template
     ASKER_NOTIFICATION_EMAIL_STRING = """
     Bidders have met your asking price for {url}.
-
     If you fix the issue, you may claim the payout by visiting the issue url:
     {url}
     """
@@ -419,6 +362,7 @@ class Payment(models.Model):
     transaction_key = models.CharField(
         max_length=255, default=uuid.uuid4, blank=True)
     api_success = models.BooleanField(default=False)
+    error_message = models.CharField(max_length=255, blank=True)
     charge_amount = models.DecimalField(
         max_digits=6, decimal_places=2, blank=True, default=0)
     confirmation = models.CharField(max_length=255, blank=True)
@@ -447,6 +391,68 @@ class Offer(Payment):
         return u'Offer payment for bid (%s) paid' % (
             self.bid.id
         )
+
+    def request(self):
+        codesy_pct = Decimal('0.025')
+
+        codesy_fee = OfferFee(
+            offer=self,
+            fee_type='codesy',
+            amount=self.amount * codesy_pct
+        )
+        codesy_fee.save()
+
+        stripe_pct = Decimal('0.029')
+        stripe_transaction = Decimal('0.30')
+
+        stripe_charge = (
+            (self.amount + codesy_fee.amount + stripe_transaction)
+            / (1 - stripe_pct)
+        )
+
+        stripe_fee = stripe_charge - (self.amount + codesy_fee.amount)
+
+        stripe_fee = OfferFee(
+            offer=self,
+            fee_type='Stripe',
+            amount=stripe_fee
+        )
+        stripe_fee.save()
+
+        # get rounded fee values
+        fees = OfferFee.objects.filter(offer=self)
+        sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
+
+        stripe_charge = self.amount + sum_fees
+
+        # TODO: removed with proper stripe mocking in tests
+        self.charge_amount = stripe_charge
+        self.save()
+
+        # TODO: HANDLE CARD NOT YET REGISTERED
+        try:
+            charge = stripe.Charge.create(
+                amount=int(stripe_charge * 100),
+                currency="usd",
+                customer=self.user.stripe_account_token,
+                description="Offer for: " + self.bid.url,
+                metadata={'id': self.id}
+            )
+            if charge:
+                self.charge_amount = stripe_charge
+                self.confirmation = charge.id
+                self.api_success = True
+                self.save()
+                self.offer = self
+                self.save()
+            else:
+                self.error_message = "Charge failed, try later"
+                return False
+        except Exception as e:
+            self.error_message = e.message
+            return False
+
+        return True
 
 
 class Payout(Payment):

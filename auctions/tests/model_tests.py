@@ -382,8 +382,8 @@ class OfferTest(TestCase):
         self.bid = mommy.make(
             Bid, user=self.user1,
             url=self.url, issue=self.issue, offer=50)
-        self.bid.payment_request(50)
-
+        offer = self.bid.make_offer(50)
+        offer.request()
 
     def test_key_created(self):
         offer = mommy.make(Offer, bid=self.bid)
@@ -400,9 +400,10 @@ class OfferTest(TestCase):
         self.assertEqual(offer_with_fees, offer.charge_amount)
 
     def test_new_offer(self):
-        self.bid.payment_request()
-        retreive_bid = Bid.objects.get(pk=self.bid.id)
-        self.assertEqual(retreive_bid.offer, 60)
+        self.assertEqual(self.bid.offer, 50)
+        offer = self.bid.make_offer(60)
+        self.assertEqual(offer.amount, 10)
+        offer.request()
         offers = Offer.objects.filter(bid=self.bid)
         self.assertEqual(len(offers), 2)
         self.assertEqual(len(self.bid.offers()), 2)
@@ -413,9 +414,10 @@ class OfferTest(TestCase):
         AMOUNTS = [333, 22, 357, 1000, 50, 999, 1, ]
         for amount in AMOUNTS:
             new_bid = mommy.make(Bid, offer=amount)
-            new_bid.payment_request(amount)
+            new_bid.make_offer(amount)
             offer = Offer.objects.get(bid=new_bid)
             fees = OfferFee.objects.filter(offer=offer)
+            self.assertEqual(offer.request(), True)
             sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
             self.assertEqual(offer.charge_amount - sum_fees, amount)
 

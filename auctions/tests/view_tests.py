@@ -30,16 +30,17 @@ class BidStatusTestCase(TestCase):
     @fudge.patch('auctions.views.messages')
     def test_post_new_offer(self, mock_messages):
         mock_messages.is_a_stub()
-        self.view.request = (fudge.Fake()
-                             .has_attr(POST={
-                                        'url': self.url,
-                                        'ask': 0,
-                                        'offer': 44,
-                             })
-                             .has_attr(user=self.user1))
+        self.view.request = (fudge.Fake().has_attr(
+            POST={
+                'url': self.url,
+                'ask': 0,
+                'offer': 44,
+            })
+            .has_attr(user=self.user1))
         self.view.post()
         retreive_bid = Bid.objects.get(pk=self.bid1.id)
         self.assertEqual(retreive_bid.offer, 44)
+
 
 class ClaimStatusTestCase(TestCase):
     def setUp(self):
