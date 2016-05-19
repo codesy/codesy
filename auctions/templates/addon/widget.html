@@ -1,0 +1,25 @@
+{% extends "addon/base.html" %}
+
+{% block widget_content %}
+
+{% if bid.ask_met or claim %}
+   {% include "addon/includes/claim_form.html" %}
+{% endif %}
+
+
+<!-- HAVE WE BEEN HERE BEFORE? -->
+   {% if bid == None %}
+      {% include "addon/includes/bid_form.html" %}
+<!-- IS THE USER ASKING OR OFFERING -->
+   {% elif bid.ask > 0 %}
+<!-- HANDLE ASKS -->
+      {% include "addon/includes/bid_form.html" %}
+   {% elif bid.offer > 0 %}
+<!-- HANDLE OFFERS -->
+      {% include "addon/includes/bid_form.html" %}
+   {% endif %}
+
+{% endblock %}
+
+<!--TODO: DONT ALLOW BIDS AFTER VOTING STARTS -->
+<!--TODO: HANDLE CLOSED CLAIMS -->

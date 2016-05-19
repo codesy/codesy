@@ -1,11 +1,22 @@
-from rest_framework.renderers import TemplateHTMLRenderer
-from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from auctions.models import Bid, Claim, Vote
+from codesy.base.models import User
+from .serializers import (BidSerializer, ClaimSerializer, UserSerializer,
+                          VoteSerializer)
 
-from .serializers import BidSerializer, ClaimSerializer, VoteSerializer
+
+class UserViewSet(ModelViewSet):
+    """
+    API endpoint for users. Users can only list, create, retrieve,
+    update, or delete themself.
+    """
+    model = User
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get_object(self, qs=None):
+        return self.request.user
 
 
 class AutoOwnObjectsModelViewSet(ModelViewSet):
@@ -29,67 +40,12 @@ class BidViewSet(AutoOwnObjectsModelViewSet):
     serializer_class = BidSerializer
 
 
-class BidAPIView(APIView):
-    """
-    API endpoint for a single bid form.
-
-    Requests for /bid/?url= will receive the HTML form for creating a bid (if
-    none exists) or updating the user's existing bid.
-
-    url -- url of an OSS issue or bug
-    """
-    renderer_classes = (TemplateHTMLRenderer,)
-
-    def get(self, request, format=None):
-        url = self.request.query_params.get('url')
-        bid = None
-        claim = None
-        try:
-            bid = Bid.objects.get(user=self.request.user, url=url)
-        except Bid.DoesNotExist:
-            pass
-        else:
-            try:
-                claim = Claim.objects.get(
-                    user=self.request.user, issue=bid.issue
-                )
-            except Claim.DoesNotExist:
-                pass
-
-        resp = Response({'bid': bid,
-                         'claim': claim,
-                         'url': url},
-                        template_name='bid.html')
-        return resp
-
-
 class ClaimViewSet(AutoOwnObjectsModelViewSet):
     """
     API endpoint for claims. Users can only access their own claims.
     """
     queryset = Claim.objects.all()
     serializer_class = ClaimSerializer
-    renderer_classes = (TemplateHTMLRenderer,)
-
-
-class ClaimAPIView(APIView):
-    """
-    Custom API endpoint for user-centric Claim status page
-
-    Requests for /claim-status/{id} will receive the claim details, along with
-    an HTML form for offering bidders to approve or deny the claim.
-
-    id -- id of claim
-    """
-    renderer_classes = (TemplateHTMLRenderer,)
-
-    def get(self, request, pk, format=None):
-        try:
-            claim = Claim.objects.get(pk=pk)
-        except Claim.DoesNotExist:
-            claim = None
-
-        return Response({'claim': claim}, template_name='claim_status.html')
 
 
 class VoteViewSet(AutoOwnObjectsModelViewSet):

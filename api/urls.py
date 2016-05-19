@@ -9,19 +9,13 @@ from . import views
 router = routers.DefaultRouter()
 router.register(r'bids', views.BidViewSet)
 router.register(r'claims', views.ClaimViewSet)
-router.register(r'issues', views.ClaimViewSet)
 router.register(r'votes', views.VoteViewSet)
+router.register(r'users', views.UserViewSet)
+router.register(r'payouts', views.UserViewSet)
 
-custom_endpoint_url_patterns = patterns(
-    '',
-    url(r'^bid-for-url/', views.BidAPIView.as_view()),
-    url(r'^claim-status/(?P<pk>[^/.]+)',
-        views.ClaimAPIView.as_view(), name='claim-status'),
-)
 
 urlpatterns = patterns(
     '',
-    url(r'^', include(custom_endpoint_url_patterns, namespace="custom-urls")),
     url(r'^', include(router.urls)),
     url(
         r'^api-auth/',

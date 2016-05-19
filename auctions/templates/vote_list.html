@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+    <div class="row">
+        <h2>Votes</h2>
+    </div>
+
+    <div class="row">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Issue</th>
+                    <th>Vote</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for vote in votes %}
+            <tr>
+                <td>
+                    <span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" title="{{ vote.created|date:"r" }}">{{ vote.created|date:"M j" }}</span></td>
+                <td><a href="{% url 'claim-status' vote.claim.id %}">{{ vote.claim.issue.title }}</a></td>
+                <td>{% if vote.approved %}Approved{% else %}Rejected{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+   {% if request.user.is_authenticated %}
+      <script src="{% static "js/home-app.js" %}" ></script>
+   {% endif %}
+{% endblock %}

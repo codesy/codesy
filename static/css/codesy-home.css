@@ -1,0 +1,132 @@
+/* codesy site styles */
+
+body {
+  color: #444;
+}
+
+.home-section {
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+}
+
+a {
+  color: #666;
+}
+
+ol {
+  padding:1em;
+}
+
+dt {
+  margin-bottom: .3rem;
+  font-weight: 700;
+}
+
+tr.total {
+  border: solid 1px #000;
+}
+
+.button {
+  background-color: #111;
+}
+
+.button:focus, .button:hover {
+  background-color: #222;
+}
+
+.button.success {
+  background-color: #60b044;
+}
+
+.button.alert {
+  background-color: #df3e3e;
+}
+
+
+.download-button {
+  background-color: #60b044;
+}
+
+.browser-install-icon {
+  margin-right: .25rem;
+}
+
+/* foundation icon styles */
+.fi-fast-forward {
+  color: red;
+}
+
+.fi-loop {
+  color:red;
+}
+
+/* top-bar */
+
+.top-bar, .top-bar ul {
+  background-color: #F5F5F5;
+}
+
+img#top-bar-gravatar {
+  height: 1em;
+}
+
+.spin {
+  -webkit-animation: spin 2s infinite linear;
+  animation: spin 2s infinite linear;
+}
+
+@-webkit-keyframes spin {
+  from { -webkit-transform: rotate(0deg); }
+  to { -webkit-transform: rotate(360deg); }
+}
+
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.installed {
+  display: none;
+}
+
+.fi-social-github {
+  font-size: 2em;
+  vertical-align: middle;
+  margin-right: .25rem;
+}
+
+.menu-text {
+  padding: 0;
+}
+
+table {
+  width: 100%;
+}
+
+#claim-status-container {
+  padding-top: 1em;
+  text-align: center;
+}
+
+.date-label {
+  background: #F7F7F7;
+  padding: .5em 2em;
+  text-align: center;
+  margin-bottom: 0;
+}
+
+.date-details {
+  border: 1px solid #eeeeec;
+  text-align: center;
+  font-size: 2em;
+}
+
+.claim-status {
+  text-align: center;
+  font-size: 2em;
+}
+
+.payout {
+  text-align: left;
+}

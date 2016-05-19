@@ -33,6 +33,9 @@ Deploy your own
 
     heroku run python manage.py createsuperuser
 
+#. Set the site domain name: Go to /admin/sites/site/1/change/ and make it
+   match ``codesy-username.herokuapp.com``
+
 #. To enable GitHub sign-ins on your heroku domain, use the following settings
    to `register your own GitHub App`_:
 
@@ -50,8 +53,37 @@ Deploy your own
 
 #. That's it. https://codesy-username.herokuapp.com/ should work.
 
-Read the Chrome Extension docs and the Firefox Add-on docs too learn how to
-configure them to use https://codesy-username.herokuapp.com.
+Configure backing services
+--------------------------
+
+#. To enable email via SendGrid, set ``SENDGRID_USERNAME`` and
+   ``SENDGRID_PASSWORD`` config values::
+
+    heroku config:set SENDGRID_USERNAME=
+    heroku config:set SENDGRID_PASSWORD=
+
+#. To enable Stripe, you will need to set ``STRIPE_SECRET_KEY`` and
+   ``STRIPE_PUBLIC_KEY`` values from `Stripe Dashboard API Keys`_::
+
+    heroku config:set STRIPE_SECRET_KEY=
+    heroku config:set STRIPE_PUBLIC_KEY=
+
+#. To enable PayPal, you will need to set ``PAYPAL_CLIENT_ID`` and
+   ``PAYPAL_CLIENT_SECRET`` value from `PayPal Developer Dashboard Apps & Credentials`_::
+
+    heroku config:set PAYPAL_CLIENT_ID=
+    heroku config:set PAYPAL_CLIENT_SECRET=
+
+
+.. _Stripe Dashboard API Keys: https://dashboard.stripe.com/account/apikeys
+.. _PayPal Developer Dashboard Apps & Credentials: https://developer.paypal.com/developer/applications/
+
+Configure extensions to use the server
+--------------------------------------
+
+Check `the extension docs`_.
+
+.. _the extension docs: https://github.com/codesy/widgets
 
 Deploying to production
 -----------------------
@@ -82,4 +114,3 @@ This means `anyone` can request a production deployment by submitting a Pull Req
 
 .. _heroku: https://www.heroku.com/
 .. _git hooks: http://git-scm.com/book/en/Customizing-Git-Git-Hooks
-.. _balanced.js: https://github.com/balanced/balanced-js

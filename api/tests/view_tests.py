@@ -4,11 +4,30 @@ from django.conf import settings
 from django.db.models.query import QuerySet
 from django.test import TestCase
 from model_mommy import mommy
-import rest_framework
 
+from codesy.base.models import User
 from auctions import models
 
 from .. import serializers, views
+
+
+class UserViewSetTest(TestCase):
+    def setUp(self):
+        self.view = views.UserViewSet()
+
+    def test_attrs(self):
+        self.assertIsInstance(self.view, views.ModelViewSet)
+        self.assertEqual(self.view.model, User)
+        self.assertEqual(
+            self.view.serializer_class, serializers.UserSerializer)
+
+    def test_get_object(self):
+        user = mommy.make(settings.AUTH_USER_MODEL)
+        self.view.request = fudge.Fake().has_attr(user=user)
+
+        obj = self.view.get_object()
+
+        self.assertEqual(obj, user)
 
 
 def _make_test_bid():
@@ -61,52 +80,6 @@ class BidViewSetTest(TestCase):
         self.assertSequenceEqual(qs.order_by('id'), [bid1, bid4, bid5])
 
 
-class BidAPIViewTest(TestCase):
-    def setUp(self):
-        self.view = views.BidAPIView()
-
-    def test_attrs(self):
-        self.assertIsInstance(self.view, rest_framework.views.APIView)
-        self.assertEqual(
-            self.view.renderer_classes,
-            (rest_framework.renderers.TemplateHTMLRenderer,)
-        )
-
-    @fudge.patch('api.views.Response')
-    def test_get_existant_bid(self, mock_resp):
-        user, url, bid = _make_test_bid()
-        self.view.request = fudge.Fake().has_attr(
-            user=user, query_params={'url': url})
-        mock_resp.expects_call().with_args(
-            {'bid': bid, 'url': url, 'claim': None}, template_name='bid.html')
-
-        self.view.get(self.view.request)
-
-    @fudge.patch('api.views.Response')
-    def test_get_nonexistant_bid_assigns_None(self, mock_resp):
-        user = mommy.make(settings.AUTH_USER_MODEL)
-        other_user = mommy.make(settings.AUTH_USER_MODEL)
-        url = 'http://gh.com/project'
-        mommy.make('auctions.Bid', user=other_user, url=url)
-        self.view.request = fudge.Fake().has_attr(
-            user=user, query_params={'url': url})
-        mock_resp.expects_call().with_args(
-            {'bid': None, 'url': url, 'claim': None}, template_name='bid.html')
-
-        self.view.get(self.view.request)
-
-    @fudge.patch('api.views.Response')
-    def test_get_existant_bid_with_claim(self, mock_resp):
-        user, url, bid = _make_test_bid()
-        claim = mommy.make('auctions.Claim', issue=bid.issue, user=user)
-        self.view.request = fudge.Fake().has_attr(
-            user=user, query_params={'url': url})
-        mock_resp.expects_call().with_args(
-            {'bid': bid, 'url': url, 'claim': claim}, template_name='bid.html')
-
-        self.view.get(self.view.request)
-
-
 class ClaimViewSetTest(TestCase):
     def setUp(self):
         self.viewset = views.ClaimViewSet()
@@ -136,39 +109,6 @@ class ClaimViewSetTest(TestCase):
         qs = self.viewset.get_queryset()
 
         self.assertSequenceEqual(qs.order_by('id'), [claim1, ])
-
-
-class ClaimAPIViewTest(TestCase):
-    def setUp(self):
-        self.view = views.ClaimAPIView()
-
-    def test_attrs(self):
-        self.assertIsInstance(self.view, rest_framework.views.APIView)
-        self.assertEqual(
-            self.view.renderer_classes,
-            (rest_framework.renderers.TemplateHTMLRenderer,)
-        )
-
-    @fudge.patch('api.views.Response')
-    def test_get_existant_claim_returns_claim_status(self, mock_resp):
-        claim = mommy.make('auctions.Claim')
-        self.view.request = fudge.Fake()
-        mock_resp.expects_call().with_args(
-            {'claim': claim},
-            template_name='claim_status.html'
-        )
-
-        self.view.get(self.view.request, claim.pk)
-
-    @fudge.patch('api.views.Response')
-    def test_get_nonexistant_claim_assigns_None(self, mock_resp):
-        self.view.request = fudge.Fake()
-        mock_resp.expects_call().with_args(
-            {'claim': None},
-            template_name='claim_status.html'
-        )
-
-        self.view.get(self.view.request, 1)
 
 
 class VoteViewSetTest(TestCase):

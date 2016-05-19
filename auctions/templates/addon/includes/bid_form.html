@@ -1,0 +1,67 @@
+<form id="codesy_bid"
+      class="ajaxSubmit"
+      {% if bid %}
+         action = "//{{current_site.domain}}{% url 'bid-detail' bid.id %}"
+         data-method="PUT"
+      {% else %}
+         action="//{{current_site.domain}}{% url 'bid-list' %}"
+         data-method="POST"
+      {% endif %}
+   > <!-- end of FORM tag -->
+   {% csrf_token %}
+   <input name="url" type="hidden" value="{{ url }}"></input>
+
+   {% if not bid.ask_met %}
+      <label class="codesy_hide" >
+      {% if bid.ask > 0 %}You have asked for{% else %}You can ask for {% endif %}
+         <input id="ask"
+                name="ask"
+                type="text"
+                class="codesy_hide"
+                placeholder="What you'd want."
+                data-original-value="{{bid.ask}}"
+                value="{% if bid.ask > 0 %}{{bid.ask}}{% endif %}">
+      </label>
+      <label id="ask-confirm" class="callout small codesy_confirm hide" ></label>
+   {% endif %}
+   {% if not claim %}
+      <label class="codesy_hide" >
+          {% if bid.offer > 0 %}You have offered{% else %}You can offer{% endif %}
+         <input id="offer"
+                name="offer"
+                type="text"
+                placeholder="What you'd pay."
+                data-original-value="{{bid.offer}}"
+                value="{% if bid.offer > 0 %}{{bid.offer}}{% endif %}">
+        </label>
+        <label id="offer-confirm" class="callout small codesy_confirm hide" ></label>
+
+   {% endif %}
+
+   {% if not bid.ask_met or not claim %}
+
+        <input
+        id="submitForm"
+        type="submit"
+        class="button expanded success codesy_confirm hide"
+        value="CONFIRM"
+        />
+
+        <button
+            type="button"
+            id="cancelSubmit"
+            class="button secondary expanded codesy_confirm hide">
+            Cancel
+        </button>
+
+
+        <button
+            type="button"
+            id="ShowSubmit"
+            class="button expanded codesy_hide">
+            {%  if bid.offer > 0 or bid.ask > 0 %}Change your Bid{% else %}Make a bid{% endif %}
+        </button>
+
+   {% endif %}
+
+</form>
