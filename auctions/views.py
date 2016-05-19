@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.shortcuts import redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import messages
@@ -40,8 +42,13 @@ class BidStatusView(LoginRequiredMixin, TemplateView):
         new_ask_amount = self.request.POST['ask']
         new_offer_amount = self.request.POST['offer']
 
+        redirect_response = redirect(
+            "%s?url=%s" % (reverse('bid-status'), url)
+        )
+
         if not(new_ask_amount) and not(new_offer_amount):
-            return
+            return redirect_response
+
         bid, claim = self._get_bid_and_claim(url)
 
         if not bid:
@@ -52,16 +59,18 @@ class BidStatusView(LoginRequiredMixin, TemplateView):
             bid.ask = new_ask_amount
             bid.save()
 
-        if new_offer_amount > bid.offer:
-            new_offer = bid.make_offer(new_offer_amount)
-            if new_offer.request():
-                messages.success(self.request, "Thanks for the offer!")
-                bid.offer = new_offer_amount
-                bid.save()
-            else:
-                messages.error(self.request, new_offer.error_message)
+        if new_offer_amount:
+            new_offer_amount = Decimal(self.request.POST['offer'])
+            if new_offer_amount > bid.offer:
+                new_offer = bid.make_offer(new_offer_amount)
+                if new_offer.request():
+                    messages.success(self.request, "Thanks for the offer!")
+                    bid.offer = new_offer_amount
+                    bid.save()
+                else:
+                    messages.error(self.request, new_offer.error_message)
 
-        # return redirect("%s?url=%s" % (reverse('bid-status'), url))
+        return redirect_response
 
 
 class ClaimStatusView(LoginRequiredMixin, TemplateView):
