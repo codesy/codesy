@@ -442,14 +442,15 @@ class Offer(Payment):
                 self.charge_amount = stripe_charge
                 self.confirmation = charge.id
                 self.api_success = True
-                self.save()
                 self.offer = self
                 self.save()
             else:
                 self.error_message = "Charge failed, try later"
+                self.save()
                 return False
         except Exception as e:
             self.error_message = e.message
+            self.save()
             return False
 
         return True
@@ -521,7 +522,6 @@ class Payout(Payment):
                     if item.transaction_status == "SUCCESS":
                         self.api_success = True
                         self.confirmation = item.payout_item_id
-                        self.save()
                         self.claim.status = "Paid"
                         self.claim.save()
                     else:
