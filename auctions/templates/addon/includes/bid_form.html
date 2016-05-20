@@ -23,7 +23,7 @@
           {% if bid.offer > 0 %}You have offered{% else %}You can offer{% endif %}
          <input id="offer"
                 name="offer"
-                type="text"['amount__sum']
+                type="text"
                 placeholder="What you'd pay."
                 data-original-value="{{bid.offer}}"
                 value="{% if bid.offer > 0 %}{{bid.offer}}{% endif %}">
