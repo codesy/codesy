@@ -18,10 +18,12 @@ def setUpPackage(self):
         'auctions.models.requests', 'get', mock_get
     )
 
+    mock_create = fudge.Fake().has_attr(id='dammit')
+
     mock_stripe = (
-        fudge.Fake().provides('create')
-        .returns_fake().has_attr(id='dammit')
+        fudge.Fake().provides('create').returns(mock_create)
     )
+
     self.patch_stripe = fudge.patch_object(
         'auctions.models.stripe', 'Charge', mock_stripe)
 
