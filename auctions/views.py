@@ -26,6 +26,7 @@ class BidStatusView(LoginRequiredMixin, TemplateView):
             bid = Bid.objects.get(user=self.request.user, url=url)
             claim = Claim.objects.get(issue=bid.issue)
         except:
+            # pass to return (None, None) to caller
             pass
         return (bid, claim)
 
@@ -61,6 +62,7 @@ class BidStatusView(LoginRequiredMixin, TemplateView):
 
         if new_offer_amount:
             new_offer_amount = Decimal(self.request.POST['offer'])
+            # TODO: move most/all of this logic into Bid.make_offer()
             if new_offer_amount > bid.offer:
                 new_offer = bid.make_offer(new_offer_amount)
                 if new_offer.request():
