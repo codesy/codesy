@@ -66,3 +66,21 @@ body {
     font-size: 0.75em;
     margin: 0.25em
 }
+
+.button.success {
+  background-color: #60b044;
+}
+
+.button.success:focus, .button.success:hover {
+  background-color: #569e3d;
+}
+
+.button.secondary {
+  background-color: #eee;
+  color: #333;
+}
+
+.button.secondary:focus, .button.secondary:hover {
+  background-color: #ddd;
+  color: #333;
+}
