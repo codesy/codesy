@@ -8,6 +8,7 @@
   position: fixed;
   bottom: .25em;
   right: .25em;
-  background-color: #fff;
+  background-color: transparent;
   border: 0px;
+  z-index: 100;
 }
