@@ -52,7 +52,8 @@ body {
   color: #767676;
   border-bottom: 1px solid #dde4e6;
   border-radius: 3px 3px 0 0;
-  padding: 0 15px;
+  text-align: center;
+  padding: 3px 0px;
 }
 
 #widget-input-form {

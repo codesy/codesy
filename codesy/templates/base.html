@@ -24,7 +24,6 @@
             <div class="top-bar-right">
                 <ul class="dropdown menu" data-dropdown-menu="data-dropdown-menu">
                 {% if user.is_authenticated %}
-                    {% get_social_accounts request.user as accounts %}
                     <li>
                     <a href="#"><img id="top-bar-gravatar" src="{{ user.get_gravatar_url }}">{{ user.username }}</a>
                         <ul class="menu">
