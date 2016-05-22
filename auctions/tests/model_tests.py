@@ -456,6 +456,7 @@ class PayoutTest(TestCase):
             self.assertFalse(claim.payout_request())
         payouts = claim.payouts.all()
         payout = payouts[0]
+        self.assertTrue(payout.api_success)
         self.assertEqual(len(payouts), 1)
         fees = PayoutFee.objects.filter(payout=payout)
         self.assertEqual(len(fees), 2)
