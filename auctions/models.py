@@ -183,7 +183,11 @@ class Claim(models.Model):
             amount=bid.ask,
         )
         payout.save()
-        return payout.request()
+        payout_attempt = payout.request()
+        if payout.api_success is True:
+            self.status = 'Paid'
+            self.save()
+        return payout_attempt
 
     def votes_by_approval(self, approved):
         return (Vote.objects
@@ -525,8 +529,7 @@ class Payout(Payment):
                     if item.transaction_status == "SUCCESS":
                         self.api_success = True
                         self.confirmation = item.payout_item_id
-                        self.claim.status = "Paid"
-                        self.claim.save()
+                        self.save()
                     else:
                         payout_attempt = False
         return payout_attempt
