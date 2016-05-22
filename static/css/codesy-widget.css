@@ -4,29 +4,61 @@ body {
   background:none;
 }
 
-#codesy_widget {
-  width: 140px;
+#widget-wrapper {
+  position: relative;
+  padding-left: 64px;
 }
 
-#codesy_widget a {
-  font-weight: 900;
+#widget-avatar {
+  float: left;
+  margin-left: -64px;
+  border-radius: 3px;
 }
 
-#codesy_widget img {
-  max-height:20px;
+#widget-input::before, #widget-input::after {
+  position: absolute;
+  top: 11px;
+  right: 100%;
+  left: -16px;
+  display: block;
+  width: 0;
+  height: 0;
+  content: " ";
+  border-color: transparent;
+  border-style: solid solid outset;
 }
 
-#codesy_widget input {
-  height: 2em;
-  margin: 0px;
-  border:0px;
-  padding: 0px;
+#widget-input::before {
+  border-width: 8px;
+  border-right-color: #bfccd1;
 }
 
-#codesy_widget input[type="submit"] {
-  margin-top: 5px;
-  padding: 5px;
-  font-weight: 900;
+#widget-input::after {
+  margin-top: 1px;
+  margin-left: 2px;
+  border-width: 7px;
+  border-right-color: #f2f8fa;
+}
+
+#widget-input {
+  position: relative;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+}
+
+#widget-input-header {
+  background-color: #f2f8fa;
+  color: #767676;
+  border-bottom: 1px solid #dde4e6;
+  border-radius: 3px 3px 0 0;
+  padding: 0 15px;
+}
+
+#widget-input-form {
+  width: 100%;
+  padding: 15px 15px 0 15px;
+  font-size: 14px;
 }
 
 .codesy_confirm{
