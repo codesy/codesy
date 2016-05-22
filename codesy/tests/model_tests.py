@@ -1,6 +1,8 @@
 from django.test import TestCase
 from django.test.client import RequestFactory
 
+from allauth.socialaccount.models import SocialAccount
+
 import fudge
 from model_mommy import mommy
 
@@ -113,8 +115,9 @@ class SignUpReceiverTest(TestCase):
 
     def test_get_gravatar_url(self):
         user = mommy.make(User, email='fake@email.com')
+        mommy.make(SocialAccount, user=user, uid="12345")
 
         self.assertEqual(
             user.get_gravatar_url(),
-            '//www.gravatar.com/avatar/724f95667e2fbe903ee1b4cffcae3b25?s=40'
+            'https://avatars3.githubusercontent.com/u/12345?v=3&s=96'
         )

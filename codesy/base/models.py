@@ -1,4 +1,3 @@
-import hashlib
 import requests
 import stripe
 
@@ -20,12 +19,10 @@ class User(AbstractUser):
     stripe_account_token = models.CharField(max_length=100, blank=True)
     USERNAME_FIELD = 'username'
 
-    def get_gravatar_url(self, size=40):
-        email_hash = hashlib.md5(self.email).hexdigest()
-        return "//www.gravatar.com/avatar/{}?s={}".format(email_hash, size)
-
-    def get_big_gravatar(self):
-        return self.get_gravatar_url(140)
+    def get_gravatar_url(self):
+        github_account = self.socialaccount_set.get(provider='github')
+        return ("https://avatars3.githubusercontent.com/u/%s?v=3&s=96" %
+                github_account.uid)
 
 
 @receiver(pre_save, sender=settings.AUTH_USER_MODEL)
