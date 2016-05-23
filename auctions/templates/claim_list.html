@@ -28,29 +28,7 @@
         </table>
     </div>
 
-    <div class="row">
-        <h2>Voted Claims</h2>
-    </div>
-    <div class="row">
-        <table>
-            <thead>
-                <tr>
-                    <th width="200">Date</th>
-                    <th>Issue</th>
-                    <th width="200">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for claim in voted_claims %}
-                <tr>
-                    <td><span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" title="{{ claim.created|date:"r" }}">{{ claim.created|date:"M j" }}</span></td>
-                    <td><a href="{% url 'claim-status' claim.id %}">{{claim.issue.title}}</a></td>
-                    <td>{{ claim.status }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+
 {% endblock %}
 
 {% block scripts %}
