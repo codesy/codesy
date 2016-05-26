@@ -3,5 +3,5 @@ coverage:
   round: down
   range: "90...100"
 
-ignore:
-- */migrations/*
+  ignore:
+    - "*/migrations/*"
