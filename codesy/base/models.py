@@ -16,6 +16,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 class User(AbstractUser):
+    stripe_cc_token = models.CharField(max_length=100, blank=True)
     stripe_account_token = models.CharField(max_length=100, blank=True)
     USERNAME_FIELD = 'username'
 
@@ -27,19 +28,13 @@ class User(AbstractUser):
 
 @receiver(pre_save, sender=settings.AUTH_USER_MODEL)
 def replace_cc_token_with_account_token(sender, instance, **kwargs):
-    if not instance.stripe_account_token:
-        # this is not an update concerning stripe
-        return
-    else:
-        saved_user = User.objects.get(id=instance.id)
-        if saved_user.stripe_account_token:
-            # TODO:  This prevents new card accounts must change
-            instance.stripe_account_token = saved_user.stripe_account_token
-        else:
-            new_customer = stripe.Customer.create(
-                source=instance.stripe_account_token,
-                description=instance.email
-            )
+    if instance.stripe_cc_token:
+        new_customer = stripe.Customer.create(
+            source=instance.stripe_cc_token,
+            description=instance.email
+        )
+        if new_customer:
+            instance.stripe_cc_token = ""
             instance.stripe_account_token = new_customer.id
 
 
