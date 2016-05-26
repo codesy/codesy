@@ -85,6 +85,7 @@ class MarketWithClaimTestCase(TestCase):
             user1: asks 50
             user2: offers 25
             user3: offers 25
+            user1 claims
         """
         self.url = 'http://github.com/codesy/codesy/issues/37'
         self.issue = mommy.make(Issue, url=self.url)
@@ -96,9 +97,9 @@ class MarketWithClaimTestCase(TestCase):
         self.user3 = mommy.make(settings.AUTH_USER_MODEL,
                                 email='user3@test.com')
         self.bid1 = mommy.make(Bid, user=self.user1,
-                               ask=50, offer=0, url=self.url)
+                               ask=50, offer=0, url=self.url, issue=self.issue)
         self.bid2 = mommy.make(Bid, user=self.user2,
-                               ask=0, offer=25, url=self.url)
+                               ask=0, offer=25, url=self.url, issue=self.issue)
         self.bid3 = mommy.make(Bid, user=self.user3,
-                               ask=0, offer=25, url=self.url)
+                               ask=0, offer=25, url=self.url, issue=self.issue)
         self.claim = mommy.make(Claim, user=self.user1, issue=self.issue)

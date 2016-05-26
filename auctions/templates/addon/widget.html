@@ -1,4 +1,5 @@
 {% extends "addon/base.html" %}
+{% load auctions_extras %}
 {% load staticfiles %}
 
 {% block widget_content %}
@@ -15,10 +16,29 @@
         </div>
 
         <div id="widget-input-form">
-            {% if bid.ask_met or claim %}
-               {% include "addon/includes/claim_form.html" %}
-            {% else %}
-                {% include "addon/includes/bid_form.html" %}
+            {% actionable_claims_for_bid_for_user bid=bid user=request.user as actionable_claims %}
+            {% if bid.ask_met or actionable_claims.own_claim %}
+               {% include "addon/includes/claim_form.html" with target="_blank"%}
+            {% elif actionable_claims.other_claims != None %}
+              {% for other_claim in actionable_claims.other_claims %}
+                  {% if other_claim.status == 'Paid' %}
+                    <p>This claim was paid; thank you!</p>
+                  {% elif other_claim.status == 'Approved' %}
+                    <p>This claim was approved; thank you!</p>
+                  {% elif other_claim.status == 'Rejected' %}
+                    <p>This claim was rejected.</p>
+                  {% else %}
+                    <p>
+                      <a class="button expanded" href="{% url 'claim-status' pk=other_claim.id %}" target="_blank">Vote on claim &raquo;</a>
+                    </p>
+                  {% endif %}
+              {% endfor %}
+            {% endif %}
+            {% bid_is_biddable bid=bid user=request.user as biddable %}
+            {% if bid == None %}
+                {% include "addon/includes/bid_form.html" with target="_blank"%}
+            {% elif bid and biddable %}
+                {% include "addon/includes/bid_form.html" with target="_blank"%}
             {% endif %}
         </div>
 
