@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+    <div class="row">
+        <h2>Terms of Service</h2>
+    </div>
+
+    <div class="panel">
+        {% include "includes/terms.html" %}
+    </div>
+
+    <div class="row">
+        <h2>Privacy Policy</h2>
+    </div>
+
+    <div class="panel">
+        {% include "includes/terms.html" %}
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+   {% if request.user.is_authenticated %}
+      <script src="{% static "js/home-app.js" %}" ></script>
+   {% endif %}
+{% endblock %}
