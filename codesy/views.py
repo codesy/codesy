@@ -28,5 +28,6 @@ class Home(TemplateView):
 class CardInfo(TemplateView):
     template_name = 'card_info.html'
 
+
 class LegalInfo(TemplateView):
     template_name = 'legal.html'
