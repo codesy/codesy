@@ -12,6 +12,7 @@ urlpatterns = patterns(
     # Static home/ explanation pages
     url(r'^$', views.Home.as_view(), name='home'),
     url(r'^card-info$', views.CardInfo.as_view(), name='card-info'),
+    url(r'^legal-info$', views.LegalInfo.as_view(), name='legal-info'),
 
     # allauth
     (

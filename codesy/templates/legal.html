@@ -3,21 +3,16 @@
 
 {% block content %}
     <div class="row">
-        <h2>Terms of Service</h2>
+        <h2 id="terms">Terms of Service</h2>
+        <pre>
+            {% include "includes/terms.html" %}
+        </pre>
+    </hr>
+        <h2 id="privacy" >Privacy Policy</h2>
+        <pre>
+            {% include "includes/privacy.html" %}
+        </pre>
     </div>
-
-    <div class="panel">
-        {% include "includes/terms.html" %}
-    </div>
-
-    <div class="row">
-        <h2>Privacy Policy</h2>
-    </div>
-
-    <div class="panel">
-        {% include "includes/terms.html" %}
-    </div>
-
 {% endblock %}
 
 {% block scripts %}
