@@ -28,6 +28,8 @@ paypalrestsdk.configure({"mode": settings.PAYPAL_MODE,
                          "client_secret": settings.PAYPAL_CLIENT_SECRET,
                          })
 
+PAYPAL_PAYOUT_RECIPIENT = settings.PAYPAL_PAYOUT_RECIPIENT
+
 
 def uuid_please():
     full_uuid = uuid.uuid4()
@@ -479,7 +481,10 @@ class Payout(Payment):
         return PayoutFee.objects.filter(payout=self)
 
     def request(self):
-
+        receiver = (
+            PAYPAL_PAYOUT_RECIPIENT if PAYPAL_PAYOUT_RECIPIENT
+            else self.claim.user.email
+        )
         paypal_fee = PayoutFee(
             payout=self,
             fee_type='PayPal',
@@ -512,8 +517,8 @@ class Payout(Payment):
                         "value": int(self.charge_amount),
                         "currency": "USD"
                     },
-                    "receiver": "DevGirl@mozilla.org",
-                    "note": "You have a fake payment waiting.",
+                    "receiver": receiver,
+                    "note": "Here's your payout for fixing an issue.",
                     "sender_item_id": sender_id
                 }
             ]
