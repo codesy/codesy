@@ -16,6 +16,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 class User(AbstractUser):
+    # TODO: remove this as we don't need or want to store it
     stripe_cc_token = models.CharField(max_length=100, blank=True)
     stripe_account_token = models.CharField(max_length=100, blank=True)
     USERNAME_FIELD = 'username'
