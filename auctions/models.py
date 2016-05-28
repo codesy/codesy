@@ -28,7 +28,7 @@ paypalrestsdk.configure({"mode": settings.PAYPAL_MODE,
                          "client_secret": settings.PAYPAL_CLIENT_SECRET,
                          })
 
-paypay_recipient = settings.PAYPAL_PAYOUT_RECIPIENT
+PAYPAL_PAYOUT_RECIPIENT = settings.PAYPAL_PAYOUT_RECIPIENT
 
 
 def uuid_please():
@@ -482,7 +482,8 @@ class Payout(Payment):
 
     def request(self):
         receiver = (
-            paypay_recipient if paypay_recipient else self.claim.user.email
+            PAYPAL_PAYOUT_RECIPIENT if PAYPAL_PAYOUT_RECIPIENT
+            else self.claim.user.email
         )
         paypal_fee = PayoutFee(
             payout=self,
