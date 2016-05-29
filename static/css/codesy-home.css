@@ -11,6 +11,7 @@ body {
 
 a {
   color: #666;
+  text-decoration: underline;
 }
 
 ol {
@@ -28,6 +29,7 @@ tr.total {
 
 .gh-button {
   background-color: #111;
+  text-decoration: none;
 }
 
 .gh-button:focus, .button:hover {
@@ -61,6 +63,11 @@ tr.total {
 }
 
 /* top-bar */
+
+.top-bar {
+  margin-bottom: 1.25em;
+  border-bottom: 1px solid #0a0a0a;
+}
 
 .top-bar, .top-bar ul {
   background-color: #F5F5F5;

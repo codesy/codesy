@@ -51,7 +51,6 @@ THIRD_PARTY_APPS = (
     'corsheaders',
     'mailer',
     'rest_framework',
-    'rest_framework.authtoken',
     'rest_framework_swagger',
 )
 
