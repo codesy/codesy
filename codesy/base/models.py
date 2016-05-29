@@ -1,4 +1,3 @@
-import hashlib
 import requests
 import stripe
 
@@ -17,32 +16,26 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 class User(AbstractUser):
+    # TODO: remove this as we don't need or want to store it
+    stripe_cc_token = models.CharField(max_length=100, blank=True)
     stripe_account_token = models.CharField(max_length=100, blank=True)
     USERNAME_FIELD = 'username'
 
-    def get_gravatar_url(self, size=40):
-        email_hash = hashlib.md5(self.email).hexdigest()
-        return "//www.gravatar.com/avatar/{}?s={}".format(email_hash, size)
-
-    def get_big_gravatar(self):
-        return self.get_gravatar_url(140)
+    def get_gravatar_url(self):
+        github_account = self.socialaccount_set.get(provider='github')
+        return ("https://avatars3.githubusercontent.com/u/%s?v=3&s=96" %
+                github_account.uid)
 
 
 @receiver(pre_save, sender=settings.AUTH_USER_MODEL)
 def replace_cc_token_with_account_token(sender, instance, **kwargs):
-    if not instance.stripe_account_token:
-        # this is not an update concerning stripe
-        return
-    else:
-        saved_user = User.objects.get(id=instance.id)
-        if saved_user.stripe_account_token:
-            # TODO:  This prevents new card accounts must change
-            instance.stripe_account_token = saved_user.stripe_account_token
-        else:
-            new_customer = stripe.Customer.create(
-                source=instance.stripe_account_token,
-                description=instance.email
-            )
+    if instance.stripe_cc_token:
+        new_customer = stripe.Customer.create(
+            source=instance.stripe_cc_token,
+            description=instance.email
+        )
+        if new_customer:
+            instance.stripe_cc_token = ""
             instance.stripe_account_token = new_customer.id
 
 

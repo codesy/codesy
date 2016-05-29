@@ -17,14 +17,29 @@ class BidStatusTestCase(TestCase):
         self.issue = mommy.make(Issue, url=self.url)
         self.user1 = mommy.make(settings.AUTH_USER_MODEL,
                                 email='user1@test.com')
+        self.bid1 = mommy.make(
+            Bid, user=self.user1, url=self.url, issue=self.issue)
 
     def test_get_by_url_returns_context(self):
-        bid = mommy.make(Bid, user=self.user1, url=self.url, issue=self.issue)
         self.view.request = (fudge.Fake()
                              .has_attr(GET={'url': self.url})
                              .has_attr(user=self.user1))
         context = self.view.get_context_data()
-        self.assertEqual(bid, context['bid'])
+        self.assertEqual(self.bid1, context['bid'])
+
+    @fudge.patch('auctions.views.messages')
+    def test_post_new_offer(self, mock_messages):
+        mock_messages.is_a_stub()
+        self.view.request = (fudge.Fake().has_attr(
+            POST={
+                'url': self.url,
+                'ask': 0,
+                'offer': 44,
+            })
+            .has_attr(user=self.user1))
+        self.view.post()
+        retreive_bid = Bid.objects.get(pk=self.bid1.id)
+        self.assertEqual(retreive_bid.offer, 44)
 
 
 class ClaimStatusTestCase(TestCase):

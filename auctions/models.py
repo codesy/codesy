@@ -28,6 +28,8 @@ paypalrestsdk.configure({"mode": settings.PAYPAL_MODE,
                          "client_secret": settings.PAYPAL_CLIENT_SECRET,
                          })
 
+PAYPAL_PAYOUT_RECIPIENT = settings.PAYPAL_PAYOUT_RECIPIENT
+
 
 def uuid_please():
     full_uuid = uuid.uuid4()
@@ -70,78 +72,24 @@ class Bid(models.Model):
     def offers(self):
         return Offer.objects.filter(bid=self)
 
-
-@receiver(post_save, sender=Bid)
-def get_payment_for_offer(sender, instance, **kwargs):
-    if not instance.offer:
-        return
-
-    offer_amount = instance.offer
-    user = instance.user
-    offers = Offer.objects.filter(bid=instance)
-    if offers:
-        sum_offers = offers.aggregate(Sum('amount'))
-        if offer_amount > sum_offers['amount__sum']:
-            offer_amount = offer_amount - sum_offers['amount__sum']
-
-# TODO: HANDLE CARD NOT YET REGISTERED
-    codesy_pct = Decimal('0.025')
-
-    new_offer = Offer(
-        user=user,
-        amount=offer_amount,
-        bid=instance,
-    )
-    new_offer.save()
-
-    codesy_fee = OfferFee(
-        offer=new_offer,
-        fee_type='codesy',
-        amount=new_offer.amount * codesy_pct
-    )
-    codesy_fee.save()
-
-    stripe_pct = Decimal('0.029')
-    stripe_transaction = Decimal('0.30')
-
-    stripe_charge = (
-        (offer_amount + codesy_fee.amount + stripe_transaction)
-        / (1 - stripe_pct)
-    )
-
-    stripe_fee = stripe_charge - (new_offer.amount + codesy_fee.amount)
-
-    stripe_fee = OfferFee(
-        offer=new_offer,
-        fee_type='Stripe',
-        amount=stripe_fee
-    )
-    stripe_fee.save()
-
-    # get rounded fee values
-    fees = OfferFee.objects.filter(offer=new_offer)
-    sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
-
-    stripe_charge = offer_amount + sum_fees
-
-    # TODO: removed with proper stripe mocking in tests
-    new_offer.charge_amount = stripe_charge
-    new_offer.save()
-
-    try:
-        charge = stripe.Charge.create(
-            amount=int(stripe_charge * 100),
-            currency="usd",
-            customer=user.stripe_account_token,
-            description="Offer for: " + instance.url,
-            metadata={'id': new_offer.id}
+    def make_offer(self, offer_amount):
+        if not offer_amount:
+            return False
+        offer_amount = Decimal(offer_amount)
+        offers = Offer.objects.filter(bid=self, api_success=True)
+        if offers:
+            sum_offers = offers.aggregate(Sum('amount'))['amount__sum']
+            if offer_amount > sum_offers:
+                offer_amount = offer_amount - sum_offers
+            else:
+                return False
+        new_offer = Offer(
+            user=self.user,
+            amount=offer_amount,
+            bid=self,
         )
-        if charge:
-            new_offer.charge_amount = stripe_charge
-            new_offer.confirmation = charge.id
-            new_offer.save()
-    except:
-        pass
+        new_offer.save()
+        return new_offer
 
 
 @receiver(post_save, sender=Bid)
@@ -149,7 +97,6 @@ def notify_matching_askers(sender, instance, **kwargs):
     # TODO: make a nicer HTML email template
     ASKER_NOTIFICATION_EMAIL_STRING = """
     Bidders have met your asking price for {url}.
-
     If you fix the issue, you may claim the payout by visiting the issue url:
     {url}
     """
@@ -238,7 +185,11 @@ class Claim(models.Model):
             amount=bid.ask,
         )
         payout.save()
-        return payout.request()
+        payout_attempt = payout.request()
+        if payout.api_success is True:
+            self.status = 'Paid'
+            self.save()
+        return payout_attempt
 
     def votes_by_approval(self, approved):
         return (Vote.objects
@@ -420,6 +371,7 @@ class Payment(models.Model):
     transaction_key = models.CharField(
         max_length=255, default=uuid.uuid4, blank=True)
     api_success = models.BooleanField(default=False)
+    error_message = models.CharField(max_length=255, blank=True)
     charge_amount = models.DecimalField(
         max_digits=6, decimal_places=2, blank=True, default=0)
     confirmation = models.CharField(max_length=255, blank=True)
@@ -449,6 +401,69 @@ class Offer(Payment):
             self.bid.id
         )
 
+    def request(self):
+        codesy_pct = Decimal('0.025')
+
+        codesy_fee = OfferFee(
+            offer=self,
+            fee_type='codesy',
+            amount=self.amount * codesy_pct
+        )
+        codesy_fee.save()
+
+        stripe_pct = Decimal('0.029')
+        stripe_transaction = Decimal('0.30')
+
+        stripe_charge = (
+            (self.amount + codesy_fee.amount + stripe_transaction)
+            / (1 - stripe_pct)
+        )
+
+        stripe_fee = stripe_charge - (self.amount + codesy_fee.amount)
+
+        stripe_fee = OfferFee(
+            offer=self,
+            fee_type='Stripe',
+            amount=stripe_fee
+        )
+        stripe_fee.save()
+
+        # get rounded fee values
+        fees = OfferFee.objects.filter(offer=self)
+        sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
+
+        stripe_charge = self.amount + sum_fees
+
+        # TODO: removed with proper stripe mocking in tests
+        self.charge_amount = stripe_charge
+        self.save()
+
+        # TODO: HANDLE CARD NOT YET REGISTERED
+        try:
+            charge = stripe.Charge.create(
+                amount=int(stripe_charge * 100),
+                currency="usd",
+                customer=self.user.stripe_account_token,
+                description="Offer for: " + self.bid.url,
+                metadata={'id': self.id}
+            )
+            if charge:
+                self.charge_amount = stripe_charge
+                self.confirmation = charge.id
+                self.api_success = True
+                self.offer = self
+                self.save()
+            else:
+                self.error_message = "Charge failed, try later"
+                self.save()
+                return False
+        except Exception as e:
+            self.error_message = e.message
+            self.save()
+            return False
+
+        return True
+
 
 class Payout(Payment):
     claim = models.ForeignKey(Claim, related_name='payouts')
@@ -466,7 +481,10 @@ class Payout(Payment):
         return PayoutFee.objects.filter(payout=self)
 
     def request(self):
-
+        receiver = (
+            PAYPAL_PAYOUT_RECIPIENT if PAYPAL_PAYOUT_RECIPIENT
+            else self.claim.user.email
+        )
         paypal_fee = PayoutFee(
             payout=self,
             fee_type='PayPal',
@@ -499,8 +517,8 @@ class Payout(Payment):
                         "value": int(self.charge_amount),
                         "currency": "USD"
                     },
-                    "receiver": "DevGirl@mozilla.org",
-                    "note": "You have a fake payment waiting.",
+                    "receiver": receiver,
+                    "note": "Here's your payout for fixing an issue.",
                     "sender_item_id": sender_id
                 }
             ]
@@ -517,8 +535,6 @@ class Payout(Payment):
                         self.api_success = True
                         self.confirmation = item.payout_item_id
                         self.save()
-                        self.claim.status = "Paid"
-                        self.claim.save()
                     else:
                         payout_attempt = False
         return payout_attempt

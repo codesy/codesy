@@ -180,4 +180,5 @@ STRIPE_PUBLIC_KEY = config('STRIPE_PUBLIC_KEY', default='')
 PAYPAL_MODE = config('PAYPAL_MODE', default='sandbox')   # sandbox or live
 PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID', default='')
 PAYPAL_CLIENT_SECRET = config('PAYPAL_CLIENT_SECRET', default='')
+PAYPAL_PAYOUT_RECIPIENT = config('PAYPAL_PAYOUT_RECIPIENT', default='')
 # TODO: create PAYPAL_SANDBOX_CLIENT_SECRET in .env

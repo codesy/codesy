@@ -1,17 +1,14 @@
 /* This is the style for the iframe added to issue pages */
 #codesy_iframe {
   visibility: visible !important;
-  max-width:150px;
-  height:250px;
+  width: 256px;
+  max-width: 256px;
+  height: 276px;
   overflow: hidden;
   position: fixed;
   bottom: .25em;
   right: .25em;
-  border-style:ridge;
-  padding:5px;
-  background: antiquewhite;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-
+  background-color: transparent;
+  border: 0px;
+  z-index: 100;
 }

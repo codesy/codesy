@@ -8,18 +8,24 @@
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/foundation-icons/3.0/foundation-icons.min.css">
    <link rel="stylesheet" href="//{{current_site.domain}}{% static "css/codesy-widget.css" %}">
    <script src="{% static "js/jquery-2.0.3.min.js" %}" ></script>
+   <script src="https://cdn.jsdelivr.net/foundation/6.2.0/foundation.min.js"></script>
    <script src="{% static "js/widget-app.js" %}" ></script>
-      
+
 </head>
 
 <body>
    <div id="codesy_widget">
-     <a href="https://{{current_site.domain}}" target="_blank">
-       <img id="codesy_logo" 
-            src="https://{{current_site.domain}}{% static "img/codesy_300dpi_323x80.png" %}"
-         />
-     </a>
+     {% if messages %}
+          <div class="row">
+        {% for message in messages %}
+           <div class="callout warning expanded" data-closable>
+              <button class="close-button" data-close>&times;</button>
+              <p class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</p>
+           </div>
+        {% endfor %}
+          </div>
+     {% endif %}
+
       {% block widget_content %}{% endblock %}
    </div>
 </body>
-

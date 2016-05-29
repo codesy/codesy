@@ -4,7 +4,7 @@
 {% block content %}
     <div class="row" id="claim-status-container">
         <div class="medium-2 columns">
-            <img src="{{ claim.user.get_big_gravatar}}"><br/>
+            <img src="{{ claim.user.get_gravatar_url }}"><br/>
             <a href="https://github.com/{{ claim.user.username }}">
                 {% if request.user == claim.user %}
                     You

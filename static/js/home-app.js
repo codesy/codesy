@@ -31,7 +31,7 @@ $(window).load(function () {
                     xhr.setRequestHeader('X-CSRFToken', _this.csrf_token);
                   },
                   data: {
-                    stripe_account_token: token
+                    stripe_cc_token: token
                   },
                   success: function(data, status, jqXHR) {
                     console.log("Updated user.");
