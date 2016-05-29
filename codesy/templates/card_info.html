@@ -11,6 +11,9 @@
 {% block scripts %}
    {% if request.user.is_authenticated %}
       <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-      <script src="{% static "js/home-app.js" %}" ></script>
+      <script type="text/javascript">
+            Stripe.setPublishableKey('{{ stripe_context.STRIPE_PUBLIC_KEY }}');
+      </script>
+      <script src="{% static "js/stripe-app.js" %}" ></script>
    {% endif %}
 {% endblock %}
