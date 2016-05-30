@@ -1,4 +1,6 @@
 $(window).load(function () {
+    Stripe.setPublishableKey($('#codesy-html').data('stripe_key'));
+
     var codesy = {user:{}}
     if ($("#codesy_user_id").length > 0) {
     codesy.user.id = $("#codesy_user_id").val();
