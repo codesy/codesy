@@ -1,33 +1,34 @@
-{% with YOU="You've made a claim" SOMEONE="There is a claim" %}
+{% if actionable_claims.own_claim %}
 
-{% if claim %}
-   <div>
-      <a class="small button success expanded"
-         target="_blank" 
-         href="//{{current_site.domain}}{% url 'claim-status' pk=claim.pk %}">
-         {% if claim.user != request.user %}{{SOMEONE}}{% else %}{{YOU}}{% endif %}
-         <i class='fi-fast-forward'></i>
-      </a> 
-   </div>
+<p>
+  {% if actionable_claims.own_claim.status == 'Paid' %}
+    This claim was paid; thank you!
+  {% elif actionable_claims.own_claim.status == 'Approved' %}
+    <a class="button success expanded" href="{% url 'claim-status' pk=actionable_claims.own_claim.id %}"{% if target %} target="{{ target }}"{% endif %}>Request Payout &raquo;</a>
+  {% else %}
+    Collecting votes for <a href="{% url 'claim-status' pk=actionable_claims.own_claim.id %}"{% if target %} target="{{ target }}"{% endif %}>your claim</a>.
+  {% endif %}
+</p>
+
 {% else %}
+
    {% if bid.ask_met %}
-      <form id="codesy_claim" 
-            class="ajaxSubmit" 
-            action="//{{current_site.domain}}{% url 'claim-list' %}" 
+      <form id="codesy_claim"
+            class="ajaxSubmit"
+            action="//{{current_site.domain}}{% url 'claim-list' %}"
             data-method="POST" >
             <label>Your ask was met!</label>
             {% csrf_token %}
             <input name="issue" type="hidden" value="{{ bid.issue.id }}" />
-               <input 
-                  id="evidence" 
+               <input
+                  id="evidence"
                   name="evidence"
-                  type="text" 
+                  type="text"
                   placeholder="Provide a URL."
                />
                <input type="submit" class="button success expanded" value="Claim your {{bid.ask}}"></input>
          </fieldset>
       </form>
    {% endif %}
-{% endif %}
-{% endwith %}
 
+{% endif %}

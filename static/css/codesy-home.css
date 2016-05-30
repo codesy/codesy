@@ -26,11 +26,11 @@ tr.total {
   border: solid 1px #000;
 }
 
-.button {
+.gh-button {
   background-color: #111;
 }
 
-.button:focus, .button:hover {
+.gh-button:focus, .button:hover {
   background-color: #222;
 }
 
