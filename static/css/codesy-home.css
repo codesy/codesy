@@ -97,10 +97,26 @@ img#top-bar-gravatar {
   display: none;
 }
 
-.fi-social-github {
+.fi-social {
   font-size: 2em;
   vertical-align: middle;
   margin-right: .25rem;
+}
+
+.twitter-button {
+  background-color: #1DA1F2;
+}
+
+.twitter-button:hover, .twitter-button:focus {
+  background-color: #2EB2F3;
+}
+
+.facebook-button {
+  background-color: #3b5998;
+}
+
+.facebook-button:hover, .facebook-button:focus {
+  background-color: #4c6aa9;
 }
 
 .menu-text {
