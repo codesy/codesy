@@ -39,3 +39,10 @@ codesy is a pay-what-you-want market for the open source community where we can 
    {% include "includes/faq.html" %}
   </div>
 {% endblock %}
+
+{% block scripts %}
+   {% if request.user.is_authenticated %}
+      <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+      <script type="text/javascript" src="{% static 'js/stripe-app.js' %}" ></script>
+   {% endif %}
+{% endblock %}
