@@ -1,4 +1,15 @@
 from django.views.generic import TemplateView
+from django.conf import settings
+
+
+def cc_debug_ctx():
+    if settings.DEBUG:
+        return {
+            'cc_number': '4111111111111111',
+            'cc_ex_month': '01',
+            'cc_ex_year': '2020',
+            'cvc': '123',
+        }
 
 
 class Home(TemplateView):
@@ -6,6 +17,7 @@ class Home(TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super(Home, self).get_context_data(**kwargs)
+        ctx['cc_debug'] = cc_debug_ctx()
         browser = 'unknown'
         if (hasattr(self.request, 'META') and
                 'HTTP_USER_AGENT' in self.request.META):
@@ -27,6 +39,11 @@ class Home(TemplateView):
 
 class CardInfo(TemplateView):
     template_name = 'card_info.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super(CardInfo, self).get_context_data(**kwargs)
+        ctx['cc_debug'] = cc_debug_ctx()
+        return ctx
 
 
 class LegalInfo(TemplateView):

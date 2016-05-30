@@ -91,6 +91,41 @@ class Bid(models.Model):
         new_offer.save()
         return new_offer
 
+    def claim_for_user(self, user):
+        return Claim.objects.get(user=user, issue=self.issue)
+
+    def claims_for_other_users(self, user):
+        return Claim.objects.filter(issue=self.issue).exclude(user=user)
+
+    def actionable_claims(self, user):
+        """
+        Returns claims for this bid on which the user can take some action:
+            * own_claim: they may request payout
+            * other_claims: they may vote
+        """
+        try:
+            own_claim = self.claim_for_user(user)
+        except Claim.DoesNotExist:
+            own_claim = None
+
+        other_claims = self.claims_for_other_users(user)
+        return {'own_claim': own_claim, 'other_claims': other_claims}
+
+    def is_biddable_by(self, user):
+        nobid_claim_statuses = ['Submitted', 'Pending', 'Approved', 'Paid']
+        if user == self.user and self.ask_met():
+            return False
+        actionable_claims = self.actionable_claims(user)
+        own_claim = actionable_claims['own_claim']
+        if own_claim and own_claim.status == 'Rejected':
+            return True
+        if own_claim and own_claim.status in nobid_claim_statuses:
+            return False
+        for other_claim in actionable_claims['other_claims']:
+            if other_claim.status in nobid_claim_statuses:
+                return False
+        return True
+
 
 @receiver(post_save, sender=Bid)
 def notify_matching_askers(sender, instance, **kwargs):
@@ -195,6 +230,19 @@ class Claim(models.Model):
         return (Vote.objects
                     .filter(claim=self, approved=approved)
                     .exclude(user=self.user))
+
+    def needs_vote_from_user(self, user):
+        try:
+            Vote.objects.get(claim=self, user=user)
+            # User has already voted on this claim
+            return False
+        except Vote.DoesNotExist:
+            user_bid = Bid.objects.filter(issue=self.issue,
+                                          user=user,
+                                          offer__gt=0)
+            if user_bid:
+                return True
+        return False
 
     @property
     def num_approvals(self):

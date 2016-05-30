@@ -103,6 +103,57 @@ class BidTest(MarketWithBidsTestCase):
         )
 
 
+class BidWithClaimsTest(MarketWithClaimTestCase):
+    def setUp(self):
+        super(BidWithClaimsTest, self).setUp()
+        self.url2 = 'http://github.com/codesy/codesy/issues/38'
+        self.issue2 = mommy.make(Issue, url=self.url2)
+        self.new_bid = mommy.make(Bid, user=self.user2, ask=100, offer=5,
+                                  url=self.url2, issue=self.issue2)
+
+    def test_claim_for_user(self):
+        self.assertEqual(self.claim, self.bid1.claim_for_user(self.user1))
+        with self.assertRaises(Claim.DoesNotExist):
+            self.bid1.claim_for_user(self.user2)
+
+    def test_claims_for_other_users(self):
+        user1_others_claims = self.bid1.claims_for_other_users(self.user1)
+        self.assertEqual([], list(user1_others_claims))
+        user2_others_claims = self.bid1.claims_for_other_users(self.user2)
+        self.assertEqual(1, len(list(user2_others_claims)))
+        self.assertEqual(self.user1, user2_others_claims[0].user)
+
+    def test_actionable_claims_includes_own_claim(self):
+        self.assertEqual(self.claim,
+                         self.bid1.actionable_claims(self.user1)['own_claim'])
+        self.assertEqual(None,
+                         self.bid1.actionable_claims(self.user2)['own_claim'])
+
+    def test_actionable_claims_includes_other_claims(self):
+        self.assertIn(self.claim,
+                      self.bid1.actionable_claims(self.user2)['other_claims'])
+        self.assertNotIn(
+            self.claim,
+            self.bid1.actionable_claims(self.user1)['other_claims']
+        )
+
+    def test_all_users_can_bid_when_theres_no_claim(self):
+        self.assertTrue(self.new_bid.is_biddable_by(self.user1))
+        self.assertTrue(self.new_bid.is_biddable_by(self.user2))
+        self.assertTrue(self.new_bid.is_biddable_by(self.user3))
+
+    def test_no_users_can_bid_when_theres_a_claim(self):
+        self.assertFalse(self.bid1.is_biddable_by(self.user1))
+        self.assertFalse(self.bid1.is_biddable_by(self.user2))
+        self.assertFalse(self.bid1.is_biddable_by(self.user3))
+
+    def test_user_cannot_bid_when_their_ask_has_been_met(self):
+        self.assertFalse(self.bid1.is_biddable_by(self.user1))
+
+    def test_other_users_can_still_bid_when_someones_ask_has_been_met(self):
+        self.assertTrue(self.new_bid.is_biddable_by(self.user2))
+
+
 class NotifyMatchersReceiverTest(MarketWithBidsTestCase):
 
     @fudge.patch('auctions.models.send_mail')
@@ -237,6 +288,17 @@ class ClaimTest(MarketWithClaimTestCase):
             datetime.now() >= test_claim_modified.replace(tzinfo=None),
             "Claim.modified should be auto-populated."
         )
+
+    def test_needs_from_user_who_already_voted_returns_false(self):
+        mommy.make(Vote, user=self.user2, claim=self.claim, approved=True)
+        self.assertFalse(self.claim.needs_vote_from_user(self.user2))
+
+    def test_needs_from_user_with_no_bid_returns_false(self):
+        user4 = mommy.make(settings.AUTH_USER_MODEL)
+        self.assertFalse(self.claim.needs_vote_from_user(user4))
+
+    def test_needs_from_user_with_bid_who_hasnt_voted_returns_true(self):
+        self.assertTrue(self.claim.needs_vote_from_user(self.user3))
 
 
 class NotifyMatchingOfferersTest(MarketWithBidsTestCase):

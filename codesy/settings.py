@@ -51,7 +51,6 @@ THIRD_PARTY_APPS = (
     'corsheaders',
     'mailer',
     'rest_framework',
-    'rest_framework.authtoken',
     'rest_framework_swagger',
 )
 
@@ -74,6 +73,7 @@ MIDDLEWARE_CLASSES = (
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
+    'codesy.context_processors.conf_settings',
     'codesy.context_processors.current_site',
     'django.core.context_processors.request',
     'django.contrib.auth.context_processors.auth',
