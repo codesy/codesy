@@ -26,7 +26,9 @@ class HomeTest(TestCase):
 
         context = self.view.get_context_data()
 
-        self.assertEqual(context, {'super': 'context', 'browser': 'unknown'})
+        expected_keys = ['super', 'browser', 'cc_debug']
+        for expected_key in expected_keys:
+            self.assertIn(expected_key, context.keys())
 
     def test_get_browser(self):
         self.view.request.has_attr(META={
