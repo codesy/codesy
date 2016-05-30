@@ -4,7 +4,7 @@
 <div class="home-section text-center">
   {% if not request.user.is_authenticated %}
 
-    <a class="button gh-button" href="{% provider_login_url "github" %}"><i class="fi-social-github medium"></i> Sign in with GitHub to get started</a>
+    <a class="button gh-button" href="{% provider_login_url "github" %}"><i class="fi-social fi-social-github medium"></i> Sign in with GitHub to get started</a>
 
   {% else %}
 
@@ -42,10 +42,22 @@
         {% if request.user.stripe_account_token %}
             <h3>You are ready to bid</h3>
             <p>Try checking out GitHub issues with the most +1 votes.</p>
+<<<<<<< 27325b4b3439fb4bf6e3b0e91dc1dfa2df8cae6c
             <a class="button gh-button" href="https://github.com/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+author%3A{{ request.user.username }}"><i class="fi-social-github medium"></i> Top +1 Issues Created by You</a>
             <a class="button gh-button" href="https://github.com/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+assignee%3A{{ request.user.username }}"><i class="fi-social-github medium"></i> Top +1 Issues Assigned to You</a>
             <a class="button gh-button" href="https://github.com/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+mentions%3A{{ request.user.username }}"><i class="fi-social-github medium"></i> Top +1 Issues Mentioning You</a><br/>
             <a class="button gh-button" href="https://github.com/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+"><i class="fi-social-github medium"></i> Global Top +1 Issues</a><br/>
+||||||| merged common ancestors
+            <a class="button" href="https://github.com/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+author%3A{{ request.user.username }}"><i class="fi-social-github medium"></i> Top +1 Issues Created by You</a>
+            <a class="button" href="https://github.com/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+assignee%3A{{ request.user.username }}"><i class="fi-social-github medium"></i> Top +1 Issues Assigned to You</a>
+            <a class="button" href="https://github.com/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+mentions%3A{{ request.user.username }}"><i class="fi-social-github medium"></i> Top +1 Issues Mentioning You</a><br/>
+            <a class="button" href="https://github.com/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+"><i class="fi-social-github medium"></i> Global Top +1 Issues</a><br/>
+=======
+            <a class="button" href="https://github.com/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+author%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Created by You</a>
+            <a class="button" href="https://github.com/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+assignee%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Assigned to You</a>
+            <a class="button" href="https://github.com/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+mentions%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Mentioning You</a><br/>
+            <a class="button" href="https://github.com/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+"><i class="fi-social fi-social-github medium"></i> Global Top +1 Issues</a><br/>
+>>>>>>> fix #322: add github, twitter, and facebook links
         {% else %}
             {% include "includes/stripe_form.html" %}
         {% endif %}

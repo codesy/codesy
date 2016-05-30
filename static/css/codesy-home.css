@@ -11,6 +11,7 @@ body {
 
 a {
   color: #666;
+  text-decoration: underline;
 }
 
 ol {
@@ -28,6 +29,7 @@ tr.total {
 
 .gh-button {
   background-color: #111;
+  text-decoration: none;
 }
 
 .gh-button:focus, .button:hover {
@@ -62,6 +64,11 @@ tr.total {
 
 /* top-bar */
 
+.top-bar {
+  margin-bottom: 1.25em;
+  border-bottom: 1px solid #0a0a0a;
+}
+
 .top-bar, .top-bar ul {
   background-color: #F5F5F5;
 }
@@ -90,10 +97,26 @@ img#top-bar-gravatar {
   display: none;
 }
 
-.fi-social-github {
+.fi-social {
   font-size: 2em;
   vertical-align: middle;
   margin-right: .25rem;
+}
+
+.twitter-button {
+  background-color: #1DA1F2;
+}
+
+.twitter-button:hover, .twitter-button:focus {
+  background-color: #2EB2F3;
+}
+
+.facebook-button {
+  background-color: #3b5998;
+}
+
+.facebook-button:hover, .facebook-button:focus {
+  background-color: #4c6aa9;
 }
 
 .menu-text {
