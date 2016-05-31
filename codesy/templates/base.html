@@ -1,7 +1,7 @@
 {% load staticfiles %}
 {% load socialaccount %}
 <!DOCTYPE html>
-<html id="codesy-html" class="no-js" lang="en" data-stripe_key="{{ settings.STRIPE_PUBLIC_KEY }}">
+<html id="codesy-html" class="no-js" lang="en" data-stripe_key="{{ settings.STRIPE_PUBLIC_KEY }}" data-ga_id="{{ settings.GOOGLE_ANALYTICS_ID }}" data-ga_filename="analytics{% if settings.DEBUG %}_debug{% endif %}.js">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -37,7 +37,7 @@
                         </ul>
                     </li>
                 {% else %}
-                    <li><a class="button gh-button" href="{% provider_login_url "github" %}"><i class="fi-social fi-social-github medium"></i> Sign in with GitHub</a></li>
+                    <li><a class="button gh-button track-btn" data-category="sign-in" href="{% provider_login_url "github" %}"><i class="fi-social fi-social-github medium"></i> Sign in with GitHub</a></li>
                 {% endif %}
                 </ul>
             </div>
@@ -89,6 +89,7 @@
     <script src="https://cdn.jsdelivr.net/foundation/6.1.2/foundation.min.js"></script>
     <script src="{% static "js/home-app.js" %}" ></script>
     <script src="{% static "js/widget-app.js" %}" ></script>
+    <script src="{% static "js/analytics.js" %}" ></script>
     {% block scripts %}
     {% endblock %}
   </body>

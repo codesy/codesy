@@ -4,26 +4,26 @@
 <div class="home-section text-center">
   {% if not request.user.is_authenticated %}
 
-    <a class="button gh-button" href="{% provider_login_url "github" %}"><i class="fi-social fi-social-github medium"></i> Sign in with GitHub to get started</a>
+    <a class="button gh-button track-btn" data-category="sign-in" href="{% provider_login_url "github" %}"><i class="fi-social fi-social-github medium"></i> Sign in with GitHub to get started</a>
 
   {% else %}
 
     <div class="install-step">
       {% if browser == 'chrome' %}
         <p id="add-to-chrome">
-          <a class="button download-button large" href="https://chrome.google.com/webstore/detail/codesyio/hodcjbmkedjlhlimhcobafpnehhpdnfe" role="button">
+          <a class="button download-button large track-btn" data-category="Download" data-label="Chrome" href="https://chrome.google.com/webstore/detail/codesyio/hodcjbmkedjlhlimhcobafpnehhpdnfe" role="button">
             <img class="browser-install-icon" src="{% static "img/chrome.png" %}" width="32" height="32"/>Download for Chrome
           </a>
         </p>
       {% elif browser == 'firefox' %}
         <p id="add-to-firefox">
-          <a class="button download-button large" href="https://github.com/codesy/widgets/raw/master/build/codesy.xpi" role="button">
+          <a class="button download-button large track-btn" data-category="Download" data-label="Firefox" href="https://github.com/codesy/widgets/raw/master/build/codesy.xpi" role="button">
             <img class="browser-install-icon" src="{% static "img/firefox.png" %}" width="32" height="32"/>Download for Firefox
           </a>
         </p>
       {% elif browser == 'opera' %}
         <p id="add-to-opera">
-          <a class="button download-button large" href="https://github.com/codesy/widgets/raw/master/build/codesy.zip" role="button">
+          <a class="button download-button large track-btn" data-category="Download" data-label="Opera" href="https://github.com/codesy/widgets/raw/master/build/codesy.zip" role="button">
             <img class="browser-install-icon" src="{% static "img/opera.png" %}" width="32" height="32"/>Download for Opera
           </a>
         </p>
@@ -42,10 +42,10 @@
         {% if request.user.stripe_account_token %}
             <h3>You are ready to bid</h3>
             <p>Try checking out GitHub issues with the most +1 votes.</p>
-            <a class="button gh-button" href="https://github.com/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+author%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Created by You</a>
-            <a class="button gh-button" href="https://github.com/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+assignee%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Assigned to You</a>
-            <a class="button gh-button" href="https://github.com/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+mentions%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Mentioning You</a><br/>
-            <a class="button gh-button" href="https://github.com/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+"><i class="fi-social fi-social-github medium"></i> Global Top +1 Issues</a><br/>
+            <a class="button gh-button track-btn" data-category="top+1" data-label="Created by You" href="https://github.com/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+author%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Created by You</a>
+            <a class="button gh-button track-btn" data-category="top+1" data-label="Assigned to You" href="https://github.com/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+assignee%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Assigned to You</a>
+            <a class="button gh-button track-btn" data-category="top+1" data-label="Mentioning You" href="https://github.com/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+mentions%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Mentioning You</a><br/>
+            <a class="button gh-button track-btn" data-category="top+1" data-label="Global" href="https://github.com/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+"><i class="fi-social fi-social-github medium"></i> Global Top +1 Issues</a><br/>
         {% else %}
             <h3>Browser Extension Installed</h3>
             <p>Add credit card.</p>

@@ -1,3 +1,6 @@
+window.codesy = {
+};
+
 function submitForm(e) {
   e.preventDefault();
   form = $(this)
