@@ -63,6 +63,7 @@ LOCAL_APPS = (
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -135,6 +136,8 @@ USE_TZ = True
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_HOST = config('DJANGO_SECURE_SSL_HOST', None)
+SECURE_SSL_REDIRECT = config('DJANGO_SECURE_SSL_REDIRECT', False)
 
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
