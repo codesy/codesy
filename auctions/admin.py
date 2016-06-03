@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Bid, Issue, Claim, Vote, Offer, Payout, OfferFee, PayoutFee
+from .models import Bid, Issue, Claim, Vote, Offer, Payout
+from .models import OfferFee, PayoutFee, PayoutCredit
 
 
 class BidAdmin(admin.ModelAdmin):
@@ -21,3 +22,4 @@ admin.site.register(Offer)
 admin.site.register(Payout)
 admin.site.register(OfferFee)
 admin.site.register(PayoutFee)
+admin.site.register(PayoutCredit)

@@ -549,10 +549,13 @@ class Payout(Payment):
         try:
             user_offers = Offer.objects.filter(user=self.claim.user)
             if user_offers:
-                total_refund = user_offers.aggregate(Sum('amount'))['amount__sum']
+                total_refund = (
+                    user_offers.aggregate(Sum('amount'))['amount__sum']
+                )
                 refund_user_offer = PayoutCredit(
                     payout=self,
                     fee_type='refund',
+                    description="Your offer",
                     amount=total_refund,
                 )
                 refund_user_offer.save()
@@ -646,7 +649,7 @@ class PayoutFee(Fee):
 
 
 class PayoutCredit(Fee):
-    payout = models.ForeignKey(Payout, related_name="refund_credits", null=True)
+    payout = models.ForeignKey(Payout, related_name="payout_credit", null=True)
 
 
 @receiver(post_save, sender=Payout)
