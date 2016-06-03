@@ -222,9 +222,10 @@ class Claim(models.Model):
         payout = Payout(
             user=self.user,
             claim=self,
-            amount=bid.ask,
+            amount=bid.ask
         )
         payout.save()
+
         payout_attempt = payout.request()
         if payout.api_success is True:
             self.status = 'Paid'
@@ -527,17 +528,38 @@ class Payout(Payment):
     def fees(self):
         return PayoutFee.objects.filter(payout=self)
 
+    def credits(self):
+        return PayoutCredit.objects.filter(payout=self)
+
     def request(self):
         receiver = (
             PAYPAL_PAYOUT_RECIPIENT if PAYPAL_PAYOUT_RECIPIENT
             else self.claim.user.email
         )
+
+        total_payout_amount = self.amount
+
         paypal_fee = PayoutFee(
             payout=self,
             fee_type='PayPal',
             amount=Decimal('0.25')
         )
         paypal_fee.save()
+
+        try:
+            user_offers = Offer.objects.filter(user=self.claim.user)
+            if user_offers:
+                total_refund = user_offers.aggregate(Sum('amount'))['amount__sum']
+                refund_user_offer = PayoutCredit(
+                    payout=self,
+                    fee_type='refund',
+                    amount=total_refund,
+                )
+                refund_user_offer.save()
+                total_payout_amount += total_refund
+
+        except Offer.DoesNotExist:
+            refund_user_offer = None
 
         codesy_fee = PayoutFee(
             payout=self,
@@ -547,7 +569,7 @@ class Payout(Payment):
         codesy_fee.save()
 
         total_fees = paypal_fee.amount + codesy_fee.amount
-        self.charge_amount = self.amount - total_fees
+        self.charge_amount = total_payout_amount - total_fees
         self.save()
 
         # TEMPORARY WHILE WAITING FOR PAYPAL
@@ -595,6 +617,7 @@ class Fee(models.Model):
         ('PayPal', 'PayPal'),
         ('Stripe', 'Stripe'),
         ('codesy', 'codesy'),
+        ('refund', 'refund')
     )
     fee_type = models.CharField(
         max_length=255,
@@ -620,6 +643,10 @@ class PayoutFee(Fee):
 
     def __unicode__(self):
         return "%s fee for %s" % (self.fee_type, self.payout)
+
+
+class PayoutCredit(Fee):
+    payout = models.ForeignKey(Payout, related_name="refund_credits", null=True)
 
 
 @receiver(post_save, sender=Payout)
