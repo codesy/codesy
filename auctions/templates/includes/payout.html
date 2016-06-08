@@ -35,4 +35,9 @@
       </div>
     </div>
   {% endfor %}
+
+{% elif claim.status == "Requested" %}
+   <h3>Payout for your claim is on the way</h3>
+   <h4>An email with your payout is being prepared and will be sent to you in 1-2 days. </h4>
+
 {% endif %}

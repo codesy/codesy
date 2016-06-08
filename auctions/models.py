@@ -180,6 +180,7 @@ class Claim(models.Model):
         ('Pending', 'Pending'),
         ('Approved', 'Approved'),
         ('Rejected', 'Rejected'),
+        ('Requested', 'Requested'),
         ('Paid', 'Paid')
     )
     issue = models.ForeignKey('Issue')
