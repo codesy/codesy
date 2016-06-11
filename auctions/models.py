@@ -12,10 +12,10 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Sum
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from decimal import Decimal, ROUND_UP
+from decimal import Decimal, ROUND_HALF_UP
 from mailer import send_mail
 
 from .managers import ClaimManager
@@ -35,6 +35,10 @@ def uuid_please():
     full_uuid = uuid.uuid4()
     # uuid is truncated because paypal must be <30
     return str(full_uuid)[:25]
+
+
+def round_penny(amount):
+    return amount.quantize(Decimal('.01'), rounding=ROUND_HALF_UP)
 
 
 class Bid(models.Model):
@@ -452,40 +456,31 @@ class Offer(Payment):
 
     def request(self):
         codesy_pct = Decimal('0.025')
+        stripe_pct = Decimal('0.029')
+        stripe_transaction = Decimal('0.30')
+
+        codesy_fee_amount = round_penny(self.amount * codesy_pct)
+
+        stripe_charge = round_penny(
+            (self.amount + codesy_fee_amount + stripe_transaction)
+            / (1 - stripe_pct)
+        )
+
+        stripe_fee_amount = stripe_charge - (self.amount + codesy_fee_amount)
 
         codesy_fee = OfferFee(
             offer=self,
             fee_type='codesy',
-            amount=self.amount * codesy_pct
+            amount=stripe_charge - stripe_fee_amount - self.amount
         )
         codesy_fee.save()
-
-        stripe_pct = Decimal('0.029')
-        stripe_transaction = Decimal('0.30')
-
-        stripe_charge = (
-            (self.amount + codesy_fee.amount + stripe_transaction)
-            / (1 - stripe_pct)
-        )
-
-        stripe_fee = stripe_charge - (self.amount + codesy_fee.amount)
 
         stripe_fee = OfferFee(
             offer=self,
             fee_type='Stripe',
-            amount=stripe_fee
+            amount=stripe_fee_amount
         )
         stripe_fee.save()
-
-        # get rounded fee values
-        fees = OfferFee.objects.filter(offer=self)
-        sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
-
-        stripe_charge = self.amount + sum_fees
-
-        # TODO: removed with proper stripe mocking in tests
-        self.charge_amount = stripe_charge
-        self.save()
 
         # TODO: HANDLE CARD NOT YET REGISTERED
         try:
@@ -613,13 +608,6 @@ class OfferFee(Fee):
 
 class PayoutFee(Fee):
     payout = models.ForeignKey(Payout, related_name="payout_fees", null=True)
-
-
-@receiver(pre_save, sender=OfferFee)
-@receiver(pre_save, sender=PayoutFee)
-def roundup_penny(sender, instance, *args, **kwargs):
-    instance.amount = (instance.amount.quantize(Decimal('.01'),
-                       rounding=ROUND_UP))
 
 
 @receiver(post_save, sender=Payout)
