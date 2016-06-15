@@ -228,7 +228,9 @@ class Claim(models.Model):
         payout_attempt = payout.request()
         if payout.api_success is True:
             self.status = 'Paid'
-            self.save()
+        else:
+            self.status = 'Requested'
+        self.save()
         return payout_attempt
 
     def votes_by_approval(self, approved):
