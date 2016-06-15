@@ -541,7 +541,7 @@ class Payout(Payment):
         codesy_fee = PayoutFee(
             payout=self,
             fee_type='codesy',
-            amount=self.amount * Decimal('0.025'),
+            amount=round_penny(self.amount * Decimal('0.025')),
         )
         codesy_fee.save()
 
