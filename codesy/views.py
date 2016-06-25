@@ -26,14 +26,14 @@ class Home(TemplateView):
         return ctx
 
     def get_browser(self):
-        browser = 'unknown'
+        browser = {'name': 'unknown'}
         agent = self.request.META.get('HTTP_USER_AGENT', '')
         if 'Firefox' in agent:
-            browser = 'firefox'
+            browser = settings.EXTENSION_SETTINGS['firefox']
         elif 'OPR' in agent:
-            browser = 'opera'
+            browser = settings.EXTENSION_SETTINGS['opera']
         elif 'Chrome' in agent:
-            browser = 'chrome'
+            browser = settings.EXTENSION_SETTINGS['chrome']
         return browser
 
 
