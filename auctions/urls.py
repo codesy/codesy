@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = patterns(
     '',
+    url(r'^addon-login', views.AddonLogin.as_view()),
     url(r'^bid-status/', views.BidStatusView.as_view(), name='bid-status'),
     url(r'^claim-status/(?P<pk>[^/.]+)',
         views.ClaimStatusView.as_view(), name='claim-status'),

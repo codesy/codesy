@@ -12,10 +12,10 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Sum
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from decimal import Decimal, ROUND_UP
+from decimal import Decimal, ROUND_HALF_UP
 from mailer import send_mail
 
 from .managers import ClaimManager
@@ -35,6 +35,10 @@ def uuid_please():
     full_uuid = uuid.uuid4()
     # uuid is truncated because paypal must be <30
     return str(full_uuid)[:25]
+
+
+def round_penny(amount):
+    return amount.quantize(Decimal('.01'), rounding=ROUND_HALF_UP)
 
 
 class Bid(models.Model):
@@ -180,6 +184,7 @@ class Claim(models.Model):
         ('Pending', 'Pending'),
         ('Approved', 'Approved'),
         ('Rejected', 'Rejected'),
+        ('Requested', 'Requested'),
         ('Paid', 'Paid')
     )
     issue = models.ForeignKey('Issue')
@@ -217,13 +222,16 @@ class Claim(models.Model):
         payout = Payout(
             user=self.user,
             claim=self,
-            amount=bid.ask,
+            amount=bid.ask
         )
         payout.save()
+
         payout_attempt = payout.request()
         if payout.api_success is True:
             self.status = 'Paid'
-            self.save()
+        else:
+            self.status = 'Requested'
+        self.save()
         return payout_attempt
 
     def votes_by_approval(self, approved):
@@ -445,46 +453,38 @@ class Offer(Payment):
         return OfferFee.objects.filter(offer=self)
 
     def __unicode__(self):
-        return u'Offer payment for bid (%s) paid' % (
+        return u'%s Offer payment for bid (%s) paid' % (
+            self.bid.user,
             self.bid.id
         )
 
     def request(self):
         codesy_pct = Decimal('0.025')
+        stripe_pct = Decimal('0.029')
+        stripe_transaction = Decimal('0.30')
+
+        codesy_fee_amount = round_penny(self.amount * codesy_pct)
+
+        stripe_charge = round_penny(
+            (self.amount + codesy_fee_amount + stripe_transaction)
+            / (1 - stripe_pct)
+        )
+
+        stripe_fee_amount = stripe_charge - (self.amount + codesy_fee_amount)
 
         codesy_fee = OfferFee(
             offer=self,
             fee_type='codesy',
-            amount=self.amount * codesy_pct
+            amount=stripe_charge - stripe_fee_amount - self.amount
         )
         codesy_fee.save()
-
-        stripe_pct = Decimal('0.029')
-        stripe_transaction = Decimal('0.30')
-
-        stripe_charge = (
-            (self.amount + codesy_fee.amount + stripe_transaction)
-            / (1 - stripe_pct)
-        )
-
-        stripe_fee = stripe_charge - (self.amount + codesy_fee.amount)
 
         stripe_fee = OfferFee(
             offer=self,
             fee_type='Stripe',
-            amount=stripe_fee
+            amount=stripe_fee_amount
         )
         stripe_fee.save()
-
-        # get rounded fee values
-        fees = OfferFee.objects.filter(offer=self)
-        sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
-
-        stripe_charge = self.amount + sum_fees
-
-        # TODO: removed with proper stripe mocking in tests
-        self.charge_amount = stripe_charge
-        self.save()
 
         # TODO: HANDLE CARD NOT YET REGISTERED
         try:
@@ -528,11 +528,17 @@ class Payout(Payment):
     def fees(self):
         return PayoutFee.objects.filter(payout=self)
 
+    def credits(self):
+        return PayoutCredit.objects.filter(payout=self)
+
     def request(self):
         receiver = (
             PAYPAL_PAYOUT_RECIPIENT if PAYPAL_PAYOUT_RECIPIENT
             else self.claim.user.email
         )
+
+        total_payout_amount = self.amount
+
         paypal_fee = PayoutFee(
             payout=self,
             fee_type='PayPal',
@@ -540,16 +546,37 @@ class Payout(Payment):
         )
         paypal_fee.save()
 
+        try:
+            user_offers = Offer.objects.filter(user=self.claim.user)
+            if user_offers:
+                total_refund = (
+                    user_offers.aggregate(Sum('amount'))['amount__sum']
+                )
+                refund_user_offer = PayoutCredit(
+                    payout=self,
+                    fee_type='refund',
+                    description="Your offer",
+                    amount=total_refund,
+                )
+                refund_user_offer.save()
+                total_payout_amount += total_refund
+
+        except Offer.DoesNotExist:
+            refund_user_offer = None
+
         codesy_fee = PayoutFee(
             payout=self,
             fee_type='codesy',
-            amount=self.amount * Decimal('0.025'),
+            amount=round_penny(self.amount * Decimal('0.025')),
         )
         codesy_fee.save()
 
         total_fees = paypal_fee.amount + codesy_fee.amount
-        self.charge_amount = self.amount - total_fees
+        self.charge_amount = total_payout_amount - total_fees
         self.save()
+
+        # TEMPORARY WHILE WAITING FOR PAYPAL
+        return False
         # attempt paypal payout
         # user generated id sent to paypal is limited to 30 chars
         sender_id = self.short_key()
@@ -593,6 +620,7 @@ class Fee(models.Model):
         ('PayPal', 'PayPal'),
         ('Stripe', 'Stripe'),
         ('codesy', 'codesy'),
+        ('refund', 'refund')
     )
     fee_type = models.CharField(
         max_length=255,
@@ -609,16 +637,19 @@ class Fee(models.Model):
 class OfferFee(Fee):
     offer = models.ForeignKey(Offer, related_name="offer_fees", null=True)
 
+    def __unicode__(self):
+        return "%s fee for %s" % (self.fee_type, self.offer)
+
 
 class PayoutFee(Fee):
     payout = models.ForeignKey(Payout, related_name="payout_fees", null=True)
 
+    def __unicode__(self):
+        return "%s fee for %s" % (self.fee_type, self.payout)
 
-@receiver(pre_save, sender=OfferFee)
-@receiver(pre_save, sender=PayoutFee)
-def roundup_penny(sender, instance, *args, **kwargs):
-    instance.amount = (instance.amount.quantize(Decimal('.01'),
-                       rounding=ROUND_UP))
+
+class PayoutCredit(Fee):
+    payout = models.ForeignKey(Payout, related_name="payout_credit", null=True)
 
 
 @receiver(post_save, sender=Payout)

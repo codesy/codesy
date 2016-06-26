@@ -7,10 +7,14 @@ from django.contrib import messages
 from auctions.models import Bid, Claim, Vote
 
 from django.views.generic import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 
-class BidStatusView(LoginRequiredMixin, TemplateView):
+class AddonLogin (TemplateView):
+    template_name = 'addon/logon.html'
+
+
+class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
     """
     Requests for /bid/?url= will receive the HTML form for creating a bid (if
     none exists) or updating the user's existing bid.
@@ -18,6 +22,10 @@ class BidStatusView(LoginRequiredMixin, TemplateView):
     url -- url of an OSS issue or bug
     """
     template_name = "addon/widget.html"
+    login_url = '/addon-login/'
+
+    def test_func(self):
+        return self.request.user.is_active
 
     def _get_bid(self, url):
         bid = None
@@ -106,13 +114,12 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
         try:
             if request.user == claim.user:
                 if claim.payout_request():
-                    messages.success(request, 'Your payout was sent')
+                    messages.success(request, 'Your payout was sent.')
                 else:
-                    messages.error(request, "Sorry please try later")
+                    messages.error(request, "Your payout has been requested.")
             else:
                 messages.error(request,
                                "Sorry, this is not your payout to claim")
-
         except:
             messages.error(request, "Sorry please try later")
 
