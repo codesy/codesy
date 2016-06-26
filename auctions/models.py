@@ -548,6 +548,9 @@ class Payout(Payment):
         total_fees = paypal_fee.amount + codesy_fee.amount
         self.charge_amount = self.amount - total_fees
         self.save()
+
+        # TEMPORARY WHILE WAITING FOR PAYPAL
+        return False
         # attempt paypal payout
         # user generated id sent to paypal is limited to 30 chars
         sender_id = self.short_key()
