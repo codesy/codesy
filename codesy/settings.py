@@ -187,3 +187,21 @@ PAYPAL_PAYOUT_RECIPIENT = config('PAYPAL_PAYOUT_RECIPIENT', default='')
 # TODO: create PAYPAL_SANDBOX_CLIENT_SECRET in .env
 
 GOOGLE_ANALYTICS_ID = config('GOOGLE_ANALYTICS_ID', default='')
+
+EXTENSION_SETTINGS = {
+    'firefox': {
+        'name': 'Firefox',
+        'href': 'https://github.com/codesy/widgets/raw/master/build/codesy.xpi',
+        'img': 'img/firefox.png',
+    },
+    'chrome': {
+        'name': 'Chrome',
+        'href': 'https://chrome.google.com/webstore/detail/codesyio/hodcjbmkedjlhlimhcobafpnehhpdnfe',
+        'img': 'img/chrome.png',
+    },
+    'opera': {
+        'name': 'Opera',
+        'href': 'https://addons.opera.com/en/extensions/details/bd9544cb386d85146940165d0e3c30b37aec7550/',
+        'img': 'img/opera.png',
+    },
+}

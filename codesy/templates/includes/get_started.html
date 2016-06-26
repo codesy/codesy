@@ -9,28 +9,26 @@
   {% else %}
 
     <div class="install-step">
-      {% if browser == 'chrome' %}
-        <p id="add-to-chrome">
-          <a class="button download-button large track-btn" data-category="Download" data-label="Chrome" href="https://chrome.google.com/webstore/detail/codesyio/hodcjbmkedjlhlimhcobafpnehhpdnfe" role="button">
-            <img class="browser-install-icon" src="{% static "img/chrome.png" %}" width="32" height="32"/>Download for Chrome
-          </a>
-        </p>
-      {% elif browser == 'firefox' %}
-        <p id="add-to-firefox">
-          <a class="button download-button large track-btn" data-category="Download" data-label="Firefox" href="https://github.com/codesy/widgets/raw/master/build/codesy.xpi" role="button">
-            <img class="browser-install-icon" src="{% static "img/firefox.png" %}" width="32" height="32"/>Download for Firefox
-          </a>
-        </p>
-      {% elif browser == 'opera' %}
-        <p id="add-to-opera">
-          <a class="button download-button large track-btn" data-category="Download" data-label="Opera" href="https://github.com/codesy/widgets/raw/master/build/codesy.zip" role="button">
-            <img class="browser-install-icon" src="{% static "img/opera.png" %}" width="32" height="32"/>Download for Opera
-          </a>
-        </p>
-      {% else %}
-        <p id="unknown-browser">Unknown browser. The codesy widgets are <a href="https://wiki.mozilla.org/WebExtensions" target="_blank">WebExtensions</a> that work with Firefox, Chrome, and Opera. We want to add it to others soon. Want to help? 
-          <a href="https://github.com/codesy/widgets">Check the widgets code on GitHub</a>.
-        </p>
+        {% if browser.name == 'unknown' %}
+            <p id="unknown-browser">Unknown browser. The codesy widgets are <a href="https://wiki.mozilla.org/WebExtensions" target="_blank">WebExtensions</a> that work with Firefox, Chrome, and Opera. We want to add it to others soon. Want to help?
+                <a href="https://github.com/codesy/widgets">Check the widgets code on GitHub</a>.
+            </p>
+        {% else %}
+            <p id="add-extension">
+                <a class="button download-button large track-btn"
+                    data-category="Download"
+                    data-label="{{ browser.name }}"
+                    href="{{ browser.href}}"
+                    role="button"
+                    target="_blank">
+                    <img class="browser-install-icon"install
+                        src="{% static browser.img %}"
+                        width="32" height="32"
+                    />
+                    Download for {{ browser.name }}
+                </a>
+            </p>
+
       {% endif %} {# end 'browser' if #}
     </div>
 
