@@ -106,13 +106,12 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
         try:
             if request.user == claim.user:
                 if claim.payout_request():
-                    messages.success(request, 'Your payout was sent')
+                    messages.success(request, 'Your payout was sent.')
                 else:
-                    messages.error(request, "Sorry please try later")
+                    messages.error(request, "Your payout has been requested.")
             else:
                 messages.error(request,
                                "Sorry, this is not your payout to claim")
-
         except:
             messages.error(request, "Sorry please try later")
 
