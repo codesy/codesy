@@ -452,7 +452,8 @@ class Offer(Payment):
         return OfferFee.objects.filter(offer=self)
 
     def __unicode__(self):
-        return u'Offer payment for bid (%s) paid' % (
+        return u'%s Offer payment for bid (%s) paid' % (
+            self.bid.user,
             self.bid.id
         )
 
@@ -610,9 +611,15 @@ class Fee(models.Model):
 class OfferFee(Fee):
     offer = models.ForeignKey(Offer, related_name="offer_fees", null=True)
 
+    def __unicode__(self):
+        return "%s fee for %s" % (self.fee_type, self.offer)
+
 
 class PayoutFee(Fee):
     payout = models.ForeignKey(Payout, related_name="payout_fees", null=True)
+
+    def __unicode__(self):
+        return "%s fee for %s" % (self.fee_type, self.payout)
 
 
 @receiver(post_save, sender=Payout)
