@@ -1,0 +1,10 @@
+{% extends "addon/base.html" %}
+{% load staticfiles %}
+
+{% block widget_content %}
+    {% if user.is_active %}
+        GO LOGIN!
+    {% else %}
+        INACTIVE
+    {% endif %}
+{% endblock %}
