@@ -191,17 +191,20 @@ GOOGLE_ANALYTICS_ID = config('GOOGLE_ANALYTICS_ID', default='')
 EXTENSION_SETTINGS = {
     'firefox': {
         'name': 'Firefox',
-        'href': 'https://github.com/codesy/widgets/raw/master/build/codesy.xpi',
+        'href': 'https://github.com/codesy/widgets/raw/master/build/'
+                'codesy.xpi',
         'img': 'img/firefox.png',
     },
     'chrome': {
         'name': 'Chrome',
-        'href': 'https://chrome.google.com/webstore/detail/codesyio/hodcjbmkedjlhlimhcobafpnehhpdnfe',
+        'href': 'https://chrome.google.com/webstore/detail/codesyio/'
+                'hodcjbmkedjlhlimhcobafpnehhpdnfe',
         'img': 'img/chrome.png',
     },
     'opera': {
         'name': 'Opera',
-        'href': 'https://addons.opera.com/en/extensions/details/bd9544cb386d85146940165d0e3c30b37aec7550/',
+        'href': 'https://addons.opera.com/en/extensions/details/'
+                'bd9544cb386d85146940165d0e3c30b37aec7550/',
         'img': 'img/opera.png',
     },
 }
