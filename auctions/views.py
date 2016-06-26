@@ -22,10 +22,10 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
     url -- url of an OSS issue or bug
     """
     template_name = "addon/widget.html"
+    login_url = '/addon-login/'
+
     def test_func(self):
         return self.request.user.is_active
-
-    login_url = '/addon-login/'
 
     def _get_bid(self, url):
         bid = None
@@ -81,7 +81,7 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
         return redirect_response
 
 
-class ClaimStatusView(LoginRequiredMixin, AddonLogin):
+class ClaimStatusView(LoginRequiredMixin, TemplateView):
     """
     Requests for /claim-status/{id} will receive the claim details, along with
     an HTML form for offering bidders to approve or deny the claim.
