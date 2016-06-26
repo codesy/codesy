@@ -13,7 +13,7 @@ from django.db.models import Sum
 from model_mommy import mommy
 
 from ..models import Bid, Claim, Issue, Vote
-from ..models import Offer, OfferFee, Payout, PayoutFee
+from ..models import Offer, OfferFee, Payout, PayoutFee, PayoutCredit
 
 from . import MarketWithBidsTestCase, MarketWithClaimTestCase
 
@@ -534,3 +534,26 @@ class PayoutTest(TestCase):
             fees = PayoutFee.objects.filter(payout=payout)
             sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
             self.assertEqual(sum_fees + payout.charge_amount, amount)
+
+    def test_payout_refund(self):
+        """
+        A user getting paid for a claim should also get back any offers
+        they made on the issue.
+        """
+        self.bid1.make_offer(10)
+        self.bid1.save()
+        claim = mommy.make(Claim, user=self.user1, issue=self.issue)
+        api_request = claim.payout_request()
+        if api_request:
+            self.assertEqual(claim.status, 'Paid')
+            self.assertFalse(claim.payout_request())
+        payouts = claim.payouts.all()
+        payout = payouts[0]
+        self.assertTrue(payout.api_success)
+        self.assertEqual(len(payouts), 1)
+
+        refund = PayoutCredit.objects.filter(payout=payout)
+        self.assertEqual(len(refund), 1)
+        self.assertEqual(len(payout.credits()), len(refund))
+        self.assertEqual(refund[0].amount, 10)
+        self.assertEqual(payout.charge_amount, 58.25)
