@@ -119,15 +119,17 @@ DATABASES = {'default': config(
 
 # CSP settings
 
-CSP_DEFAULT_SRC = ("'self'",)
+CSP_DEFAULT_SRC = ("'none'",)
 
 CSP_FRAME_SRC=(
     "'self'",
+    '*.stripe.com',
     'https://github.com',
     'https://render.githubusercontent.com',
 )
 CSP_STYLE_SRC = (
     "'self'",
+    "'unsafe-inline'",
     'https://dhbhdrzi4tiry.cloudfront.net',
     'https://cdn.jsdelivr.net',
 )
