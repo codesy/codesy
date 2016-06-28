@@ -121,7 +121,7 @@ DATABASES = {'default': config(
 
 CSP_DEFAULT_SRC = ("'none'",)
 
-CSP_FRAME_SRC=(
+CSP_FRAME_SRC = (
     "'self'",
     '*.stripe.com',
     'https://www.youtube.com',
@@ -153,7 +153,6 @@ CSP_FONT_SRC = (
     "'self'",
     'https://cdn.jsdelivr.net'
 )
-
 
 
 # Internationalization
