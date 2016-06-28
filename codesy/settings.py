@@ -124,9 +124,12 @@ CSP_DEFAULT_SRC = ("'none'",)
 CSP_FRAME_SRC=(
     "'self'",
     '*.stripe.com',
+    'https://www.youtube.com',
+    'https://youtu.be',
     'https://github.com',
     'https://render.githubusercontent.com',
 )
+
 CSP_STYLE_SRC = (
     "'self'",
     "'unsafe-inline'",
