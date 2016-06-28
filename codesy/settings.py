@@ -126,7 +126,13 @@ CSP_FRAME_SRC = (
     '*.stripe.com',
     'https://www.youtube.com',
     'https://youtu.be',
-    'https://github.com',
+    'https://*.github.com',
+    'https://render.githubusercontent.com',
+)
+
+
+CSP_CHILD_SRC = (
+    'https://*.github.com',
     'https://render.githubusercontent.com',
 )
 
