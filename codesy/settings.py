@@ -65,6 +65,7 @@ INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'csp.middleware.CSPMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -115,6 +116,47 @@ DATABASES = {'default': config(
     'DATABASE_URL',
     default="postgres://postgres@localhost:5432/codesy",
     cast=dj_database_url.parse)}
+
+# CSP settings
+
+CSP_DEFAULT_SRC = ("'none'",)
+
+CSP_CONNECT_SRC = (
+    "'self'",
+)
+
+CSP_FRAME_SRC = (
+    "'self'",
+    '*.stripe.com',
+    'https://www.youtube.com',
+    'https://youtu.be',
+)
+
+
+CSP_STYLE_SRC = (
+    "'self'",
+    # TODO: remove all inline styles
+    "'unsafe-inline'",
+    'https://dhbhdrzi4tiry.cloudfront.net',
+    'https://cdn.jsdelivr.net',
+)
+CSP_SCRIPT_SRC = (
+    "'self'",
+    'https://cdn.jsdelivr.net',
+    '*.stripe.com',
+    'www.google-analytics.com',
+)
+
+CSP_IMG_SRC = (
+    "'self'",
+    'https://cdn.jsdelivr.net',
+    'https://avatars3.githubusercontent.com',
+    'https://licensebuttons.net',
+)
+CSP_FONT_SRC = (
+    "'self'",
+    'https://cdn.jsdelivr.net'
+)
 
 
 # Internationalization
