@@ -135,8 +135,6 @@ CSP_FRAME_SRC = (
 
 CSP_STYLE_SRC = (
     "'self'",
-    # TODO: remove all inline styles
-    "'unsafe-inline'",
     'https://dhbhdrzi4tiry.cloudfront.net',
     'https://cdn.jsdelivr.net',
 )
