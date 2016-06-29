@@ -121,23 +121,21 @@ DATABASES = {'default': config(
 
 CSP_DEFAULT_SRC = ("'none'",)
 
+CSP_CONNECT_SRC = (
+    "'self'",
+)
+
 CSP_FRAME_SRC = (
     "'self'",
     '*.stripe.com',
     'https://www.youtube.com',
     'https://youtu.be',
-    'https://*.github.com',
-    'https://render.githubusercontent.com',
 )
 
-
-CSP_CHILD_SRC = (
-    'https://*.github.com',
-    'https://render.githubusercontent.com',
-)
 
 CSP_STYLE_SRC = (
     "'self'",
+    # TODO: remove all inline styles
     "'unsafe-inline'",
     'https://dhbhdrzi4tiry.cloudfront.net',
     'https://cdn.jsdelivr.net',
