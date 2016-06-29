@@ -152,6 +152,7 @@ CSP_IMG_SRC = (
     'https://cdn.jsdelivr.net',
     'https://avatars3.githubusercontent.com',
     'https://licensebuttons.net',
+    'https://www.google-analytics.com',
 )
 CSP_FONT_SRC = (
     "'self'",
