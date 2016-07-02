@@ -12,6 +12,7 @@ body {
 a {
   color: #666;
   text-decoration: underline;
+  border-width:0;
 }
 
 ol {
@@ -71,6 +72,10 @@ tr.total {
 
 .top-bar, .top-bar ul {
   background-color: #F5F5F5;
+}
+
+img {
+    border-width:0;
 }
 
 img#top-bar-gravatar {
