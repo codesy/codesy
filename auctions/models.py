@@ -547,7 +547,8 @@ class Payout(Payment):
         paypal_fee.save()
 
         try:
-            user_offers = Offer.objects.filter(user=self.claim.user)
+            user_offers = Offer.objects.filter(user=self.claim.user,
+                                               bid__issue=self.claim.issue)
             if user_offers:
                 total_refund = (
                     user_offers.aggregate(Sum('amount'))['amount__sum']
