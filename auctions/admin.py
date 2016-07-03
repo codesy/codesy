@@ -35,6 +35,8 @@ class PayoutAdmin(admin.ModelAdmin):
     list_display = ('user', 'claim', 'amount', 'charge_amount', 'api_success',
                     'created')
     list_filter = ('api_success',)
+    search_fields = ['claim__user__username', 'claim__user__email',
+                     'confirmation', 'transaction_key']
 
 
 class VoteAdmin(admin.ModelAdmin):
@@ -47,12 +49,21 @@ class PayoutCreditAdmin(admin.ModelAdmin):
     search_fields = ['description']
 
 
+class PayoutFeeAdmin(admin.ModelAdmin):
+    list_display = ('payout', 'fee_type', 'amount', 'description')
+    search_fields = ['description']
+
+
+class OfferFeeAdmin(admin.ModelAdmin):
+    list_display = ('offer', 'fee_type', 'amount', 'description')
+    search_fields = ['description']
+
 admin.site.register(Bid, BidAdmin)
 admin.site.register(Issue, IssueAdmin)
 admin.site.register(Claim, ClaimAdmin)
 admin.site.register(Vote, VoteAdmin)
 admin.site.register(Offer, OfferAdmin)
 admin.site.register(Payout, PayoutAdmin)
-admin.site.register(OfferFee)
-admin.site.register(PayoutFee)
+admin.site.register(OfferFee, OfferFeeAdmin)
+admin.site.register(PayoutFee, PayoutFeeAdmin)
 admin.site.register(PayoutCredit, PayoutCreditAdmin)
