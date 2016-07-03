@@ -175,7 +175,7 @@ class Issue(models.Model):
     last_fetched = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
-        return u'Issue for %s (%s)' % (self.url, self.state)
+        return u'%s (%s)' % (self.url, self.state)
 
 
 class Claim(models.Model):
@@ -650,6 +650,9 @@ class PayoutFee(Fee):
 
 class PayoutCredit(Fee):
     payout = models.ForeignKey(Payout, related_name="payout_credit", null=True)
+
+    def __unicode__(self):
+        return "%s credit for %s" % (self.fee_type, self.payout)
 
 
 @receiver(post_save, sender=Payout)
