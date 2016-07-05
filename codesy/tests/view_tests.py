@@ -37,7 +37,7 @@ class HomeTest(TestCase):
             'Gecko/20100101 '
             'Firefox/37.0'
         })
-        self.assertEquals('firefox', self.view.get_browser())
+        self.assertEquals('Firefox', self.view.get_browser()['name'])
 
         self.view.request.has_attr(META={
             'HTTP_USER_AGENT': 'Mozilla/5.0 '
@@ -46,4 +46,4 @@ class HomeTest(TestCase):
             'Chrome/42.0.2300.2 '
             'Safari/537.36'
         })
-        self.assertEquals('chrome', self.view.get_browser())
+        self.assertEquals('Chrome', self.view.get_browser()['name'])
