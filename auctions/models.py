@@ -175,7 +175,7 @@ class Issue(models.Model):
     last_fetched = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
-        return u'Issue for %s (%s)' % (self.url, self.state)
+        return u'%s (%s)' % (self.url, self.state)
 
 
 class Claim(models.Model):
@@ -538,7 +538,6 @@ class Payout(Payment):
         )
 
         total_payout_amount = self.amount
-
         paypal_fee = PayoutFee(
             payout=self,
             fee_type='PayPal',
@@ -547,7 +546,8 @@ class Payout(Payment):
         paypal_fee.save()
 
         try:
-            user_offers = Offer.objects.filter(user=self.claim.user)
+            user_offers = Offer.objects.filter(user=self.claim.user,
+                                               bid__issue=self.claim.issue)
             if user_offers:
                 total_refund = (
                     user_offers.aggregate(Sum('amount'))['amount__sum']
@@ -567,7 +567,7 @@ class Payout(Payment):
         codesy_fee = PayoutFee(
             payout=self,
             fee_type='codesy',
-            amount=round_penny(self.amount * Decimal('0.025')),
+            amount=round_penny(total_payout_amount * Decimal('0.025')),
         )
         codesy_fee.save()
 
@@ -576,7 +576,7 @@ class Payout(Payment):
         self.save()
 
         # TEMPORARY WHILE WAITING FOR PAYPAL
-        return False
+        # return False
         # attempt paypal payout
         # user generated id sent to paypal is limited to 30 chars
         sender_id = self.short_key()
@@ -650,6 +650,9 @@ class PayoutFee(Fee):
 
 class PayoutCredit(Fee):
     payout = models.ForeignKey(Payout, related_name="payout_credit", null=True)
+
+    def __unicode__(self):
+        return "%s credit for %s" % (self.fee_type, self.payout)
 
 
 @receiver(post_save, sender=Payout)

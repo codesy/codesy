@@ -23,7 +23,7 @@ class IssueTest(MarketWithBidsTestCase):
     def test_unicode(self):
         self.issue.state = 'unknown'
         self.assertEqual(
-            str(self.issue), 'Issue for %s (%s)' % (self.url, self.issue.state)
+            str(self.issue), u'%s (%s)' % (self.url, self.issue.state)
         )
 
 
@@ -542,6 +542,8 @@ class PayoutTest(TestCase):
         """
         self.bid1.make_offer(10)
         self.bid1.save()
+        mommy.make(Bid, user=self.user1, offer=50)
+
         claim = mommy.make(Claim, user=self.user1, issue=self.issue)
         api_request = claim.payout_request()
         if api_request:
