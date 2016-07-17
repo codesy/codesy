@@ -37,13 +37,17 @@ class Home(TemplateView):
         return browser
 
 
-class CardInfo(TemplateView):
+class OfferInfo(TemplateView):
     template_name = 'card_info.html'
 
     def get_context_data(self, **kwargs):
         ctx = super(CardInfo, self).get_context_data(**kwargs)
         ctx['cc_debug'] = cc_debug_ctx()
         return ctx
+
+
+class PayoutInfo(TemplateView):
+    template_name = 'acct_info.html'
 
 
 class LegalInfo(TemplateView):
