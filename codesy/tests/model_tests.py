@@ -110,7 +110,7 @@ class SignUpReceiverTest(TestCase):
     def test_save_cc_token(self, mock_stripe):
         mock_stripe.provides('create').returns_fake().has_attr(id='dammit')
         user = mommy.make(User)
-        user.stripe_account_token = "howdy"
+        user.stripe_customer_token = "howdy"
         user.save()
 
     def test_get_gravatar_url(self):
