@@ -25,6 +25,9 @@ class User(AbstractUser):
         return ("https://avatars3.githubusercontent.com/u/%s?v=3&s=96" %
                 github_account.uid)
 
+    def account(self):
+        return StripeAccount.objects.filter(user=self)
+
 
 @receiver(pre_save, sender=settings.AUTH_USER_MODEL)
 def replace_cc_token_with_account_token(sender, instance, **kwargs):
@@ -56,3 +59,23 @@ def add_email_from_signup_and_start_inactive(sender, request, user, **kwargs):
 
 class StripeAccount(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    stripe_id =  models.CharField(max_length=100, blank=True)
+    secret_key = models.CharField(max_length=100, blank=True)
+    public_key = models.CharField(max_length=100, blank=True)
+    tos_acceptance_date = models.DateTimeField(null=True, blank=True)
+    tos_acceptance_ip = models.CharField(max_length=20, blank=True)
+
+# other possible fields:
+# legal_entity.address.city
+# legal_entity.address.line1
+# legal_entity.address.postal_code
+# legal_entity.address.state
+# legal_entity.business_name
+# legal_entity.business_tax_id
+# legal_entity.dob.day
+# legal_entity.dob.month
+# legal_entity.dob.year
+# legal_entity.first_name
+# legal_entity.last_name
+# legal_entity.ssn_last_4
+# legal_entity.type

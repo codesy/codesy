@@ -1,6 +1,13 @@
 from django.views.generic import TemplateView
-from django.conf import settings
+from django.shortcuts import redirect
+from django.core.urlresolvers import reverse
 
+from django.conf import settings
+import datetime
+
+from codesy.base.models import StripeAccount
+import stripe
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 def cc_debug_ctx():
     if settings.DEBUG:
@@ -41,7 +48,7 @@ class OfferInfo(TemplateView):
     template_name = 'card_info.html'
 
     def get_context_data(self, **kwargs):
-        ctx = super(CardInfo, self).get_context_data(**kwargs)
+        ctx = super(OfferInfo, self).get_context_data(**kwargs)
         ctx['cc_debug'] = cc_debug_ctx()
         return ctx
 
@@ -49,6 +56,38 @@ class OfferInfo(TemplateView):
 class PayoutInfo(TemplateView):
     template_name = 'acct_info.html'
 
+    def post(self, *args, **kwargs):
+        """
+        create or update stripe managed account
+        """
+        if self.request.user.account():
+            # process update
+            pass
+        else:
+            # create new account
+            try:
+                new_account = stripe.Account.create(
+                    country="US",
+                    managed=True
+                )
+                import ipdb; ipdb.set_trace()
+                if new_account:
+                    import ipdb; ipdb.set_trace()
+                    new_codesy_acct = StripeAccount(
+                        user=self.request.user,
+                        stripe_id=new_account.id,
+                        secret_key=new_account['keys'].secret,
+                        public_key=new_account['keys'].publishable,
+                        tos_acceptance_date=datetime.datetime.now(),
+                        tos_acceptance_ip=self.request.META.get('REMOTE_ADDR')
+                    )
+
+                    new_codesy_acct.save()
+            except Exception as e:
+                import ipdb; ipdb.set_trace()
+                self.error_message = e.message
+
+        return redirect('payout-info')
 
 class LegalInfo(TemplateView):
     template_name = 'legal.html'

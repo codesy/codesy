@@ -2,12 +2,20 @@
 {% load staticfiles %}
 
 {% block content %}
-    {% include "includes/acct_form.html" %}
+
+    {% if request.user.account %}
+        {% include "includes/acct_form.html" %}
+    {% else %}
+        {% include "includes/stripe_signup.html" %}
+    {% endif %}
+
+
+
 {% endblock %}
 
 {% block scripts %}
    {% if request.user.is_authenticated %}
       <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-      <script type="text/javascript" src="{% static 'js/stripe-app.js' %}" ></script>
+      {# <script type="text/javascript" src="{% static 'js/stripe-app.js' %}" ></script>#}
    {% endif %}
 {% endblock %}
