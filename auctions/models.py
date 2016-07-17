@@ -491,7 +491,7 @@ class Offer(Payment):
             charge = stripe.Charge.create(
                 amount=int(stripe_charge * 100),
                 currency="usd",
-                customer=self.user.stripe_account_token,
+                customer=self.user.stripe_customer_token,
                 description="Offer for: " + self.bid.url,
                 metadata={'id': self.id}
             )
