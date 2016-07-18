@@ -1,7 +1,7 @@
-from django.views.generic import TemplateView
+from django.views.generic import View, TemplateView
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
-
+from django.http import HttpResponse
 from django.conf import settings
 import datetime
 
@@ -17,6 +17,10 @@ def cc_debug_ctx():
             'cc_ex_year': '2020',
             'cvc': '123',
         }
+
+
+class LegalInfo(TemplateView):
+    template_name = 'legal.html'
 
 
 class Home(TemplateView):
@@ -78,9 +82,12 @@ class PayoutInfo(TemplateView):
                         stripe_id=new_account.id,
                         secret_key=new_account['keys'].secret,
                         public_key=new_account['keys'].publishable,
-                        tos_acceptance_date=datetime.datetime.now(),
-                        tos_acceptance_ip=self.request.META.get('REMOTE_ADDR')
                     )
+
+                    new_account.tos_acceptance.date = datetime.datetime.now()
+                    new_account.tos_acceptance.ip = self.request.META.get('REMOTE_ADDR')
+                    new_account.save()
+
 
                     new_codesy_acct.save()
             except Exception as e:
@@ -89,5 +96,13 @@ class PayoutInfo(TemplateView):
 
         return redirect('payout-info')
 
-class LegalInfo(TemplateView):
-    template_name = 'legal.html'
+
+class StripeHookView(View):
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponse('Thank for the update!')
+
+    def post(self, *args, **kwargs):
+        # import ipdb; ipdb.set_trace()
+        print("Got it")
+        return HttpResponse()

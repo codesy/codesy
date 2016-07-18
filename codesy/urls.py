@@ -6,6 +6,13 @@ from . import views
 admin.site.site_header = u'Codesy administration'
 admin.site.site_title = u'Codesy site admin'
 
+# separating stripe, probably a django app in the future
+stripe_urls = patterns(
+    '',
+    url(r'^update', views.StripeHookView.as_view()),
+)
+
+
 
 urlpatterns = patterns(
     '',
@@ -27,6 +34,10 @@ urlpatterns = patterns(
 
     # auction and widget
     url(r'^', include('auctions.urls')),
+
+    # stripe
+    url(r'^stripe/', include(stripe_urls)),
+
 
     # API docs
     url(r'^api/docs/', include('rest_framework_swagger.urls')),
