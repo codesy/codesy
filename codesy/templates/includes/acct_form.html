@@ -2,24 +2,24 @@
   <div class="column medium-4 medium-offset-4 text-left">
     <fieldset class="fieldset">
       <legend>Change Bank Account</legend>
-    <form id="cc-entry" role="form" class="form-horizontal">
+    <form id="acct-entry" role="form" class="form-horizontal">
         {% csrf_token %}
         <div class="form-group">
             <label for="name">Name on the account</label>
-            <input type="text" class="form-control" id="name" autocomplete="off" value="{{ acct_debug.name}}" maxlength="16" />
-            <label for="routing-number">Routing Number</label>
-            <input type="text" class="form-control" id="routing-number" autocomplete="off" value="{{ acct_debug.routing_number}}" maxlength="16" />
+            <input type="text" class="form-control" id="account_holder_name" autocomplete="off" value="{{ acct_debug.name}}" maxlength="16" />
+            <label for="routing_number">Routing Number</label>
+            <input type="text" class="form-control" id="routing_number" autocomplete="off" value="{{ acct_debug.routing_number}}" maxlength="16" />
             <label for="acct-number">Account Number</label>
-            <input type="text" class="form-control" id="acct-number" autocomplete="off" value="{{ acct_debug.account_number}}" maxlength="16" />
+            <input type="text" class="form-control" id="account_number" autocomplete="off" value="{{ acct_debug.account_number}}" maxlength="16" />
             <fieldset >
               <legend>Acount Type</legend>
-              <input type="radio" name="acct_type" value="individual" id="indiv" required checked="checked">
+              <input type="radio" name="account_holder_type" value="individual" id="indiv" required checked="checked">
               <label for="indiv">Individual</label>
-              <input type="radio" name="acct_type" value="company" id="company">
+              <input type="radio" name="account_holder_type" value="company" id="company">
               <label for="company">Company</label>
             </fieldset>
         </div>
-        <button id="cc-submit" class="button success track-btn" data-category="Stripe" data-label="Authorize">Authorize Credit Card</button>
+        <button id="acct-submit" class="button success track-btn" data-category="Stripe" data-label="Authorize">Authorize Credit Card</button>
     </form>
   </fieldset>
   </div>

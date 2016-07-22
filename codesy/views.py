@@ -1,13 +1,20 @@
 from django.views.generic import View, TemplateView
 from django.shortcuts import redirect
-from django.core.urlresolvers import reverse
+# from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.conf import settings
 import datetime
 
-from codesy.base.models import StripeAccount
+
+# stripe related:
+from codesy.base.models import StripeAccount, StripeEvent
 import stripe
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+import json
+
 stripe.api_key = settings.STRIPE_SECRET_KEY
+
 
 def cc_debug_ctx():
     if settings.DEBUG:
@@ -17,6 +24,21 @@ def cc_debug_ctx():
             'cc_ex_year': '2020',
             'cvc': '123',
         }
+
+
+def acct_debug_ctx():
+    if settings.DEBUG:
+        return {
+            'name': 'Joe Sample',
+            'routing_number': '110000000',
+            'account_number': '000123456789',
+        }
+
+
+class CSRFExemptMixin(object):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(CSRFExemptMixin, self).dispatch(*args, **kwargs)
 
 
 class LegalInfo(TemplateView):
@@ -60,49 +82,52 @@ class OfferInfo(TemplateView):
 class PayoutInfo(TemplateView):
     template_name = 'acct_info.html'
 
+    def get_context_data(self, **kwargs):
+        ctx = super(PayoutInfo, self).get_context_data(**kwargs)
+        ctx['acct_debug'] = acct_debug_ctx()
+        return ctx
+
     def post(self, *args, **kwargs):
         """
         create or update stripe managed account
         """
-        if self.request.user.account():
-            # process update
-            pass
-        else:
+        import ipdb; ipdb.set_trace()
+        if not self.request.user.account():
             # create new account
             try:
                 new_account = stripe.Account.create(
                     country="US",
                     managed=True
                 )
-                import ipdb; ipdb.set_trace()
                 if new_account:
-                    import ipdb; ipdb.set_trace()
                     new_codesy_acct = StripeAccount(
                         user=self.request.user,
-                        stripe_id=new_account.id,
+                        account_id=new_account.id,
                         secret_key=new_account['keys'].secret,
                         public_key=new_account['keys'].publishable,
                     )
 
                     new_account.tos_acceptance.date = datetime.datetime.now()
-                    new_account.tos_acceptance.ip = self.request.META.get('REMOTE_ADDR')
+                    new_account.tos_acceptance.ip = (
+                        self.request.META.get('REMOTE_ADDR'))
                     new_account.save()
-
-
                     new_codesy_acct.save()
+
             except Exception as e:
-                import ipdb; ipdb.set_trace()
                 self.error_message = e.message
 
         return redirect('payout-info')
 
 
-class StripeHookView(View):
-
-    def get(self, request, *args, **kwargs):
-        return HttpResponse('Thank for the update!')
+class StripeHookView(CSRFExemptMixin, View):
 
     def post(self, *args, **kwargs):
-        # import ipdb; ipdb.set_trace()
-        print("Got it")
+        message = json.loads(self.request.body)
+        new_event = StripeEvent(
+            event_id=message['id'],
+            type=message['type'],
+            message_text=json.dumps(message)
+        )
+        new_event.save()
+
         return HttpResponse()

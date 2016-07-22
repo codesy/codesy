@@ -10,11 +10,10 @@
     <form
         role="form"
         class="form-horizontal"
-        action="/payout-info" 
+        action="/payout-info"
         method="POST">
         {% csrf_token %}
         <button
-            id="cc-submit"
             class="button success track-btn"
             data-category="Stripe"
             data-label="Authorize">Please set up an account.

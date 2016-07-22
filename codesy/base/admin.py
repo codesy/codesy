@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserChangeForm
 
-from .models import User, StripeAccount
+from .models import User, StripeAccount, StripeEvent
 
 
 class CodesyUserChangeForm(UserChangeForm):
@@ -17,5 +17,7 @@ class CodesyUserAdmin(UserAdmin):
         ('Payments', {'fields': ('stripe_customer_token',)}),
     )
 
+
 admin.site.register(User, CodesyUserAdmin)
 admin.site.register(StripeAccount)
+admin.site.register(StripeEvent)
