@@ -1,6 +1,8 @@
 from django.views.generic import View, TemplateView
 from django.shortcuts import redirect
 # from django.core.urlresolvers import reverse
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
 from django.conf import settings
 import datetime
@@ -71,7 +73,7 @@ class Home(TemplateView):
 
 
 class OfferInfo(TemplateView):
-    template_name = 'card_info.html'
+    template_name = 'stripe/credit_card_form.html'
 
     def get_context_data(self, **kwargs):
         ctx = super(OfferInfo, self).get_context_data(**kwargs)
@@ -79,45 +81,51 @@ class OfferInfo(TemplateView):
         return ctx
 
 
-class PayoutInfo(TemplateView):
-    template_name = 'acct_info.html'
-
-    def get_context_data(self, **kwargs):
-        ctx = super(PayoutInfo, self).get_context_data(**kwargs)
-        ctx['acct_debug'] = acct_debug_ctx()
-        return ctx
+class CreateManagedAccount(TemplateView):
+    template_name = "stripe/create_account.html"
 
     def post(self, *args, **kwargs):
         """
-        create or update stripe managed account
+        create stripe managed account
         """
         import ipdb; ipdb.set_trace()
-        if not self.request.user.account():
-            # create new account
-            try:
-                new_account = stripe.Account.create(
-                    country="US",
-                    managed=True
+        try:
+            new_account = stripe.Account.create(
+                country="US",
+                managed=True
+            )
+            if new_account:
+                new_codesy_acct = StripeAccount(
+                    user=self.request.user,
+                    account_id=new_account.id,
+                    secret_key=new_account['keys'].secret,
+                    public_key=new_account['keys'].publishable,
                 )
-                if new_account:
-                    new_codesy_acct = StripeAccount(
-                        user=self.request.user,
-                        account_id=new_account.id,
-                        secret_key=new_account['keys'].secret,
-                        public_key=new_account['keys'].publishable,
-                    )
+                new_account.tos_acceptance.date = datetime.datetime.now()
+                new_account.tos_acceptance.ip = (
+                    self.request.META.get('REMOTE_ADDR'))
+                new_account.save()
+                new_codesy_acct.save()
 
-                    new_account.tos_acceptance.date = datetime.datetime.now()
-                    new_account.tos_acceptance.ip = (
-                        self.request.META.get('REMOTE_ADDR'))
-                    new_account.save()
-                    new_codesy_acct.save()
-
-            except Exception as e:
-                self.error_message = e.message
+        except Exception as e:
+            self.error_message = e.message
 
         return redirect('payout-info')
 
+
+class UserHasManagedAccount(UserPassesTestMixin):
+    login_url = '/stripe/accept-terms'
+    redirect_field_name = None
+    def test_func(self):
+        return self.request.user.account()
+
+class SaveAccountInfo(UserHasManagedAccount, TemplateView):
+    template_name = 'stripe/bank_account_form.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super(SaveAccountInfo, self).get_context_data(**kwargs)
+        ctx['acct_debug'] = acct_debug_ctx()
+        return ctx
 
 class StripeHookView(CSRFExemptMixin, View):
 

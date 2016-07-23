@@ -18,7 +18,7 @@ class UserSerializerTest(TestCase):
         self.assertEqual(self.serializer.Meta.model, User)
         self.assertEqual(
             self.serializer.Meta.fields,
-            ('id', 'username', 'stripe_customer_token', 'stripe_cc_token')
+            ('id', 'username', 'stripe_card', 'stripe_bank_account')
         )
         self.assertEqual(
             self.serializer.Meta.read_only_fields, ('id', 'username'))

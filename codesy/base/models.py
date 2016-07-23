@@ -16,8 +16,9 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class User(AbstractUser):
     # TODO: remove this as we don't need or want to store it
-    stripe_cc_token = models.CharField(max_length=100, blank=True)
-    stripe_customer_token = models.CharField(max_length=100, blank=True)
+    stripe_card = models.CharField(max_length=100, blank=True)
+    stripe_customer = models.CharField(max_length=100, blank=True)
+    stripe_bank_account = models.CharField(max_length=100, blank=True)
     USERNAME_FIELD = 'username'
 
     def get_gravatar_url(self):
@@ -38,7 +39,7 @@ def replace_cc_token_with_account_token(sender, instance, **kwargs):
         )
         if new_customer:
             instance.stripe_cc_token = ""
-            instance.stripe_customer_token = new_customer.id
+            instance.stripe_card = new_customer.id
 
 
 @receiver(user_signed_up)

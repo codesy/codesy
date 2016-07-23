@@ -7,7 +7,7 @@ from auctions.models import Bid, Claim, Vote
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'stripe_customer_token', 'stripe_cc_token')
+        fields = ('id', 'username', 'stripe_bank_account', 'stripe_customer')
         read_only_fields = ('id', 'username')
 
 

@@ -14,9 +14,8 @@ class CodesyUserAdmin(UserAdmin):
     form = CodesyUserChangeForm
 
     fieldsets = UserAdmin.fieldsets + (
-        ('Payments', {'fields': ('stripe_customer_token',)}),
+        ('Stripe tokens', {'fields': ('stripe_customer','stripe_bank_account')}),
     )
-
 
 admin.site.register(User, CodesyUserAdmin)
 admin.site.register(StripeAccount)
