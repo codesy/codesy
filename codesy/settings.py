@@ -123,6 +123,7 @@ CSP_DEFAULT_SRC = ("'none'",)
 
 CSP_CONNECT_SRC = (
     "'self'",
+    '*.stripe.com',
 )
 
 CSP_FRAME_SRC = (
