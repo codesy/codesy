@@ -1,32 +1,31 @@
 {% extends "stripe/base.html" %}
-
 {% block content %}
     <div class="row">
       <div class="column medium-4 medium-offset-4 text-left">
         <fieldset class="fieldset">
-          <legend>Change Bank Account</legend>
-        <form id="stripe-form" role="form" class="form-horizontal">
-            {% csrf_token %}
-            <div class="form-group">
+            <legend>Bank Account Information</legend>
+            <form id="stripe-form" stripe-account-type="bankAccount" role="form" class="form-horizontal">
+                {% csrf_token %}
                 <input type="hidden" data-stripe="country" value="US">
                 <input type="hidden" data-stripe="currency" value="USD">
-                <label for="name">Name on the account</label>
-                <input type="text" class="form-control" data-stripe="account_holder_name" autocomplete="off" value="{{ acct_debug.name}}" maxlength="16" />
-                <label for="routing_number">Routing Number</label>
-                <input type="text" class="form-control" data-stripe="routing_number" autocomplete="off" value="{{ acct_debug.routing_number}}" maxlength="16" />
-                <label for="acct-number">Account Number</label>
-                <input type="text" class="form-control" data-stripe="account_number" autocomplete="off" value="{{ acct_debug.account_number}}" maxlength="16" />
-                <fieldset >
-                  <legend>Acount Type</legend>
-                  <input type="radio" data-stripe="account_holder_type" value="individual" id="indiv" required checked="checked">
-                  <label for="indiv">Individual</label>
-                  <input type="radio" data-stripe="account_holder_type" value="company" id="company">
-                  <label for="company">Company</label>
-                </fieldset>
-            </div>
-            <button id="stripe-submit" class="button success track-btn" data-category="Stripe" data-label="Authorize">Authorize Credit Card</button>
-        </form>
-      </fieldset>
+                <div class="form-group">
+                    <label for="name">Name on the account</label>
+                    <input type="text" class="form-control" data-stripe="account_holder_name" autocomplete="off" value="{{ acct_debug.name}}" maxlength="16" />
+                    <label for="routing_number">Routing Number</label>
+                    <input type="text" class="form-control" data-stripe="routing_number" autocomplete="off" value="{{ acct_debug.routing_number}}" maxlength="16" />
+                    <label for="acct-number">Account Number</label>
+                    <input type="text" class="form-control" data-stripe="account_number" autocomplete="off" value="{{ acct_debug.account_number}}" maxlength="16" />
+                    <fieldset >
+                        <legend>Acount Type</legend>
+                        <input type="radio" data-stripe="account_holder_type" value="individual" id="indiv" required checked="checked">
+                        <label for="indiv">Individual</label>
+                        <input type="radio" data-stripe="account_holder_type" value="company" id="company">
+                        <label for="company">Company</label>
+                    </fieldset>
+                </div>
+                <button id="stripe-submit" class="button success track-btn" data-category="Stripe" data-label="Authorize">Encrypt Bank Account Information</button>
+            </form>
+        </fieldset>
       </div>
     </div>
 {% endblock %}

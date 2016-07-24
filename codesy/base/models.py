@@ -5,7 +5,6 @@ import stripe
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from allauth.account.signals import user_signed_up
 # from django.contrib.postgres.fields import JSONField
@@ -29,17 +28,28 @@ class User(AbstractUser):
     def account(self):
         return StripeAccount.objects.filter(user=self)
 
+    def save(self, *args, **kwargs):
+        saved = User.objects.get(pk=self.pk)
 
-@receiver(pre_save, sender=settings.AUTH_USER_MODEL)
-def replace_cc_token_with_account_token(sender, instance, **kwargs):
-    if instance.stripe_cc_token:
-        new_customer = stripe.Customer.create(
-            source=instance.stripe_cc_token,
-            email=instance.email
-        )
-        if new_customer:
-            instance.stripe_cc_token = ""
-            instance.stripe_card = new_customer.id
+        if saved.stripe_card != self.stripe_card:
+            new_customer = stripe.Customer.create(
+                source=self.stripe_card,
+                email=self.email
+            )
+            if new_customer:
+                self.stripe_card = ""
+                self.stripe_customer = new_customer.id
+
+        if saved.stripe_bank_account != self.stripe_bank_account:
+            managed_account = StripeAccount.objects.get(user=self)
+            if managed_account:
+                stripe_account = (
+                    stripe.Account.retrieve(managed_account.account_id)
+                )
+                stripe_account.external_account = self.stripe_bank_account
+                stripe_account.save()
+
+        super(User, self).save(*args, **kwargs)
 
 
 @receiver(user_signed_up)
@@ -63,6 +73,7 @@ class StripeAccount(models.Model):
     account_id = models.CharField(max_length=100, blank=True)
     secret_key = models.CharField(max_length=100, blank=True)
     public_key = models.CharField(max_length=100, blank=True)
+    external_account = models.CharField(max_length=100, blank=True)
     tos_acceptance_date = models.DateTimeField(null=True, blank=True)
     tos_acceptance_ip = models.CharField(max_length=20, blank=True)
     verification_fields = models.TextField(default="", blank=True)
@@ -89,23 +100,23 @@ class StripeEvent(models.Model):
     def message(self):
         return json.loads(self.message_text)
 
+    def save(self, *args, **kwargs):
+        try:
+            duplicate = StripeEvent.objects.get(event_id=self.event_id)
+            if duplicate:
+                return
+        except:
+            pass
+        message = self.message()
+        if self.type == "account.updated":
+            account_id = message['data']['object']['id']
+            account_to_update = (
+                StripeAccount.objects.get(account_id=account_id)
+            )
+            account_to_update.account_updated(self)
 
-@receiver(pre_save, sender=StripeEvent)
-def reject_duplicate_events(sender, instance, **kwargs):
-    try:
-        StripeEvent.objects.filter(event_id=instance.event_id)
-        pass
-    except:
-        raise Exception('duplicate message')
+        super(StripeEvent, self).save(*args, **kwargs)
 
-
-@receiver(post_save, sender=StripeEvent)
-def event_received(sender, instance, **kwargs):
-    message = instance.message()
-    if instance.type == "account.updated":
-        account_id = message['data']['object']['id']
-        account_to_update = StripeAccount.objects.get(account_id=account_id)
-        account_to_update.account_updated(instance)
 
 # other possible fields:
 # legal_entity.address.city

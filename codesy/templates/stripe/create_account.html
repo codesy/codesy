@@ -9,17 +9,39 @@
     <div class="row">
       <div class="column medium-4 medium-offset-4 text-left">
         <fieldset class="fieldset">
-          <legend>I acknowled and agree to these terms.</legend>
+          <legend>Please set up an account.</legend>
         <form
             role="form"
             class="form-horizontal"
             action="/stripe/accept-terms"
             method="POST">
             {% csrf_token %}
+
+            <label for="name">First Name</label>
+            <input type="text" class="form-control" autocomplete="off" maxlength="16" />
+            <label for="name">Last Name</label>
+            <input type="text" class="form-control" autocomplete="off" maxlength="16" />
+
+            <fieldset >
+                <legend>Birthdate</legend>
+                <label for="name">Month</label>
+                <input type="text" class="form-control" autocomplete="off" maxlength="2" />
+                <label for="name">Day</label>
+                <input type="text" class="form-control" autocomplete="off" maxlength="2" />
+                <label for="name">Year</label>
+                <input type="text" class="form-control" autocomplete="off" maxlength="4" />
+
+
+            </fieldset>
+
+
+
+
+
             <button
                 class="button success track-btn"
                 data-category="Stripe"
-                data-label="Authorize">Please set up an account.
+                data-label="Authorize">I acknowled and agree to these terms.
             </button>
         </form>
       </fieldset>

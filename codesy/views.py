@@ -2,7 +2,6 @@ from django.views.generic import View, TemplateView
 from django.shortcuts import redirect
 # from django.core.urlresolvers import reverse
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
 from django.conf import settings
 import datetime
@@ -88,7 +87,6 @@ class CreateManagedAccount(TemplateView):
         """
         create stripe managed account
         """
-        import ipdb; ipdb.set_trace()
         try:
             new_account = stripe.Account.create(
                 country="US",
@@ -116,8 +114,10 @@ class CreateManagedAccount(TemplateView):
 class UserHasManagedAccount(UserPassesTestMixin):
     login_url = '/stripe/accept-terms'
     redirect_field_name = None
+
     def test_func(self):
         return self.request.user.account()
+
 
 class SaveAccountInfo(UserHasManagedAccount, TemplateView):
     template_name = 'stripe/bank_account_form.html'
@@ -126,6 +126,10 @@ class SaveAccountInfo(UserHasManagedAccount, TemplateView):
         ctx = super(SaveAccountInfo, self).get_context_data(**kwargs)
         ctx['acct_debug'] = acct_debug_ctx()
         return ctx
+
+    def post(self, *args, **kwargs):
+        pass
+
 
 class StripeHookView(CSRFExemptMixin, View):
 
