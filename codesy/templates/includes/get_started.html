@@ -38,7 +38,7 @@
 
         <div id="payment-errors"></div>
 
-        {% if request.user.stripe_customer_token %}
+        {% if request.user.stripe_customer%}
             <h3>You are ready to bid</h3>
             <p>Try checking out GitHub issues with the most +1 votes.</p>
             <a class="button gh-button track-btn" data-category="top+1" data-label="Created by You" href="https://github.com/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+author%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Created by You</a>

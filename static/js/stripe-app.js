@@ -1,6 +1,6 @@
 $(window).load(function () {
     Stripe.setPublishableKey($('#codesy-html').data('stripe_key'));
-    stripeResponse = function (csrf_token) {
+    let stripeResponse = function (csrf_token) {
         this.csrf_token = csrf_token
         return (function(_this){
             return function (status, response) {
@@ -24,6 +24,7 @@ $(window).load(function () {
                             console.error(err);
                         },
                         complete: function(){
+
                             document.location.reload();
                         }
                     });
@@ -32,17 +33,14 @@ $(window).load(function () {
         })(this)
     }
 
+    let handleResponse = new stripeResponse($('form input[name="csrfmiddlewaretoken"]').val())
+    let $form = $('#stripe-form')
+    let account_type = $form.attr('stripe-account-type')
+
     $('#stripe-submit').click(function (e) {
         e.preventDefault();
         $('#stripe-submit').text('Encrypting ... ');
-        let $form = $('#stripe-form')
-        let handleResponse = new stripeResponse($('form input[name="csrfmiddlewaretoken"]').val())
-        let account_type = $form.attr('stripe-account-type')
         Stripe[account_type].createToken($form, handleResponse);
     });
 
 })
-
-
-// card.createToken
-// bankAccount.createToken

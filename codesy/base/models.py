@@ -18,6 +18,8 @@ class User(AbstractUser):
     stripe_card = models.CharField(max_length=100, blank=True)
     stripe_customer = models.CharField(max_length=100, blank=True)
     stripe_bank_account = models.CharField(max_length=100, blank=True)
+    tos_acceptance_date = models.DateTimeField(null=True, blank=True)
+    tos_acceptance_ip = models.CharField(max_length=20, blank=True)
     USERNAME_FIELD = 'username'
 
     def get_gravatar_url(self):
@@ -25,8 +27,8 @@ class User(AbstractUser):
         return ("https://avatars3.githubusercontent.com/u/%s?v=3&s=96" %
                 github_account.uid)
 
-    def account(self):
-        return StripeAccount.objects.filter(user=self)
+    def accepted_terms(self):
+        return self.tos_acceptance_date and self.tos_acceptance_ip
 
     def save(self, *args, **kwargs):
         saved = User.objects.get(pk=self.pk)
@@ -41,13 +43,34 @@ class User(AbstractUser):
                 self.stripe_customer = new_customer.id
 
         if saved.stripe_bank_account != self.stripe_bank_account:
-            managed_account = StripeAccount.objects.get(user=self)
-            if managed_account:
-                stripe_account = (
-                    stripe.Account.retrieve(managed_account.account_id)
-                )
-                stripe_account.external_account = self.stripe_bank_account
+            """
+            create stripe managed account
+            """
+            bank_account = self.stripe_bank_account
+            try:
+                codesy_account = StripeAccount.objects.get(user=self)
+                stripe_account = stripe.Account.retrieve(
+                    codesy_account.account_id)
+                stripe_account.external_account = bank_account
                 stripe_account.save()
+            except StripeAccount.DoesNotExist:
+                stripe_account = stripe.Account.create(
+                    country="US",
+                    managed=True,
+                    tos_acceptance={
+                        'date': self.tos_acceptance_date,
+                        'ip': self.tos_acceptance_ip,
+                    },
+                    external_account=bank_account
+                )
+                if stripe_account:
+                    codesy_account = StripeAccount(
+                        user=self,
+                        account_id=stripe_account.id,
+                        secret_key=stripe_account['keys'].secret,
+                        public_key=stripe_account['keys'].publishable,
+                    )
+                    codesy_account.save()
 
         super(User, self).save(*args, **kwargs)
 
@@ -73,23 +96,19 @@ class StripeAccount(models.Model):
     account_id = models.CharField(max_length=100, blank=True)
     secret_key = models.CharField(max_length=100, blank=True)
     public_key = models.CharField(max_length=100, blank=True)
-    external_account = models.CharField(max_length=100, blank=True)
-    tos_acceptance_date = models.DateTimeField(null=True, blank=True)
-    tos_acceptance_ip = models.CharField(max_length=20, blank=True)
-    verification_fields = models.TextField(default="", blank=True)
+    verification_fields = models.TextField(default='', blank=True)
 
-    def account_updated(self, event):
+    def update(self, event):
         message = event.message()
-        print message['data']['object']['verification']['fields_needed']
+        fields_needed = (
+            message['data']['object']['verification']['fields_needed']
+        )
+        self.verification_fields = json.dumps(fields_needed)
+        self.save()
 
-
-#  requrired account fields
-# legal_entity.dob.day
-# legal_entity.dob.month
-# legal_entity.dob.year
-# legal_entity.first_name
-# legal_entity.last_name
-# legal_entity.type
+    def identity_verified(self):
+        fields_needed = json.loads(self.verification_fields)
+        return not fields_needed
 
 
 class StripeEvent(models.Model):
@@ -105,25 +124,12 @@ class StripeEvent(models.Model):
             duplicate = StripeEvent.objects.get(event_id=self.event_id)
             if duplicate:
                 return
-        except:
-            pass
-        message = self.message()
-        if self.type == "account.updated":
-            account_id = message['data']['object']['id']
-            account_to_update = (
-                StripeAccount.objects.get(account_id=account_id)
-            )
-            account_to_update.account_updated(self)
-
-        super(StripeEvent, self).save(*args, **kwargs)
-
-
-# other possible fields:
-# legal_entity.address.city
-# legal_entity.address.line1
-# legal_entity.address.postal_code
-# legal_entity.address.state
-# legal_entity.business_name
-# legal_entity.business_tax_id
-# legal_entity.ssn_last_4
-# legal_entity.type
+        except StripeEvent.DoesNotExist:
+            message = self.message()
+            if self.type == "account.updated":
+                account_id = message['data']['object']['id']
+                account_to_update = (
+                    StripeAccount.objects.get(account_id=account_id)
+                )
+                account_to_update.update(self)
+            super(StripeEvent, self).save(*args, **kwargs)

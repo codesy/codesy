@@ -9,8 +9,11 @@ admin.site.site_title = u'Codesy site admin'
 # separating stripe, probably a django app in the future
 stripe_urls = patterns(
     '',
-    url(r'^update', views.StripeHookView.as_view()),
-    url(r'^accept-terms', views.CreateManagedAccount.as_view()),
+    url(r'^update', views.StripeHookView.as_view(), name='webhook-endpoint'),
+    url(r'^accept-terms', views.AcceptTermsView.as_view(), name='accept-terms'),
+    url(r'^verify-id', views.VerifyIdentityView.as_view(), name='verify-id'),
+    url(r'^bank-info$', views.BankAccountView.as_view(), name='bank-info'),
+    url(r'^card-info$', views.CreditCardView.as_view(), name='card-info'),
 
 )
 
@@ -18,10 +21,7 @@ urlpatterns = patterns(
     '',
     # Static home/ explanation pages
     url(r'^$', views.Home.as_view(), name='home'),
-    url(r'^offer-info$', views.OfferInfo.as_view(), name='offer-info'),
-    url(r'^payout-info$', views.SaveAccountInfo.as_view(), name='payout-info'),
     url(r'^legal-info$', views.LegalInfo.as_view(), name='legal-info'),
-
     # allauth
     (
         r'^accounts/logout/$', 'django.contrib.auth.views.logout',

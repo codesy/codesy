@@ -3,8 +3,6 @@ import requests
 import re
 import HTMLParser
 import stripe
-import paypalrestsdk
-from paypalrestsdk import Payout as PaypalPayout
 
 from datetime import datetime, timedelta
 from django.conf import settings
@@ -20,15 +18,9 @@ from mailer import send_mail
 
 from .managers import ClaimManager
 
+from codesy.base.models import StripeAccount
+
 stripe.api_key = settings.STRIPE_SECRET_KEY
-
-# TODO: Find a prettier way to authenticate
-paypalrestsdk.configure({"mode": settings.PAYPAL_MODE,
-                         "client_id": settings.PAYPAL_CLIENT_ID,
-                         "client_secret": settings.PAYPAL_CLIENT_SECRET,
-                         })
-
-PAYPAL_PAYOUT_RECIPIENT = settings.PAYPAL_PAYOUT_RECIPIENT
 
 
 def uuid_please():
@@ -532,19 +524,15 @@ class Payout(Payment):
         return PayoutCredit.objects.filter(payout=self)
 
     def request(self):
-        receiver = (
-            PAYPAL_PAYOUT_RECIPIENT if PAYPAL_PAYOUT_RECIPIENT
-            else self.claim.user.email
-        )
+        try:
+            managed_account = StripeAccount.objects.get(user=self.claim.user)
+        except StripeAccount.DoesNotExist:
+            return False
 
+        codesy_pct = Decimal('0.025')
+        stripe_pct = Decimal('0.029')
+        stripe_transaction = Decimal('0.30')
         total_payout_amount = self.amount
-        paypal_fee = PayoutFee(
-            payout=self,
-            fee_type='PayPal',
-            amount=Decimal('0.25')
-        )
-        paypal_fee.save()
-
         try:
             user_offers = Offer.objects.filter(user=self.claim.user,
                                                bid__issue=self.claim.issue)
@@ -567,37 +555,38 @@ class Payout(Payment):
         codesy_fee = PayoutFee(
             payout=self,
             fee_type='codesy',
-            amount=round_penny(total_payout_amount * Decimal('0.025')),
+            amount=round_penny(total_payout_amount * codesy_pct),
         )
         codesy_fee.save()
 
-        total_fees = paypal_fee.amount + codesy_fee.amount
-        self.charge_amount = total_payout_amount - total_fees
-        self.save()
+        stripe_fee_amount = round_penny(
+            (total_payout_amount * stripe_pct) + stripe_transaction
+        )
 
-        # TEMPORARY WHILE WAITING FOR PAYPAL
-        # return False
-        # attempt paypal payout
-        # user generated id sent to paypal is limited to 30 chars
-        sender_id = self.short_key()
-        paypal_payout = PaypalPayout({
-            "sender_batch_header": {
-                "sender_batch_id": sender_id,
-                "email_subject": "Your codesy payout is here!"
-            },
-            "items": [
-                {
-                    "recipient_type": "EMAIL",
-                    "amount": {
-                        "value": int(self.charge_amount),
-                        "currency": "USD"
-                    },
-                    "receiver": receiver,
-                    "note": "Here's your payout for fixing an issue.",
-                    "sender_item_id": sender_id
-                }
-            ]
-        })
+        stripe_fee = PayoutFee(
+            payout=self,
+            fee_type='Stripe',
+            amount=stripe_fee_amount
+        )
+        stripe_fee.save()
+
+        try:
+            charge = stripe.Charge.create(
+                amount=int(total_payout_amount * 100),
+                currency="usd",
+                description="codesy.io payout",
+                source="acct_16pOYJDanbbP0xsU",
+                application_fee=int(
+                    (codesy_fee.amount + stripe_fee.amount) * 100),
+                stripe_account=managed_account.account_id
+            )
+            if charge:
+                pass
+        except Exception as e:
+            print e.message
+
+        return False
+
         try:
             payout_attempt = paypal_payout.create(sync_mode=True)
         except:
