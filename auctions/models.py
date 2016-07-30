@@ -527,8 +527,8 @@ class Payout(Payment):
             return False
 
         codesy_pct = Decimal('0.025')
-        stripe_pct = Decimal('0.029')
-        stripe_transaction = Decimal('0.30')
+        stripe_pct = Decimal('0.005')  # .05% transfer
+        stripe_transaction = Decimal('0.0')
         total_payout_amount = self.amount
         try:
             user_offers = Offer.objects.filter(user=self.claim.user,
