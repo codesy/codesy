@@ -13,8 +13,13 @@ class CodesyUserChangeForm(UserChangeForm):
 class CodesyUserAdmin(UserAdmin):
     form = CodesyUserChangeForm
     fieldsets = UserAdmin.fieldsets + (
-        ('Accepted Terms', {'fields': ('tos_acceptance_ip','tos_acceptance_date')}),
-        ('Stripe tokens', {'fields': ('stripe_card','stripe_customer','stripe_bank_account')}),
+        ('Accepted Terms',
+            {'fields': ('tos_acceptance_ip', 'tos_acceptance_date')}),
+        ('Stripe tokens',
+            {'fields':
+                ('stripe_card', 'stripe_customer', 'stripe_bank_account')
+             }
+         ),
     )
 
 admin.site.register(User, CodesyUserAdmin)

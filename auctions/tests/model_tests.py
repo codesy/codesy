@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import time
+from decimal import Decimal
 
 import fudge
 from fudge.inspector import arg
@@ -12,6 +13,7 @@ from django.db.models import Sum
 
 from model_mommy import mommy
 
+from codesy.base.models import StripeAccount
 from ..models import Bid, Claim, Issue, Vote
 from ..models import Offer, OfferFee, Payout, PayoutFee, PayoutCredit
 
@@ -512,6 +514,8 @@ class PayoutTest(TestCase):
 
     def test_payout_request(self):
         claim = mommy.make(Claim, user=self.user1, issue=self.issue)
+        account = mommy.make(StripeAccount, user=self.user1)
+        self.assertEqual(account, self.user1.account())
         api_request = claim.payout_request()
         if api_request:
             self.assertEqual(claim.status, 'Paid')
@@ -530,6 +534,7 @@ class PayoutTest(TestCase):
         AMOUNTS = [333, 22, 357, 1000, 50, 999, 1, ]
         for amount in AMOUNTS:
             payout = mommy.make(Payout, amount=amount)
+            mommy.make(StripeAccount, user=payout.user)
             payout.request()
             fees = PayoutFee.objects.filter(payout=payout)
             sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
@@ -543,6 +548,7 @@ class PayoutTest(TestCase):
         self.bid1.make_offer(10)
         self.bid1.save()
         mommy.make(Bid, user=self.user1, offer=50)
+        mommy.make(StripeAccount, user=self.user1)
 
         claim = mommy.make(Claim, user=self.user1, issue=self.issue)
         api_request = claim.payout_request()
@@ -558,4 +564,4 @@ class PayoutTest(TestCase):
         self.assertEqual(len(refund), 1)
         self.assertEqual(len(payout.credits()), len(refund))
         self.assertEqual(refund[0].amount, 10)
-        self.assertEqual(payout.charge_amount, 58.25)
+        self.assertEqual(payout.charge_amount, Decimal('58.20'))

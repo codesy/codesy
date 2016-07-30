@@ -6,8 +6,7 @@ from allauth.socialaccount.models import SocialAccount
 import fudge
 from model_mommy import mommy
 
-
-from ..base.models import EMAIL_URL, User, add_email_from_signup
+from ..base.models import EMAIL_URL, User, add_signup_email_and_start_inactive
 
 
 VERIFIED_PRIMARY_EMAIL = "verified+primary@test.com"
@@ -55,10 +54,10 @@ class SignUpReceiverTest(TestCase):
                  .returns(
                      GITHUB_DATA_WITH_VERIFIED_PRIMARY_EMAIL))
 
-        add_email_from_signup(self.sender,
-                              self.request,
-                              self.user,
-                              **self.kwargs)
+        add_signup_email_and_start_inactive(self.sender,
+                                            self.request,
+                                            self.user,
+                                            **self.kwargs)
         self.assertEquals(VERIFIED_PRIMARY_EMAIL, self.user.email)
 
     @fudge.patch('requests.get')
@@ -70,10 +69,10 @@ class SignUpReceiverTest(TestCase):
                  .returns(
                      GITHUB_DATA_WITH_VERIFIED_EMAIL))
 
-        add_email_from_signup(self.sender,
-                              self.request,
-                              self.user,
-                              **self.kwargs)
+        add_signup_email_and_start_inactive(self.sender,
+                                            self.request,
+                                            self.user,
+                                            **self.kwargs)
         self.assertEquals(VERIFIED_EMAIL, self.user.email)
 
     @fudge.patch('requests.get')
@@ -85,10 +84,10 @@ class SignUpReceiverTest(TestCase):
                  .returns(
                      GITHUB_DATA_WITH_UNVERIFIED_EMAIL))
 
-        add_email_from_signup(self.sender,
-                              self.request,
-                              self.user,
-                              **self.kwargs)
+        add_signup_email_and_start_inactive(self.sender,
+                                            self.request,
+                                            self.user,
+                                            **self.kwargs)
         self.assertEquals(None, self.user.email)
 
     @fudge.patch('requests.get')
@@ -100,10 +99,11 @@ class SignUpReceiverTest(TestCase):
                  .returns(
                      GITHUB_DATA_WITH_MANY_EMAILS))
 
-        add_email_from_signup(self.sender,
-                              self.request,
-                              self.user,
-                              **self.kwargs)
+        add_signup_email_and_start_inactive(self.sender,
+                                            self.request,
+                                            self.user,
+                                            **self.kwargs
+                                            )
         self.assertEquals(VERIFIED_PRIMARY_EMAIL, self.user.email)
 
     @fudge.patch('stripe.Customer')

@@ -38,53 +38,56 @@ class User(AbstractUser):
             return False
 
     def save(self, *args, **kwargs):
-        existing = User.objects.get(pk=self.pk)
+        try:
+            existing = User.objects.get(pk=self.pk)
 
-        if existing.stripe_card != self.stripe_card:
-            new_customer = stripe.Customer.create(
-                source=self.stripe_card,
-                email=self.email
-            )
-            if new_customer:
-                self.stripe_card = ""
-                self.stripe_customer = new_customer.id
-
-        if existing.stripe_bank_account != self.stripe_bank_account:
-            """
-            create stripe managed account
-            """
-            bank_account = self.stripe_bank_account
-            managed_account = self.account()
-
-            if managed_account:
-                stripe_account = stripe.Account.retrieve(
-                    managed_account.account_id)
-                stripe_account.external_account = bank_account
-                stripe_account.save()
-            else:
-                stripe_account = stripe.Account.create(
-                    country="US",
-                    managed=True,
-                    tos_acceptance={
-                        'date': self.tos_acceptance_date,
-                        'ip': self.tos_acceptance_ip,
-                    },
-                    external_account=bank_account
+            if existing.stripe_card != self.stripe_card:
+                new_customer = stripe.Customer.create(
+                    source=self.stripe_card,
+                    email=self.email
                 )
-                if stripe_account:
-                    new_account = StripeAccount(
-                        user=self,
-                        account_id=stripe_account.id,
-                        secret_key=stripe_account['keys'].secret,
-                        public_key=stripe_account['keys'].publishable,
+                if new_customer:
+                    self.stripe_card = ""
+                    self.stripe_customer = new_customer.id
+
+            if existing.stripe_bank_account != self.stripe_bank_account:
+                """
+                create stripe managed account
+                """
+                bank_account = self.stripe_bank_account
+                managed_account = self.account()
+
+                if managed_account:
+                    stripe_account = stripe.Account.retrieve(
+                        managed_account.account_id)
+                    stripe_account.external_account = bank_account
+                    stripe_account.save()
+                else:
+                    stripe_account = stripe.Account.create(
+                        country="US",
+                        managed=True,
+                        tos_acceptance={
+                            'date': self.tos_acceptance_date,
+                            'ip': self.tos_acceptance_ip,
+                        },
+                        external_account=bank_account
                     )
-                    new_account.save()
+                    if stripe_account:
+                        new_account = StripeAccount(
+                            user=self,
+                            account_id=stripe_account.id,
+                            secret_key=stripe_account['keys'].secret,
+                            public_key=stripe_account['keys'].publishable,
+                        )
+                        new_account.save()
+        except User.DoesNotExist:
+            pass
 
         super(User, self).save(*args, **kwargs)
 
 
 @receiver(user_signed_up)
-def add_email_from_signup_and_start_inactive(sender, request, user, **kwargs):
+def add_signup_email_and_start_inactive(sender, request, user, **kwargs):
     user.is_active = False
     params = {'access_token': kwargs['sociallogin'].token}
     email_data = requests.get(EMAIL_URL, params=params).json()

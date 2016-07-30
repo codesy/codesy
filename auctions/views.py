@@ -126,8 +126,8 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
         return redirect(reverse('claim-status',
                                 kwargs={'pk': claim.id}))
 
-# List Views
 
+# List Views
 class BidList(LoginRequiredMixin, TemplateView):
     """List of bids for the User
     """
