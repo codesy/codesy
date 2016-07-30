@@ -116,7 +116,7 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
                 if claim.payout_request():
                     messages.success(request, 'Your payout was sent.')
                 else:
-                    messages.error(request, "Your payout has been requested.")
+                    messages.error(request, "Sorry please try later")
             else:
                 messages.error(request,
                                "Sorry, this is not your payout to claim")
@@ -127,7 +127,6 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
                                 kwargs={'pk': claim.id}))
 
 # List Views
-
 
 class BidList(LoginRequiredMixin, TemplateView):
     """List of bids for the User

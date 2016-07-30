@@ -30,10 +30,17 @@ class User(AbstractUser):
     def accepted_terms(self):
         return self.tos_acceptance_date and self.tos_acceptance_ip
 
-    def save(self, *args, **kwargs):
-        saved = User.objects.get(pk=self.pk)
+    def account(self):
+        try:
+            codesy_account = StripeAccount.objects.get(user=self)
+            return codesy_account
+        except:
+            return False
 
-        if saved.stripe_card != self.stripe_card:
+    def save(self, *args, **kwargs):
+        existing = User.objects.get(pk=self.pk)
+
+        if existing.stripe_card != self.stripe_card:
             new_customer = stripe.Customer.create(
                 source=self.stripe_card,
                 email=self.email
@@ -42,18 +49,19 @@ class User(AbstractUser):
                 self.stripe_card = ""
                 self.stripe_customer = new_customer.id
 
-        if saved.stripe_bank_account != self.stripe_bank_account:
+        if existing.stripe_bank_account != self.stripe_bank_account:
             """
             create stripe managed account
             """
             bank_account = self.stripe_bank_account
-            try:
-                codesy_account = StripeAccount.objects.get(user=self)
+            managed_account = self.account()
+
+            if managed_account:
                 stripe_account = stripe.Account.retrieve(
-                    codesy_account.account_id)
+                    managed_account.account_id)
                 stripe_account.external_account = bank_account
                 stripe_account.save()
-            except StripeAccount.DoesNotExist:
+            else:
                 stripe_account = stripe.Account.create(
                     country="US",
                     managed=True,
@@ -64,13 +72,13 @@ class User(AbstractUser):
                     external_account=bank_account
                 )
                 if stripe_account:
-                    codesy_account = StripeAccount(
+                    new_account = StripeAccount(
                         user=self,
                         account_id=stripe_account.id,
                         secret_key=stripe_account['keys'].secret,
                         public_key=stripe_account['keys'].publishable,
                     )
-                    codesy_account.save()
+                    new_account.save()
 
         super(User, self).save(*args, **kwargs)
 
@@ -96,19 +104,19 @@ class StripeAccount(models.Model):
     account_id = models.CharField(max_length=100, blank=True)
     secret_key = models.CharField(max_length=100, blank=True)
     public_key = models.CharField(max_length=100, blank=True)
-    verification_fields = models.TextField(default='', blank=True)
+    verification = models.TextField(default='', blank=True)
 
     def update(self, event):
         message = event.message()
-        fields_needed = (
-            message['data']['object']['verification']['fields_needed']
+        verification = (
+            message['data']['object']['verification']
         )
-        self.verification_fields = json.dumps(fields_needed)
+        self.verification = json.dumps(verification)
         self.save()
 
     def identity_verified(self):
-        fields_needed = json.loads(self.verification_fields)
-        return not fields_needed
+        verification = json.loads(self.verification)
+        return not verification.due_by
 
 
 class StripeEvent(models.Model):

@@ -38,7 +38,6 @@ urlpatterns = patterns(
     # stripe
     url(r'^stripe/', include(stripe_urls)),
 
-
     # API docs
     url(r'^api/docs/', include('rest_framework_swagger.urls')),
 

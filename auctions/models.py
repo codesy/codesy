@@ -18,8 +18,6 @@ from mailer import send_mail
 
 from .managers import ClaimManager
 
-from codesy.base.models import StripeAccount
-
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
@@ -510,7 +508,7 @@ class Payout(Payment):
     provider = models.CharField(
         max_length=255,
         choices=Payment.PROVIDER_CHOICES,
-        default='PayPal')
+        default='Stripe')
 
     def __unicode__(self):
         return u'Payout to %s for claim (%s)' % (
@@ -524,9 +522,8 @@ class Payout(Payment):
         return PayoutCredit.objects.filter(payout=self)
 
     def request(self):
-        try:
-            managed_account = StripeAccount.objects.get(user=self.claim.user)
-        except StripeAccount.DoesNotExist:
+        managed_account = self.user.account()
+        if not managed_account:
             return False
 
         codesy_pct = Decimal('0.025')
@@ -571,37 +568,27 @@ class Payout(Payment):
         stripe_fee.save()
 
         try:
-            charge = stripe.Charge.create(
-                amount=int(total_payout_amount * 100),
+            transfer = stripe.Transfer.create(
                 currency="usd",
                 description="codesy.io payout",
-                source="acct_16pOYJDanbbP0xsU",
+                amount=int(total_payout_amount * 100),
                 application_fee=int(
                     (codesy_fee.amount + stripe_fee.amount) * 100),
-                stripe_account=managed_account.account_id
+                destination=managed_account.account_id
             )
-            if charge:
-                pass
+            if transfer:
+                self.charge_amount = (
+                    total_payout_amount
+                    - (codesy_fee.amount + stripe_fee.amount)
+                )
+                self.api_success = True
+                self.confirmation = transfer.id
+                self.save()
+                return True
         except Exception as e:
-            print e.message
+            self.error_message = e.message
 
         return False
-
-        try:
-            payout_attempt = paypal_payout.create(sync_mode=True)
-        except:
-            payout_attempt = False
-
-        if payout_attempt:
-            if paypal_payout.items:
-                for item in paypal_payout.items:
-                    if item.transaction_status == "SUCCESS":
-                        self.api_success = True
-                        self.confirmation = item.payout_item_id
-                        self.save()
-                    else:
-                        payout_attempt = False
-        return payout_attempt
 
 
 class Fee(models.Model):

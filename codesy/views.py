@@ -59,7 +59,7 @@ class UserIdentityVerifiedMixin(UserPassesTestMixin):
     def test_func(self):
         user_account = self.request.user.account()
         if not user_account:
-            login_url = '/stripe/accept-terms'
+            login_url = '/stripe/bank-info'
             return False
         return user_account.identity_verified()
 
@@ -166,7 +166,7 @@ class VerifyIdentityView(TemplateView):
                 posted['personal_id_number'])
             stripe_acct.legal_entity.type = posted['type']
             stripe_acct.save()
-            return redirect('account-info')
+        return redirect('bank-info')
 
 
 class StripeHookView(CSRFExemptMixin, View):

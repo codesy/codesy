@@ -24,7 +24,6 @@ $(window).load(function () {
                             console.error(err);
                         },
                         complete: function(){
-
                             document.location.reload();
                         }
                     });
