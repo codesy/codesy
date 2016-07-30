@@ -9,11 +9,11 @@ admin.site.site_title = u'Codesy site admin'
 # separating stripe, probably a django app in the future
 stripe_urls = patterns(
     '',
-    url(r'^update', views.StripeHookView.as_view(), name='webhook-endpoint'),
-    url(r'^accept-terms', views.AcceptTermsView.as_view(), name='accept-terms'),
-    url(r'^verify-id', views.VerifyIdentityView.as_view(), name='verify-id'),
-    url(r'^bank-info$', views.BankAccountView.as_view(), name='bank-info'),
-    url(r'^card-info$', views.CreditCardView.as_view(), name='card-info'),
+    url(r'^events', views.StripeHookView.as_view(), name='events'),
+    url(r'^terms', views.AcceptTermsView.as_view(), name='terms'),
+    url(r'^identity', views.VerifyIdentityView.as_view(), name='identity'),
+    url(r'^bank$', views.BankAccountView.as_view(), name='bank'),
+    url(r'^card$', views.CreditCardView.as_view(), name='card'),
 
 )
 

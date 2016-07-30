@@ -53,19 +53,19 @@ class CSRFExemptMixin(object):
 
 
 class UserIdentityVerifiedMixin(UserPassesTestMixin):
-    login_url = '/stripe/verify-id'
+    login_url = '/stripe/identity'
     redirect_field_name = None
 
     def test_func(self):
         user_account = self.request.user.account()
         if not user_account:
-            login_url = '/stripe/bank-info'
+            self.login_url = '/stripe/bank'
             return False
         return user_account.identity_verified()
 
 
 class UserHasAcceptedTermsMixin(UserPassesTestMixin):
-    login_url = '/stripe/accept-terms'
+    login_url = '/stripe/terms'
     redirect_field_name = None
 
     def test_func(self):
@@ -132,7 +132,7 @@ class AcceptTermsView(TemplateView):
             user.save()
         except User.DoesNotExist:
             pass
-        return redirect('bank-info')
+        return redirect('bank')
 
 
 class VerifyIdentityView(TemplateView):
@@ -166,7 +166,7 @@ class VerifyIdentityView(TemplateView):
                 posted['personal_id_number'])
             stripe_acct.legal_entity.type = posted['type']
             stripe_acct.save()
-        return redirect('bank-info')
+        return redirect('bank')
 
 
 class StripeHookView(CSRFExemptMixin, View):
