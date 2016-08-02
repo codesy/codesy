@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserChangeForm
 
-from .models import User, StripeAccount, StripeEvent
+from .models import User
+from .stripe_events import StripeAccount, StripeEvent
 
 
 class CodesyUserChangeForm(UserChangeForm):

@@ -6,7 +6,8 @@ from django.http import HttpResponse
 from django.conf import settings
 import datetime
 # stripe related:
-from codesy.base.models import User, StripeEvent
+from codesy.base.models import User
+from codesy.base.stripe_events import StripeEvent
 import stripe
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -153,6 +154,7 @@ class VerifyIdentityView(TemplateView):
                 'year': posted['dob_year']
             }
             stripe_acct = stripe.Account.retrieve(codesy_account.account_id)
+            # TODO: Cannot change if account already verified
             stripe_acct.legal_entity.dob = dob
             stripe_acct.legal_entity.first_name = posted['first_name']
             stripe_acct.legal_entity.last_name = posted['last_name']
@@ -173,11 +175,12 @@ class StripeHookView(CSRFExemptMixin, View):
 
     def post(self, *args, **kwargs):
         message = json.loads(self.request.body)
-        new_event = StripeEvent(
-            event_id=message['id'],
-            type=message['type'],
-            message_text=json.dumps(message)
-        )
-        new_event.save()
-
+        event_id = message['id']
+        if not StripeEvent.objects.filter(event_id=event_id).exists():
+            new_event = StripeEvent(
+                event_id=event_id,
+                type=message['type'],
+                message_text=json.dumps(message)
+            )
+            new_event.save()
         return HttpResponse()
