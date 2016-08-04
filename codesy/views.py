@@ -1,6 +1,7 @@
 from django.views.generic import TemplateView
 from django.conf import settings
 
+
 class LegalInfo(TemplateView):
     template_name = 'legal.html'
 

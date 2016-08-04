@@ -1,3 +1,6 @@
 from django.contrib import admin
+from payments.models import StripeAccount, StripeEvent
 
-# Register your models here.
+
+admin.site.register(StripeAccount)
+admin.site.register(StripeEvent)

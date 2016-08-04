@@ -3,7 +3,6 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserChangeForm
 
 from .models import User
-from payments.models import StripeAccount, StripeEvent
 
 
 class CodesyUserChangeForm(UserChangeForm):
@@ -24,5 +23,3 @@ class CodesyUserAdmin(UserAdmin):
     )
 
 admin.site.register(User, CodesyUserAdmin)
-admin.site.register(StripeAccount)
-admin.site.register(StripeEvent)

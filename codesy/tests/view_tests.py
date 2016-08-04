@@ -26,7 +26,7 @@ class HomeTest(TestCase):
 
         context = self.view.get_context_data()
 
-        expected_keys = ['super', 'browser', 'cc_debug']
+        expected_keys = ['super', 'browser',]
         for expected_key in expected_keys:
             self.assertIn(expected_key, context.keys())
 
