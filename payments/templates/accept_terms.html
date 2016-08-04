@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+      <div class="column medium-4 medium-offset-4 text-left">
+          <p>Before we can send you money, we need to set up an account.  We use <a href="https://stripe.com" target="_blank">Stripe</a> to handle your account.  This keeps your banking information safe and codesy.io legal.</p>
+
+          <p>
+              To get started you need to agree to our <a href="/legal-info#terms">Terms of Service</a> and the <a href="https://stripe.com/terms">Stripe Connected Account Agreement</a>.
+          </p>
+
+        <fieldset class="fieldset">
+          <legend>Please set up an account.</legend>
+        <form
+            role="form"
+            class="form-horizontal"
+            action="/payments/terms"
+            method="POST">
+            {% csrf_token %}
+
+            <button
+                class="button success track-btn"
+                data-category="Stripe"
+                data-label="Authorize">I acknowled and agree to these terms.
+            </button>
+        </form>
+      </fieldset>
+      </div>
+    </div>
+{% endblock %}
+{# #}
+{% block scripts %}{# stripe.js not needed #} {% endblock %}
