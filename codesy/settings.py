@@ -58,6 +58,7 @@ LOCAL_APPS = (
     'codesy.base',
     'api',
     'auctions',
+    'payments',
 )
 
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS

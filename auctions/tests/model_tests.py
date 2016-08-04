@@ -13,7 +13,7 @@ from django.db.models import Sum
 
 from model_mommy import mommy
 
-from codesy.base.stripe_events import StripeAccount
+from payments.models import StripeAccount
 from ..models import Bid, Claim, Issue, Vote
 from ..models import Offer, OfferFee, Payout, PayoutFee, PayoutCredit
 

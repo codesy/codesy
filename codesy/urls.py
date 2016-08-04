@@ -6,17 +6,6 @@ from . import views
 admin.site.site_header = u'Codesy administration'
 admin.site.site_title = u'Codesy site admin'
 
-# separating stripe, probably a django app in the future
-stripe_urls = patterns(
-    '',
-    url(r'^events', views.StripeHookView.as_view(), name='events'),
-    url(r'^terms', views.AcceptTermsView.as_view(), name='terms'),
-    url(r'^identity', views.VerifyIdentityView.as_view(), name='identity'),
-    url(r'^bank$', views.BankAccountView.as_view(), name='bank'),
-    url(r'^card$', views.CreditCardView.as_view(), name='card'),
-
-)
-
 urlpatterns = patterns(
     '',
     # Static home/ explanation pages
@@ -36,7 +25,7 @@ urlpatterns = patterns(
     url(r'^', include('auctions.urls')),
 
     # stripe
-    url(r'^stripe/', include(stripe_urls)),
+    url(r'^payments/', include('payments.urls')),
 
     # API docs
     url(r'^api/docs/', include('rest_framework_swagger.urls')),

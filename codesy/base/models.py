@@ -1,17 +1,13 @@
 import requests
-import stripe
 
-from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.dispatch import receiver
 from allauth.account.signals import user_signed_up
-# from django.contrib.postgres.fields import JSONField
 
-from .stripe_events import StripeAccount
+from payments.models import StripeAccount, get_customer_token
 
 EMAIL_URL = 'https://api.github.com/user/emails'
-stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 class User(AbstractUser):
@@ -36,49 +32,21 @@ class User(AbstractUser):
             codesy_account = StripeAccount.objects.get(user=self)
             return codesy_account
         except:
-            return False
+            return StripeAccount(user=self)
 
     def save(self, *args, **kwargs):
         if User.objects.filter(pk=self.pk).exists():
             existing = User.objects.get(pk=self.pk)
 
             if existing.stripe_card != self.stripe_card:
-                new_customer = stripe.Customer.create(
-                    source=self.stripe_card,
-                    email=self.email
-                )
-                if new_customer:
-                    self.stripe_card = ""
-                    self.stripe_customer = new_customer.id
+                customer = get_customer_token(self)
+                self.stripe_card = ""
+                self.stripe_customer = customer
 
             if existing.stripe_bank_account != self.stripe_bank_account:
-                bank_account = self.stripe_bank_account
-                managed_account = self.account()
-
-                if managed_account:
-                    stripe_account = stripe.Account.retrieve(
-                        managed_account.account_id)
-                    stripe_account.external_account = bank_account
-                    stripe_account.save()
-                else:
-                    if bank_account:
-                        stripe_account = stripe.Account.create(
-                            country="US",
-                            managed=True,
-                            tos_acceptance={
-                                'date': self.tos_acceptance_date,
-                                'ip': self.tos_acceptance_ip,
-                            },
-                            external_account=bank_account
-                        )
-                        if stripe_account:
-                            new_account = StripeAccount(
-                                user=self,
-                                account_id=stripe_account.id,
-                                secret_key=stripe_account['keys'].secret,
-                                public_key=stripe_account['keys'].publishable,
-                            )
-                            new_account.save()
+                if not self.stripe_bank_account == "":
+                    managed_account = self.account()
+                    managed_account.external_account(self.stripe_bank_account)
 
         super(User, self).save(*args, **kwargs)
 
