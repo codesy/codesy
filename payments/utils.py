@@ -81,7 +81,7 @@ def charge(offer, payout):
     try:
         charge = stripe.Charge.create(
             customer=offer.user.stripe_customer,
-            destination=payout.user.stripe_bank_account,
+            destination=payout.user.account().account_id,
             amount=int(offer.charge_amount * 100),
             currency="usd",
             description="Payout for: " + offer.bid.url,
