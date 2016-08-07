@@ -44,7 +44,7 @@ labelDiff = function(type, $from_elem, $to_elem){
         if (diff === 0 ){
             confirmTemplate=["Your offer did not change."]
         } else if (diff > 0 ) {
-            confirmTemplate = ["Your offer increased. $",diff," will be charged to your credit card."]
+            confirmTemplate = ["Your offer increased. $",diff," will be authorized your credit card."]
         } else if (diff < 0) {
             confirmTemplate = ["Sorry, you can't decrease your offer."]
             $from_elem.val(original_value)

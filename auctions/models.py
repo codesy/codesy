@@ -2,7 +2,7 @@ import uuid
 import requests
 import re
 import HTMLParser
-import stripe
+from decimal import Decimal
 
 from datetime import datetime, timedelta
 from django.conf import settings
@@ -13,22 +13,17 @@ from django.db.models import Sum
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from decimal import Decimal, ROUND_HALF_UP
 from mailer import send_mail
 
 from .managers import ClaimManager
 
-stripe.api_key = settings.STRIPE_SECRET_KEY
+import payments.utils as payments
 
 
 def uuid_please():
     full_uuid = uuid.uuid4()
     # uuid is truncated because paypal must be <30
     return str(full_uuid)[:25]
-
-
-def round_penny(amount):
-    return amount.quantize(Decimal('.01'), rounding=ROUND_HALF_UP)
 
 
 class Bid(models.Model):
@@ -51,6 +46,7 @@ class Bid(models.Model):
         return u'%s bid on %s' % (self.user, self.url)
 
     def ask_met(self):
+
         if self.ask:
             other_bids = Bid.objects.filter(
                 url=self.url
@@ -63,27 +59,33 @@ class Bid(models.Model):
         else:
             return False
 
+
+    @property
     def offers(self):
         return Offer.objects.filter(bid=self)
 
-    def make_offer(self, offer_amount):
-        if not offer_amount:
-            return False
+    def set_offer(self, offer_amount):
         offer_amount = Decimal(offer_amount)
-        offers = Offer.objects.filter(bid=self, api_success=True)
-        if offers:
-            sum_offers = offers.aggregate(Sum('amount'))['amount__sum']
-            if offer_amount > sum_offers:
-                offer_amount = offer_amount - sum_offers
-            else:
-                return False
+        # refund any previous offers
+        previous_offers = self.offers.exclude(
+            charge_id=u''
+        ).filter(
+            refund_id=u''
+        )
+        for offer in previous_offers:
+            payments.refund(offer)
+
         new_offer = Offer(
             user=self.user,
             amount=offer_amount,
             bid=self,
         )
         new_offer.save()
+        payments.authorize(new_offer)
+        self.offer = offer_amount
+        self.save()
         return new_offer
+
 
     def claim_for_user(self, user):
         return Claim.objects.get(user=user, issue=self.issue)
@@ -197,32 +199,46 @@ class Claim(models.Model):
             self.user, self.issue.id, self.status
         )
 
+    def payout(self):
+        try:
+            # refund any authorize offers by this user
+            # TODO: this should be part of the claim create processing
+            users_offers = Offer.objects.filter(
+                    bid__issue=self.issue,
+                    user=self.user,
+                    refund_id=u'',
+                    charge_id__isnull=False
+                )
+            for offer in users_offers:
+                payments.refund(offer)
+
+            # get all authorized offers for this issue
+            valid_offers = Offer.objects.filter(
+                    bid__issue=self.issue,
+                    charge_id__isnull=False,
+                    refund_id=u'',
+                )
+            # capture payment to this users account
+            for offer in valid_offers:
+                payments.refund(offer)
+                payout = Payout(
+                    user=self.user,
+                    claim=self,
+                    amount=offer.amount
+                )
+                payout.save()
+                payments.charge(offer, payout)
+            return True
+        except Exception as e:
+            print   e.message
+            return False
+
     def payouts(self):
         return Payout.objects.filter(claim=self)
 
     def successful_payouts(self):
         return Payout.objects.filter(claim=self, api_success=True)
 
-    def payout_request(self):
-        if self.status == 'Paid':
-            return False
-
-        bid = Bid.objects.get(url=self.issue.url, user=self.user)
-
-        payout = Payout(
-            user=self.user,
-            claim=self,
-            amount=bid.ask
-        )
-        payout.save()
-
-        payout_attempt = payout.request()
-        if payout.api_success is True:
-            self.status = 'Paid'
-        else:
-            self.status = 'Requested'
-        self.save()
-        return payout_attempt
 
     def votes_by_approval(self, approved):
         return (Vote.objects
@@ -420,7 +436,8 @@ class Payment(models.Model):
     error_message = models.CharField(max_length=255, blank=True)
     charge_amount = models.DecimalField(
         max_digits=6, decimal_places=2, blank=True, default=0)
-    confirmation = models.CharField(max_length=255, blank=True)
+    charge_id = models.CharField(max_length=255, blank=True)
+    refund_id = models.CharField(max_length=255, blank=True)
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True, auto_now=True)
 
@@ -439,8 +456,11 @@ class Offer(Payment):
         choices=Payment.PROVIDER_CHOICES,
         default='Stripe')
 
-    def fees(self):
-        return OfferFee.objects.filter(offer=self)
+    def save(self, *args, **kwargs):
+        is_new = not self.pk
+        super(Offer, self).save(*args, **kwargs)
+        if is_new:
+            self.add_fees()
 
     def __unicode__(self):
         return u'%s Offer payment for bid (%s) paid' % (
@@ -448,59 +468,31 @@ class Offer(Payment):
             self.bid.id
         )
 
-    def request(self):
-        codesy_pct = Decimal('0.025')
-        stripe_pct = Decimal('0.029')
-        stripe_transaction = Decimal('0.30')
+    @property
+    def fees(self):
+        return OfferFee.objects.filter(offer=self)
 
-        codesy_fee_amount = round_penny(self.amount * codesy_pct)
+    @property
+    def sum_fees(self):
+        return self.fees.aggregate(Sum('amount'))['amount__sum']
 
-        stripe_charge = round_penny(
-            (self.amount + codesy_fee_amount + stripe_transaction)
-            / (1 - stripe_pct)
+    def add_fees(self):
+        fee_details = payments.offer_amounts(self.amount)
+        stripe_fee = OfferFee(
+            offer=self,
+            fee_type='Stripe',
+            amount=fee_details['stripe_fee']
         )
-
-        stripe_fee_amount = stripe_charge - (self.amount + codesy_fee_amount)
+        stripe_fee.save()
 
         codesy_fee = OfferFee(
             offer=self,
             fee_type='codesy',
-            amount=stripe_charge - stripe_fee_amount - self.amount
+            amount=fee_details['codesy_fee']
         )
         codesy_fee.save()
 
-        stripe_fee = OfferFee(
-            offer=self,
-            fee_type='Stripe',
-            amount=stripe_fee_amount
-        )
-        stripe_fee.save()
-
-        # TODO: HANDLE CARD NOT YET REGISTERED
-        try:
-            charge = stripe.Charge.create(
-                amount=int(stripe_charge * 100),
-                currency="usd",
-                customer=self.user.stripe_customer,
-                description="Offer for: " + self.bid.url,
-                metadata={'id': self.id}
-            )
-            if charge:
-                self.charge_amount = stripe_charge
-                self.confirmation = charge.id
-                self.api_success = True
-                self.offer = self
-                self.save()
-            else:
-                self.error_message = "Charge failed, try later"
-                self.save()
-                return False
-        except Exception as e:
-            self.error_message = e.message
-            self.save()
-            return False
-
-        return True
+        self.charge_amount = fee_details['charge_amount']
 
 
 class Payout(Payment):
@@ -520,75 +512,6 @@ class Payout(Payment):
 
     def credits(self):
         return PayoutCredit.objects.filter(payout=self)
-
-    def request(self):
-        managed_account = self.user.account()
-        if not managed_account:
-            return False
-
-        codesy_pct = Decimal('0.025')
-        stripe_pct = Decimal('0.005')  # .05% transfer
-        stripe_transaction = Decimal('0.0')
-        total_payout_amount = self.amount
-        try:
-            user_offers = Offer.objects.filter(user=self.claim.user,
-                                               bid__issue=self.claim.issue)
-            if user_offers:
-                total_refund = (
-                    user_offers.aggregate(Sum('amount'))['amount__sum']
-                )
-                refund_user_offer = PayoutCredit(
-                    payout=self,
-                    fee_type='refund',
-                    description="Your offer",
-                    amount=total_refund,
-                )
-                refund_user_offer.save()
-                total_payout_amount += total_refund
-
-        except Offer.DoesNotExist:
-            refund_user_offer = None
-
-        codesy_fee = PayoutFee(
-            payout=self,
-            fee_type='codesy',
-            amount=round_penny(total_payout_amount * codesy_pct),
-        )
-        codesy_fee.save()
-
-        stripe_fee_amount = round_penny(
-            (total_payout_amount * stripe_pct) + stripe_transaction
-        )
-
-        stripe_fee = PayoutFee(
-            payout=self,
-            fee_type='Stripe',
-            amount=stripe_fee_amount
-        )
-        stripe_fee.save()
-
-        try:
-            transfer = stripe.Transfer.create(
-                currency="usd",
-                description="codesy.io payout",
-                amount=int(total_payout_amount * 100),
-                application_fee=int(
-                    (codesy_fee.amount + stripe_fee.amount) * 100),
-                destination=managed_account.account_id
-            )
-            if transfer:
-                self.charge_amount = (
-                    total_payout_amount
-                    - (codesy_fee.amount + stripe_fee.amount)
-                )
-                self.api_success = True
-                self.confirmation = transfer.id
-                self.save()
-                return True
-        except Exception as e:
-            self.error_message = e.message
-
-        return False
 
 
 class Fee(models.Model):
@@ -614,7 +537,7 @@ class OfferFee(Fee):
     offer = models.ForeignKey(Offer, related_name="offer_fees", null=True)
 
     def __unicode__(self):
-        return "%s fee for %s" % (self.fee_type, self.offer)
+        return "%s fee amount:%s" % (self.fee_type, self.offer)
 
 
 class PayoutFee(Fee):
