@@ -24,15 +24,24 @@ def calculate_stripe_fee(amount):
 
 
 def calculate_charge_amount(amount):
-    return round_penny(amount / (1 - stripe_pct))
+    return round_penny(
+        (amount + stripe_transaction)
+        / (1 - stripe_pct)
+    )
 
 
 def offer_amounts(amount):
     codesy_fee_amount = calculate_codesy_fee(amount)
     charge_amount = calculate_charge_amount(
-        codesy_fee_amount + amount
+        amount +
+        codesy_fee_amount
     )
-    stripe_fee_amount = calculate_stripe_fee(charge_amount)
+    stripe_fee_amount = (
+        charge_amount -
+        amount -
+        codesy_fee_amount
+    )
+
     return {
         'codesy_fee': codesy_fee_amount,
         'stripe_fee': stripe_fee_amount,
