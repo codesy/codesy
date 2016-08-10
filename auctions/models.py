@@ -59,7 +59,6 @@ class Bid(models.Model):
         else:
             return False
 
-
     @property
     def offers(self):
         return Offer.objects.filter(bid=self)
@@ -85,7 +84,6 @@ class Bid(models.Model):
         self.offer = offer_amount
         self.save()
         return new_offer
-
 
     def claim_for_user(self, user):
         return Claim.objects.get(user=user, issue=self.issue)
@@ -204,20 +202,21 @@ class Claim(models.Model):
             # refund any authorize offers by this user
             # TODO: this should be part of the claim create processing
             users_offers = Offer.objects.filter(
-                    bid__issue=self.issue,
-                    user=self.user,
-                    refund_id=u'',
-                    charge_id__isnull=False
-                )
+                bid__issue=self.issue,
+                user=self.user,
+                refund_id=u'',
+                charge_id__isnull=False
+            )
             for offer in users_offers:
                 payments.refund(offer)
 
             # get all authorized offers for this issue
             valid_offers = Offer.objects.filter(
-                    bid__issue=self.issue,
-                    charge_id__isnull=False,
-                    refund_id=u'',
-                )
+                bid__issue=self.issue,
+                charge_id__isnull=False,
+                refund_id=u'',
+            )
+
             # capture payment to this users account
             for offer in valid_offers:
                 payments.refund(offer)
@@ -229,8 +228,7 @@ class Claim(models.Model):
                 payout.save()
                 payments.charge(offer, payout)
             return True
-        except Exception as e:
-            print   e.message
+        except:
             return False
 
     def payouts(self):
@@ -238,7 +236,6 @@ class Claim(models.Model):
 
     def successful_payouts(self):
         return Payout.objects.filter(claim=self, api_success=True)
-
 
     def votes_by_approval(self, approved):
         return (Vote.objects
@@ -448,6 +445,12 @@ class Payment(models.Model):
     class Meta:
         abstract = True
 
+    def save(self, *args, **kwargs):
+        is_new = not self.pk
+        super(Offer, self).save(*args, **kwargs)
+        if is_new:
+            self.add_fees()
+
 
 class Offer(Payment):
     bid = models.ForeignKey(Bid, related_name='payments')
@@ -455,12 +458,6 @@ class Offer(Payment):
         max_length=255,
         choices=Payment.PROVIDER_CHOICES,
         default='Stripe')
-
-    def save(self, *args, **kwargs):
-        is_new = not self.pk
-        super(Offer, self).save(*args, **kwargs)
-        if is_new:
-            self.add_fees()
 
     def __unicode__(self):
         return u'%s Offer payment for bid (%s) paid' % (
@@ -477,11 +474,11 @@ class Offer(Payment):
         return self.fees.aggregate(Sum('amount'))['amount__sum']
 
     def add_fees(self):
-        fee_details = payments.offer_amounts(self.amount)
+        fee_details = payments.transaction_amounts(self.amount)
         stripe_fee = OfferFee(
             offer=self,
             fee_type='Stripe',
-            amount=fee_details['stripe_fee']
+            amount=fee_details['offer_stripe_fee']
         )
         stripe_fee.save()
 
@@ -492,7 +489,7 @@ class Offer(Payment):
         )
         codesy_fee.save()
 
-        self.charge_amount = fee_details['charge_amount']
+        self.charge_amount = fee_details['payout_amount']
 
 
 class Payout(Payment):
@@ -512,6 +509,24 @@ class Payout(Payment):
 
     def credits(self):
         return PayoutCredit.objects.filter(payout=self)
+
+    def add_fees(self):
+        fee_details = payments.transaction_amounts(self.amount)
+        stripe_fee = PayoutFee(
+            offer=self,
+            fee_type='Stripe',
+            amount=fee_details['payout_stripe_fee']
+        )
+        stripe_fee.save()
+
+        codesy_fee = PayoutFee(
+            offer=self,
+            fee_type='codesy',
+            amount=fee_details['codesy_fee']
+        )
+        codesy_fee.save()
+
+        self.charge_amount = fee_details['charge_amount']
 
 
 class Fee(models.Model):

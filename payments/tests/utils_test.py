@@ -2,24 +2,46 @@ from django.test import TestCase
 
 import payments.utils as payments
 
+
 class PaymentAmountTest(TestCase):
 
     def test_calculate_amounts(self):
-        amounts = [10,2,3,5,7,9,200,333,999]
+        # amounts = [10, 1, 2, 3, 5, 7, 9, 200, 333, 999]
+        amounts = range(1, 1000)
         for amount in amounts:
-
-            offer_values = payments.offer_amounts(amount)
+            print "---"
+            offer_values = payments.transaction_amounts(amount)
 
             for comp in offer_values:
                 print u'%s : %s' % (comp, offer_values[comp])
 
-            total_components = (
-                amount + 1 +
-                offer_values['codesy_fee'] +
-                offer_values['stripe_fee']
+            offer_components = (
+                amount
+                + offer_values['codesy_fee']
+                + offer_values['offer_stripe_fee']
+            )
+            self.assertEqual(
+                offer_components,
+                offer_values['charge_amount']
+            )
+
+            payout_components = (
+                amount
+                - offer_values['codesy_fee']
+                - offer_values['payout_stripe_fee']
             )
 
             self.assertEqual(
-                total_components,
-                offer_values['charge_amount']
+                payout_components,
+                offer_values['payout_amount']
             )
+
+            self.assertEqual(
+                offer_values['payout_amount'],
+                (offer_values['charge_amount']
+                    - offer_values['application_fee']
+                 )
+            )
+
+    def test_sandbox_charge(TestCase):
+        payments.sandbox_charge(10)

@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from django.shortcuts import redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import messages
@@ -99,7 +97,8 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
                 if claim.payout():
                     messages.success(request, 'Your payout was sent.')
                 else:
-                    messages.error(request, "Sorry please try this payout later")
+                    messages.error(
+                        request, "Sorry please try this payout later")
             else:
                 messages.error(request,
                                "Sorry, this is not your payout to claim")

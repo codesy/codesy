@@ -23,29 +23,57 @@ def calculate_stripe_fee(amount):
     )
 
 
-def calculate_charge_amount(amount):
+def calculate_charge_amount(goal):
     return round_penny(
-        (amount + stripe_transaction)
-        / (1 - stripe_pct)
+        (goal + stripe_transaction) / (1 - stripe_pct)
     )
 
 
-def offer_amounts(amount):
+def calculate_offer_charge(goal):
+    return round_penny(
+        (goal + (stripe_transaction / 2))
+        / (1 - (stripe_pct / 2))
+    )
+
+
+def transaction_amounts(amount):
     codesy_fee_amount = calculate_codesy_fee(amount)
-    charge_amount = calculate_charge_amount(
-        amount +
-        codesy_fee_amount
+    charge_amount = calculate_offer_charge(
+        amount
+        + codesy_fee_amount
     )
-    stripe_fee_amount = (
-        charge_amount -
-        amount -
-        codesy_fee_amount
+
+    offer_stripe_fee = (
+        charge_amount
+        - amount
+        - codesy_fee_amount
+    )
+
+    total_stripe_fee = calculate_stripe_fee(charge_amount)
+
+    payout_stripe_fee = total_stripe_fee - offer_stripe_fee
+
+    payout_amount = (
+        amount
+        - codesy_fee_amount
+        - payout_stripe_fee
+    )
+
+    application_fee = (
+        offer_stripe_fee
+        + payout_stripe_fee
+        + (codesy_fee_amount * 2)
     )
 
     return {
+        'amount': amount,
+        'charge_amount': round_penny(charge_amount),
+        'payout_amount': payout_amount,
         'codesy_fee': codesy_fee_amount,
-        'stripe_fee': stripe_fee_amount,
-        'charge_amount': charge_amount,
+        'total_stripe_fee': total_stripe_fee,
+        'offer_stripe_fee': offer_stripe_fee,
+        'payout_stripe_fee': payout_stripe_fee,
+        'application_fee': application_fee
     }
 
 
@@ -85,26 +113,45 @@ def authorize(offer):
 
 
 def charge(offer, payout):
-    codesy_fee = calculate_codesy_fee(offer.amount)
+
+    details = transaction_amounts(offer.amount)
 
     try:
         charge = stripe.Charge.create(
             customer=offer.user.stripe_customer,
             destination=payout.user.account().account_id,
-            amount=int(offer.charge_amount * 100),
+            amount=int(details['charge_amount'] * 100),
             currency="usd",
             description="Payout for: " + offer.bid.url,
             metadata={'bid_id': offer.bid.id},
-            application_fee=int(codesy_fee * 100)
+            application_fee=int(details['application_fee'] * 100)
         )
         if charge:
             payout.charge_id = charge.id
             payout.api_success = True
             payout.save()
             payout.claim.status = 'Paid'
-            pay.claim.save()
+            payout.claim.save()
         else:
             offer.error_message = "Authorization failed, please try later"
     except Exception as e:
         offer.error_message = e.message
     offer.save()
+
+
+def sandbox_charge(offer_amount):
+        details = transaction_amounts(offer_amount)
+        amount = details['charge_amount']
+        fee = details['application_fee']
+
+        print details
+
+        charge = stripe.Charge.create(
+            customer='cus_8xssHec3HDIwUs',
+            destination='acct_18fylUFyyzYSCsjR',
+            amount=int(amount * 100),
+            currency="usd",
+            application_fee=int(fee * 100)
+        )
+
+        print charge.id
