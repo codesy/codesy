@@ -25,32 +25,15 @@ def setUpPackage(self):
     )
 
     self.patch_stripe = fudge.patch_object(
-        'auctions.models.stripe', 'Charge', mock_stripe)
+        'payments.utils.stripe', 'Charge', mock_stripe)
 
     self.patch_stripe = fudge.patch_object(
-        'auctions.models.stripe', 'Transfer', mock_stripe)
-
-    # fake_items = [fudge.Fake().has_attr(
-    #     transaction_status='SUCCESS',
-    #     payout_item_id='Howdy'),
-    # ]
-
-    # mock_paypal = (
-    #     fudge.Fake().is_callable().returns(
-    #         fudge.Fake().provides('create').returns(True)
-    #         .has_attr(items=fake_items)
-    #     )
-    # )
-    #
-    # self.patch_paypal = fudge.patch_object(
-    #     'auctions.models', 'PaypalPayout', mock_paypal
-    # )
+        'payments.utils.stripe', 'Refund', mock_stripe)
 
 
 def tearDownPackage(self):
     self.patch_request.restore()
     self.patch_stripe.restore()
-    # self.patch_paypal.restore()
 
 
 class MarketWithBidsTestCase(TestCase):

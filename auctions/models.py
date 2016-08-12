@@ -197,10 +197,11 @@ class Claim(models.Model):
             self.user, self.issue.id, self.status
         )
 
-    def payout(self):
-        try:
+    def save(self, *args, **kwargs):
+        is_new = not self.pk
+        super(Claim, self).save(*args, **kwargs)
+        if is_new:
             # refund any authorize offers by this user
-            # TODO: this should be part of the claim create processing
             users_offers = Offer.objects.filter(
                 bid__issue=self.issue,
                 user=self.user,
@@ -210,14 +211,15 @@ class Claim(models.Model):
             for offer in users_offers:
                 payments.refund(offer)
 
+    def payout(self):
+        try:
             # get all authorized offers for this issue
             valid_offers = Offer.objects.filter(
                 bid__issue=self.issue,
                 charge_id__isnull=False,
                 refund_id=u'',
             )
-
-            # capture payment to this users account
+            # # capture payment to this users account
             for offer in valid_offers:
                 payments.refund(offer)
                 payout = Payout(
@@ -228,7 +230,8 @@ class Claim(models.Model):
                 payout.save()
                 payments.charge(offer, payout)
             return True
-        except:
+        except Exception as e:
+            print 'payout error: %s' % e.message
             return False
 
     def payouts(self):
@@ -438,16 +441,12 @@ class Payment(models.Model):
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True, auto_now=True)
 
-    def short_key(self):
-        return (self.transaction_key
-                .bytes.encode('base64').rstrip('=\n').replace('/', '_'))
-
     class Meta:
         abstract = True
 
     def save(self, *args, **kwargs):
         is_new = not self.pk
-        super(Offer, self).save(*args, **kwargs)
+        super(Payment, self).save(*args, **kwargs)
         if is_new:
             self.add_fees()
 
@@ -489,7 +488,7 @@ class Offer(Payment):
         )
         codesy_fee.save()
 
-        self.charge_amount = fee_details['payout_amount']
+        self.charge_amount = fee_details['charge_amount']
 
 
 class Payout(Payment):
@@ -513,20 +512,20 @@ class Payout(Payment):
     def add_fees(self):
         fee_details = payments.transaction_amounts(self.amount)
         stripe_fee = PayoutFee(
-            offer=self,
+            payout=self,
             fee_type='Stripe',
             amount=fee_details['payout_stripe_fee']
         )
         stripe_fee.save()
 
         codesy_fee = PayoutFee(
-            offer=self,
+            payout=self,
             fee_type='codesy',
             amount=fee_details['codesy_fee']
         )
         codesy_fee.save()
 
-        self.charge_amount = fee_details['charge_amount']
+        self.charge_amount = fee_details['payout_amount']
 
 
 class Fee(models.Model):

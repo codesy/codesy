@@ -84,11 +84,10 @@ def refund(offer):
         )
         if refund:
             offer.refund_id = refund.id
-            offer.save()
     except Exception as e:
         print e.message
         offer.error_message = e.message
-        offer.save()
+    offer.save()
 
 
 def authorize(offer):
@@ -113,7 +112,6 @@ def authorize(offer):
 
 
 def charge(offer, payout):
-
     details = transaction_amounts(offer.amount)
 
     try:
@@ -127,6 +125,7 @@ def charge(offer, payout):
             application_fee=int(details['application_fee'] * 100)
         )
         if charge:
+            payout.charge_amount = details['payout_amount']
             payout.charge_id = charge.id
             payout.api_success = True
             payout.save()
@@ -135,6 +134,7 @@ def charge(offer, payout):
         else:
             offer.error_message = "Authorization failed, please try later"
     except Exception as e:
+        print 'charge error: %s' % e.message
         offer.error_message = e.message
     offer.save()
 

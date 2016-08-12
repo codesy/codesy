@@ -1,16 +1,15 @@
 from django.test import TestCase
-
-import payments.utils as payments
+from payments import utils
 
 
 class PaymentAmountTest(TestCase):
 
     def test_calculate_amounts(self):
-        # amounts = [10, 1, 2, 3, 5, 7, 9, 200, 333, 999]
-        amounts = range(1, 1000)
+        amounts = [20, 1, 2, 3, 5, 7, 9, 200, 333, 999]
+        # amounts = range(1, 1000)
         for amount in amounts:
             print "---"
-            offer_values = payments.transaction_amounts(amount)
+            offer_values = utils.transaction_amounts(amount)
 
             for comp in offer_values:
                 print u'%s : %s' % (comp, offer_values[comp])
@@ -44,4 +43,4 @@ class PaymentAmountTest(TestCase):
             )
 
     def test_sandbox_charge(TestCase):
-        payments.sandbox_charge(10)
+        utils.sandbox_charge(10)

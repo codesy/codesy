@@ -92,18 +92,19 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
 
         claim = get_object_or_404(Claim, pk=self.kwargs['pk'])
 
-        try:
-            if request.user == claim.user:
-                if claim.payout():
-                    messages.success(request, 'Your payout was sent.')
-                else:
-                    messages.error(
-                        request, "Sorry please try this payout later")
-            else:
-                messages.error(request,
-                               "Sorry, this is not your payout to claim")
-        except:
-            messages.error(request, "Sorry please try later")
+        if request.user != claim.user:
+            messages.error(
+                request,
+                "Sorry, this is not your payout to claim"
+            )
+            return redirect(reverse('claim-status',
+                            kwargs={'pk': claim.id}))
+
+        if claim.payout():
+            messages.success(request, 'Your payout was sent.')
+        else:
+            messages.error(
+                request, "Sorry please try this payout later")
 
         return redirect(reverse('claim-status',
                                 kwargs={'pk': claim.id}))
