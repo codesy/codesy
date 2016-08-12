@@ -1,5 +1,6 @@
 from django.test import TestCase
-from payments import utils
+
+from .. import utils
 
 
 class PaymentAmountTest(TestCase):
