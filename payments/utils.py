@@ -137,21 +137,3 @@ def charge(offer, payout):
         print 'charge error: %s' % e.message
         offer.error_message = e.message
     offer.save()
-
-
-def sandbox_charge(offer_amount):
-        details = transaction_amounts(offer_amount)
-        amount = details['charge_amount']
-        fee = details['application_fee']
-
-        print details
-
-        charge = stripe.Charge.create(
-            customer='cus_8xssHec3HDIwUs',
-            destination='acct_18fylUFyyzYSCsjR',
-            amount=int(amount * 100),
-            currency="usd",
-            application_fee=int(fee * 100)
-        )
-
-        print charge.id

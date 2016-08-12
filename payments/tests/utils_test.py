@@ -42,6 +42,3 @@ class PaymentAmountTest(TestCase):
                     - offer_values['application_fee']
                  )
             )
-
-    def test_sandbox_charge(TestCase):
-        utils.sandbox_charge(10)

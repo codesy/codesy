@@ -218,6 +218,8 @@ class Claim(models.Model):
                 bid__issue=self.issue,
                 charge_id__isnull=False,
                 refund_id=u'',
+            ).exclude(
+                user=self.user
             )
             # # capture payment to this users account
             for offer in valid_offers:
@@ -449,6 +451,9 @@ class Payment(models.Model):
         super(Payment, self).save(*args, **kwargs)
         if is_new:
             self.add_fees()
+
+    def add_fees():
+        raise NotImplementedError
 
 
 class Offer(Payment):
