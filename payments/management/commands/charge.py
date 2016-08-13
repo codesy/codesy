@@ -1,9 +1,10 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
-from payments import utils
-
 import stripe
+
+from ... import utils
+
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
