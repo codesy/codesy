@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.test import TestCase
 
 from .. import utils
@@ -6,8 +8,7 @@ from .. import utils
 class PaymentAmountTest(TestCase):
 
     def test_calculate_amounts(self):
-        amounts = [20, 1, 2, 3, 5, 7, 9, 200, 333, 999]
-        # amounts = range(1, 1000)
+        amounts = range(1, 1000)
         for amount in amounts:
             print "---"
             offer_values = utils.transaction_amounts(amount)
@@ -42,3 +43,22 @@ class PaymentAmountTest(TestCase):
                     - offer_values['application_fee']
                  )
             )
+
+    def test_fixed_amounts(self):
+            values = utils.transaction_amounts(10)
+            self.assertEqual(values['total_stripe_fee'], Decimal('0.61'))
+            self.assertEqual(values['application_fee'], Decimal('1.11'))
+            self.assertEqual(values['codesy_fee'], Decimal('0.25'))
+            self.assertEqual(values['charge_amount'], Decimal('10.55'))
+            self.assertEqual(values['offer_stripe_fee'], Decimal('0.30'))
+            self.assertEqual(values['payout_amount'], Decimal('9.44'))
+            self.assertEqual(values['payout_stripe_fee'], Decimal('0.31'))
+
+            values = utils.transaction_amounts(50)
+            self.assertEqual(values['total_stripe_fee'], Decimal('1.81'))
+            self.assertEqual(values['application_fee'], Decimal('4.31'))
+            self.assertEqual(values['codesy_fee'], Decimal('1.25'))
+            self.assertEqual(values['charge_amount'], Decimal('52.16'))
+            self.assertEqual(values['offer_stripe_fee'], Decimal('0.91'))
+            self.assertEqual(values['payout_amount'], Decimal('47.85'))
+            self.assertEqual(values['payout_stripe_fee'], Decimal('0.90'))
