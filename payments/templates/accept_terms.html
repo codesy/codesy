@@ -14,7 +14,7 @@
         <form
             role="form"
             class="form-horizontal"
-            action="/payments/terms"
+            action="{% url 'terms' %}"
             method="POST">
             {% csrf_token %}
 
