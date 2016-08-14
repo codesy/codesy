@@ -24,7 +24,7 @@ class ClaimAdmin(admin.ModelAdmin):
 
 
 class OfferAdmin(admin.ModelAdmin):
-    list_display = ('user', 'bid', 'amount', 'charge_amount', 'api_success',
+    list_display = ('user', 'bid', 'amount', 'charge_amount', 'refund_id',
                     'created')
     list_filter = ('api_success',)
     search_fields = ['bid__user__username', 'bid__user__email',

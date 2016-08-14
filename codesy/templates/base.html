@@ -1,4 +1,4 @@
-{% load staticfiles %}
+    {% load staticfiles %}
 {% load socialaccount %}
 <!DOCTYPE html>
 <html id="codesy-html" class="no-js" lang="en" data-stripe_key="{{ settings.STRIPE_PUBLIC_KEY }}" data-ga_id="{{ settings.GOOGLE_ANALYTICS_ID }}" data-ga_filename="analytics{% if settings.DEBUG %}_debug{% endif %}.js">
@@ -31,7 +31,8 @@
                             <li><a href="/claim-list">Claims</a></li>
                             <li><a href="/vote-list">Votes</a></li>
                             <hr/>
-                            <li><a href="{% url 'card-info' %}">Change Credit Card</a></li>
+                            <li><a href="{% url 'card' %}">Change Credit Card</a></li>
+                            <li><a href="{% url 'bank' %}">Change Bank Account</a></li>
                             <hr/>
                             <li><a href="{% url 'account_logout' %}">Sign out</a></li>
                         </ul>
@@ -87,7 +88,6 @@
     <script src="https://cdn.jsdelivr.net/jquery/2.2.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/foundation/6.1.2/foundation.min.js"></script>
     <script src="{% static "js/home-app.js" %}" ></script>
-    <script src="{% static "js/widget-app.js" %}" ></script>
     <script src="{% static "js/analytics.js" %}" ></script>
     {% block scripts %}
     {% endblock %}

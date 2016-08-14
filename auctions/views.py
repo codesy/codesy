@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from django.shortcuts import redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import messages
@@ -28,13 +26,12 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
         return self.request.user.is_active
 
     def _get_bid(self, url):
-        bid = None
         try:
-            bid = Bid.objects.get(user=self.request.user, url=url)
+            return Bid.objects.get(user=self.request.user, url=url)
         except:
-            # pass to return (None, None) to caller
-            pass
-        return bid
+            new_bid = Bid(user=self.request.user, url=url)
+            new_bid.save()
+            return new_bid
 
     def get_context_data(self, **kwargs):
         url = self.request.GET['url']
@@ -49,36 +46,20 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
         new_ask_amount = self.request.POST['ask']
         new_offer_amount = self.request.POST['offer']
 
-        redirect_response = redirect(
-            "%s?url=%s" % (reverse('bid-status'), url)
-        )
-
-        if not(new_ask_amount) and not(new_offer_amount):
-            return redirect_response
-
         bid = self._get_bid(url)
-
-        if not bid:
-            bid = Bid(user=self.request.user, url=url)
-            bid.save()
 
         if new_ask_amount:
             bid.ask = new_ask_amount
             bid.save()
 
         if new_offer_amount:
-            new_offer_amount = Decimal(self.request.POST['offer'])
-            # TODO: move most/all of this logic into Bid.make_offer()
-            if new_offer_amount > bid.offer:
-                new_offer = bid.make_offer(new_offer_amount)
-                if new_offer.request():
-                    messages.success(self.request, "Thanks for the offer!")
-                    bid.offer = new_offer_amount
-                    bid.save()
-                else:
-                    messages.error(self.request, new_offer.error_message)
+            new_offer = bid.set_offer(new_offer_amount)
+            if new_offer.error_message:
+                messages.error(self.request, new_offer.error_message)
+            else:
+                messages.success(self.request, "Thanks for the offer!")
 
-        return redirect_response
+        return redirect("%s?url=%s" % (reverse('bid-status'), url))
 
 
 class ClaimStatusView(LoginRequiredMixin, TemplateView):
@@ -111,24 +92,25 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
 
         claim = get_object_or_404(Claim, pk=self.kwargs['pk'])
 
-        try:
-            if request.user == claim.user:
-                if claim.payout_request():
-                    messages.success(request, 'Your payout was sent.')
-                else:
-                    messages.error(request, "Your payout has been requested.")
-            else:
-                messages.error(request,
-                               "Sorry, this is not your payout to claim")
-        except:
-            messages.error(request, "Sorry please try later")
+        if request.user != claim.user:
+            messages.error(
+                request,
+                "Sorry, this is not your payout to claim"
+            )
+            return redirect(reverse('claim-status',
+                            kwargs={'pk': claim.id}))
+
+        if claim.payout():
+            messages.success(request, 'Your payout was sent.')
+        else:
+            messages.error(
+                request, "Sorry please try this payout later")
 
         return redirect(reverse('claim-status',
                                 kwargs={'pk': claim.id}))
 
+
 # List Views
-
-
 class BidList(LoginRequiredMixin, TemplateView):
     """List of bids for the User
     """

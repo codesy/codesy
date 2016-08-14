@@ -12,8 +12,9 @@ from django.db.models import Sum
 
 from model_mommy import mommy
 
+from payments.models import StripeAccount
 from ..models import Bid, Claim, Issue, Vote
-from ..models import Offer, OfferFee, Payout, PayoutFee, PayoutCredit
+from ..models import Offer, OfferFee, Payout, PayoutFee
 
 from . import MarketWithBidsTestCase, MarketWithClaimTestCase
 
@@ -444,8 +445,7 @@ class OfferTest(TestCase):
         self.bid = mommy.make(
             Bid, user=self.user1,
             url=self.url, issue=self.issue, offer=50)
-        offer = self.bid.make_offer(50)
-        offer.request()
+        self.offer = self.bid.set_offer(50)
 
     def test_key_created(self):
         offer = mommy.make(Offer, bid=self.bid)
@@ -456,32 +456,20 @@ class OfferTest(TestCase):
         self.assertEqual(offer.amount, 50)
         fees = OfferFee.objects.filter(offer=offer)
         self.assertEqual(len(fees), 2)
-        self.assertEqual(len(fees), len(offer.fees()))
+        self.assertEqual(len(fees), len(offer.fees))
         sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
         offer_with_fees = offer.amount + sum_fees
         self.assertEqual(offer_with_fees, offer.charge_amount)
 
     def test_new_offer(self):
         self.assertEqual(self.bid.offer, 50)
-        offer = self.bid.make_offer(60)
-        self.assertEqual(offer.amount, 10)
-        offer.request()
+        offer = self.bid.set_offer(60)
+        self.assertEqual(offer.amount, 60)
         offers = Offer.objects.filter(bid=self.bid)
         self.assertEqual(len(offers), 2)
-        self.assertEqual(len(self.bid.offers()), 2)
+        self.assertEqual(len(self.bid.offers), 2)
         sum_offers = offers.aggregate(Sum('amount'))['amount__sum']
-        self.assertEqual(sum_offers, 60)
-
-    def test_offer_fee_calculatons(self):
-        AMOUNTS = [333, 22, 357, 1000, 50, 999, 1, ]
-        for amount in AMOUNTS:
-            new_bid = mommy.make(Bid, offer=amount)
-            new_bid.make_offer(amount)
-            offer = Offer.objects.get(bid=new_bid)
-            fees = OfferFee.objects.filter(offer=offer)
-            self.assertEqual(offer.request(), True)
-            sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
-            self.assertEqual(offer.charge_amount - sum_fees, amount)
+        self.assertEqual(sum_offers, 110)
 
 
 class PayoutTest(TestCase):
@@ -500,7 +488,8 @@ class PayoutTest(TestCase):
 
         self.bid2 = mommy.make(
             Bid, user=self.user2,
-            url=self.url, issue=self.issue, offer=50)
+            url=self.url, issue=self.issue)
+        self.bid2.set_offer(50)
 
     def test_payouts_property(self):
         claim = mommy.make(Claim)
@@ -510,12 +499,13 @@ class PayoutTest(TestCase):
         payouts = Payout.objects.all()
         self.assertEqual(len(claim.payouts.all()), len(payouts))
 
-    def test_payout_request(self):
+    def test_payout(self):
         claim = mommy.make(Claim, user=self.user1, issue=self.issue)
-        api_request = claim.payout_request()
+        account = mommy.make(StripeAccount, user=self.user1)
+        self.assertEqual(account, self.user1.account())
+        api_request = claim.payout()
         if api_request:
             self.assertEqual(claim.status, 'Paid')
-            self.assertFalse(claim.payout_request())
         payouts = claim.payouts.all()
         payout = payouts[0]
         self.assertTrue(payout.api_success)
@@ -525,37 +515,3 @@ class PayoutTest(TestCase):
         self.assertEqual(len(payout.fees()), len(fees))
         sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
         self.assertEqual(sum_fees + payout.charge_amount, self.bid1.ask)
-
-    def test_payout_fee_calculations(self):
-        AMOUNTS = [333, 22, 357, 1000, 50, 999, 1, ]
-        for amount in AMOUNTS:
-            payout = mommy.make(Payout, amount=amount)
-            payout.request()
-            fees = PayoutFee.objects.filter(payout=payout)
-            sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
-            self.assertEqual(sum_fees + payout.charge_amount, amount)
-
-    def test_payout_refund(self):
-        """
-        A user getting paid for a claim should also get back any offers
-        they made on the issue.
-        """
-        self.bid1.make_offer(10)
-        self.bid1.save()
-        mommy.make(Bid, user=self.user1, offer=50)
-
-        claim = mommy.make(Claim, user=self.user1, issue=self.issue)
-        api_request = claim.payout_request()
-        if api_request:
-            self.assertEqual(claim.status, 'Paid')
-            self.assertFalse(claim.payout_request())
-        payouts = claim.payouts.all()
-        payout = payouts[0]
-        self.assertTrue(payout.api_success)
-        self.assertEqual(len(payouts), 1)
-
-        refund = PayoutCredit.objects.filter(payout=payout)
-        self.assertEqual(len(refund), 1)
-        self.assertEqual(len(payout.credits()), len(refund))
-        self.assertEqual(refund[0].amount, 10)
-        self.assertEqual(payout.charge_amount, 58.25)
