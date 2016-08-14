@@ -1,6 +1,6 @@
 -r requirements.txt
 
-coverage==4.0.3
+coverage==4.2
 django-nose==1.4.3
 flake8==2.5.4
 fudge==1.1.0
