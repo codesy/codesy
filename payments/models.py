@@ -106,3 +106,15 @@ class BalanceAvailableProcessor(object):
             pass
 
 webhooks['balance.available'] = BalanceAvailableProcessor()
+
+
+class ChargeUpdatedProcessor(object):
+    def process(self, event):
+        message = event.message()
+        account_id = message['user_id']
+        try:
+            pass
+        except:
+            pass
+
+webhooks['charge.updated'] = ChargeUpdatedProcessor()
