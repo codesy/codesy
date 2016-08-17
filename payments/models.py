@@ -1,5 +1,6 @@
 import json
 from decimal import Decimal
+from datetime import datetime
 
 from django.conf import settings
 from django.db import models
@@ -57,31 +58,62 @@ class StripeAccount(models.Model):
 
 class StripeEvent(models.Model):
     event_id = models.CharField(primary_key=True, max_length=100, blank=True)
+    user_id = models.CharField(max_length=100, blank=True)
     type = models.CharField(max_length=100, blank=True)
     message_text = models.TextField()
+    verified = models.BooleanField(default=False)
     processed = models.BooleanField(default=False)
+    created = models.DateTimeField(null=True, blank=True)
 
+    @property
     def message(self):
         return json.loads(self.message_text)
 
     def save(self, *args, **kwargs):
+        self.created = datetime.now()
+        super(StripeEvent, self).save(*args, **kwargs)
+
         try:
-            webhooks[self.type].process(self)
+            self.user_id = self.message_text['user_id']
+            retrieved_event = stripe.Event.retrieve(
+                id=self.event_id, stripe_account=self.user_id)
         except KeyError:
+            retrieved_event = stripe.Event.retrieve(id=self.event_id)
+
+        if retrieved_event:
+            self.verified = True
+            self.type = retrieved_event['type']
+            self.message_text = json.dumps(retrieved_event)
+        super(StripeEvent, self).save(*args, **kwargs)
+
+        # attempt to process a webhook for the event type
+        try:
+            webhooks[self.type](event=self).process()
+            self.processed = True
+        except KeyError:
+            # TODO: Add something like papertrail to log this
             pass
         super(StripeEvent, self).save(*args, **kwargs)
 
 webhooks = {}
 
 
-class AccountUpdatedProcessor(object):
-    def process(self, event):
-        message = event.message()
-        account_id = message['user_id']
+class WebHookProcessor(object):
+
+    def __init__(self, event, *args, **kwargs):
+        self.object = event.message['data']['object']
+        super(WebHookProcessor, self).__init__(*args, **kwargs)
+
+    def process():
+        raise NotImplementedError
+
+
+class AccountUpdatedProcessor(WebHookProcessor):
+    def process(self):
         try:
-            account = StripeAccount.objects.get(account_id=account_id)
+            account = StripeAccount.objects.get(account_id=self.account_id)
             verification = (
-                message['data']['object']['verification']
+                self.object['verification']
             )
             account.verification = json.dumps(verification)
             account.save()
@@ -89,32 +121,39 @@ class AccountUpdatedProcessor(object):
             # TODO: Tell someone this happened
             pass
 
-webhooks['account.updated'] = AccountUpdatedProcessor()
+webhooks['account.updated'] = AccountUpdatedProcessor
 
 
-class BalanceAvailableProcessor(object):
-    def process(self, event):
-        message = event.message()
-        account_id = message['user_id']
+class BalanceAvailableProcessor(WebHookProcessor):
+    def process(self):
         try:
-            account = StripeAccount.objects.get(account_id=account_id)
+            account = StripeAccount.objects.get(account_id=self.account_id)
             amount = Decimal(
-                message['data']['object']['available'][0]['amount'])
+                self.object['available'][0]['amount'])
             account.available_balance = (amount / 100)
             account.save()
         except StripeAccount.DoesNotExist:
             pass
 
-webhooks['balance.available'] = BalanceAvailableProcessor()
+webhooks['balance.available'] = BalanceAvailableProcessor
 
 
-class ChargeUpdatedProcessor(object):
-    def process(self, event):
-        message = event.message()
-        account_id = message['user_id']
+class ChargeUpdatedProcessor(WebHookProcessor):
+    def process(self):
         try:
             pass
         except:
             pass
 
-webhooks['charge.updated'] = ChargeUpdatedProcessor()
+webhooks['charge.updated'] = ChargeUpdatedProcessor
+
+
+class PaymentCreatedProcessor(WebHookProcessor):
+    def process(self):
+        try:
+            print "a payment was created"
+            pass
+        except:
+            pass
+
+webhooks['payment.created'] = PaymentCreatedProcessor

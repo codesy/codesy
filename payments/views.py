@@ -145,11 +145,9 @@ class StripeHookView(CSRFExemptMixin, View):
     def post(self, *args, **kwargs):
         message = json.loads(self.request.body)
         event_id = message['id']
+
         if not StripeEvent.objects.filter(event_id=event_id).exists():
-            new_event = StripeEvent(
-                event_id=event_id,
-                type=message['type'],
-                message_text=json.dumps(message)
-            )
+            new_event = StripeEvent(event_id=event_id, message_text=message)
             new_event.save()
+
         return HttpResponse()
