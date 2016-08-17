@@ -23,7 +23,7 @@ class Command(BaseCommand):
 
             charge = stripe.Charge.create(
                 customer='cus_8xssHec3HDIwUs',
-                destination='acct_18fylUFyyzYSCsjR',
+                destination='acct_18ec5MFizJPFF3oA',
                 amount=int(charge_amount * 100),
                 currency="usd",
                 application_fee=int(fee * 100)

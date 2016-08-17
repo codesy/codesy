@@ -1,6 +1,6 @@
 import json
 from decimal import Decimal
-from datetime import datetime
+from django.utils import timezone
 
 from django.conf import settings
 from django.db import models
@@ -70,7 +70,7 @@ class StripeEvent(models.Model):
         return json.loads(self.message_text)
 
     def save(self, *args, **kwargs):
-        self.created = datetime.now()
+        self.created = timezone.now()
         super(StripeEvent, self).save(*args, **kwargs)
 
         try:

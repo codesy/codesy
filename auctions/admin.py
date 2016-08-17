@@ -25,7 +25,7 @@ class ClaimAdmin(admin.ModelAdmin):
 
 class OfferAdmin(admin.ModelAdmin):
     list_display = ('user', 'bid', 'amount', 'charge_amount', 'refund_id',
-                    'created')
+                    'created', 'modified')
     list_filter = ('api_success',)
     search_fields = ['bid__user__username', 'bid__user__email',
                      'error_message', 'confirmation', 'transaction_key']
@@ -33,7 +33,7 @@ class OfferAdmin(admin.ModelAdmin):
 
 class PayoutAdmin(admin.ModelAdmin):
     list_display = ('user', 'claim', 'amount', 'charge_amount', 'api_success',
-                    'created')
+                    'created', 'modified')
     list_filter = ('api_success',)
     search_fields = ['claim__user__username', 'claim__user__email',
                      'confirmation', 'transaction_key']
