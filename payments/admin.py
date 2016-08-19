@@ -8,7 +8,7 @@ class StripeAccountAdmin(admin.ModelAdmin):
 
     readonly_fields = (
         'user', 'account_id', 'secret_key', 'public_key',
-        'available_balance', 'verification'
+        'available_balance'
     )
 
 

@@ -53,24 +53,21 @@ class CSRFExemptMixin(object):
         return super(CSRFExemptMixin, self).dispatch(*args, **kwargs)
 
 
-class UserIdentityVerifiedMixin(UserPassesTestMixin):
-    login_url = reverse_lazy('identity')
-    redirect_field_name = None
-
-    def test_func(self):
-        user_account = self.request.user.account()
-        if not user_account:
-            self.login_url = reverse_lazy('bank')
-            return False
-        return user_account.identity_verified()
-
-
 class UserHasAcceptedTermsMixin(UserPassesTestMixin):
     login_url = reverse_lazy('terms')
     redirect_field_name = None
 
     def test_func(self):
         return self.request.user.accepted_terms()
+
+
+class UserIdentityVerifiedMixin(UserHasAcceptedTermsMixin):
+    login_url = reverse_lazy('identity')
+    redirect_field_name = None
+
+    def test_func(self):
+        user_account = self.request.user.account()
+        return user_account.identity_verified()
 
 
 class CreditCardView(TemplateView):
@@ -82,7 +79,7 @@ class CreditCardView(TemplateView):
         return ctx
 
 
-class BankAccountView(UserHasAcceptedTermsMixin, TemplateView):
+class BankAccountView(UserIdentityVerifiedMixin, TemplateView):
     template_name = 'bank_account_page.html'
 
     def get_context_data(self, **kwargs):
@@ -111,6 +108,8 @@ class VerifyIdentityView(TemplateView):
     def get_context_data(self, **kwargs):
         ctx = super(VerifyIdentityView, self).get_context_data(**kwargs)
         ctx['STRIPE_DEBUG'] = stripe_debug_values()
+        codesy_account = self.request.user.account()
+        ctx['fields_needed'] = codesy_account.fields_needed
         return ctx
 
     def post(self, *args, **kwargs):

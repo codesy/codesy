@@ -28,8 +28,16 @@ class StripeAccount(models.Model):
     verification = models.TextField(default='', blank=True)
 
     def identity_verified(self):
+        if not self.verification:
+            return True
+        else:
+            verification = json.loads(self.verification)
+        return not verification['due_by']
+
+    @property
+    def fields_needed(self):
         verification = json.loads(self.verification)
-        return not verification.due_by
+        return verification['fields_needed']
 
     def new_managed_account(self, bank_account):
         stripe_account = stripe.Account.create(
