@@ -22,6 +22,7 @@ class Command(BaseCommand):
         offers = Offer.objects.filter(
             refund_id=u'')
 
+        # TODO:  Add expiration to the oject filter
         for offer in offers:
             expires = offer.created + timedelta(days=day_limit)
 

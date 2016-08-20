@@ -5,10 +5,10 @@ from .models import StripeAccount, StripeEvent
 
 
 class StripeAccountAdmin(admin.ModelAdmin):
+    list_display = ('user', 'account_id', 'available_balance',)
 
     readonly_fields = (
-        'user', 'account_id', 'secret_key', 'public_key',
-        'available_balance'
+        'user', 'public_key', 'available_balance',
     )
 
 

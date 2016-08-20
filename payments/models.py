@@ -21,7 +21,7 @@ def get_customer_token(user):
 class StripeAccount(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     account_id = models.CharField(max_length=100, blank=True)
-    secret_key = models.CharField(max_length=100, blank=True)
+    secret_key = models.CharField(max_length=100, blank=True, editable=False)
     public_key = models.CharField(max_length=100, blank=True)
     available_balance = models.DecimalField(
         max_digits=6, decimal_places=2, blank=True, default=0)
@@ -32,7 +32,7 @@ class StripeAccount(models.Model):
             return True
         else:
             verification = json.loads(self.verification)
-        return not verification['due_by']
+            return not verification['due_by']
 
     @property
     def fields_needed(self):
@@ -91,8 +91,12 @@ class StripeEvent(models.Model):
         if retrieved_event:
             self.verified = True
             self.type = retrieved_event['type']
-            self.message_text = json.dumps(retrieved_event)
-        super(StripeEvent, self).save(*args, **kwargs)
+            # indent used to avoid c encoder bug
+            self.message_text = json.dumps(retrieved_event, indent=4)
+            super(StripeEvent, self).save(*args, **kwargs)
+        else:
+            # TODO: log this somewhere
+            return
 
         # attempt to process a webhook for the event type
         try:
@@ -119,7 +123,7 @@ class WebHookProcessor(object):
 class AccountUpdatedProcessor(WebHookProcessor):
     def process(self):
         try:
-            account = StripeAccount.objects.get(account_id=self.account_id)
+            account = StripeAccount.objects.get(account_id=self.object['id'])
             verification = (
                 self.object['verification']
             )
@@ -135,7 +139,7 @@ webhooks['account.updated'] = AccountUpdatedProcessor
 class BalanceAvailableProcessor(WebHookProcessor):
     def process(self):
         try:
-            account = StripeAccount.objects.get(account_id=self.account_id)
+            account = StripeAccount.objects.get(account_id=self.object['id'])
             amount = Decimal(
                 self.object['available'][0]['amount'])
             account.available_balance = (amount / 100)
