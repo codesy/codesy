@@ -65,7 +65,7 @@ class UserIdentityVerifiedMixin(UserPassesTestMixin):
     login_url = reverse_lazy('identity')
     redirect_field_name = None
 
-    def test_func(self, **kwargs):
+    def test_func(self):
         user_account = self.request.user.account()
         return user_account.identity_verified()
 
@@ -74,7 +74,7 @@ class BankAccountTestsMixin(UserPassesTestMixin):
     login_url = reverse_lazy('terms')
     redirect_field_name = None
 
-    def test_func(self, **kwargs):
+    def test_func(self):
         if self.request.user.accepted_terms():
             self.login_url = reverse_lazy('identity')
         else:

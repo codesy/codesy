@@ -25,11 +25,7 @@ class User(AbstractUser):
                 github_account.uid)
 
     def accepted_terms(self):
-        return (
-            not (not self.tos_acceptance_date)
-            and
-            not (not self.tos_acceptance_ip)
-        )
+        return self.tos_acceptance_date and self.tos_acceptance_ip
 
     def account(self):
         try:
