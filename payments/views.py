@@ -20,9 +20,9 @@ def stripe_debug_values():
     if settings.DEBUG:
         return {
             'identity': {
-                'dob_day': '04',
-                'dob_month': '07',
-                'dob_year': '1976',
+                'day': '04',
+                'month': '07',
+                'year': '1976',
                 'first_name': 'Joe',
                 'last_name': 'Example',
                 'street': '36 East Cameron',
@@ -53,24 +53,35 @@ class CSRFExemptMixin(object):
         return super(CSRFExemptMixin, self).dispatch(*args, **kwargs)
 
 
-class UserIdentityVerifiedMixin(UserPassesTestMixin):
-    login_url = reverse_lazy('identity')
-    redirect_field_name = None
-
-    def test_func(self):
-        user_account = self.request.user.account()
-        if not user_account:
-            self.login_url = reverse_lazy('bank')
-            return False
-        return user_account.identity_verified()
-
-
 class UserHasAcceptedTermsMixin(UserPassesTestMixin):
     login_url = reverse_lazy('terms')
     redirect_field_name = None
 
     def test_func(self):
         return self.request.user.accepted_terms()
+
+
+class UserIdentityVerifiedMixin(UserPassesTestMixin):
+    login_url = reverse_lazy('identity')
+    redirect_field_name = None
+
+    def test_func(self):
+        user_account = self.request.user.account()
+        return user_account.identity_verified()
+
+
+class BankAccountTestsMixin(UserPassesTestMixin):
+    login_url = reverse_lazy('terms')
+    redirect_field_name = None
+
+    def test_func(self):
+        if self.request.user.accepted_terms():
+            self.login_url = reverse_lazy('identity')
+        else:
+            return False
+
+        user_account = self.request.user.account()
+        return user_account.identity_verified()
 
 
 class CreditCardView(TemplateView):
@@ -82,7 +93,7 @@ class CreditCardView(TemplateView):
         return ctx
 
 
-class BankAccountView(UserHasAcceptedTermsMixin, TemplateView):
+class BankAccountView(BankAccountTestsMixin, TemplateView):
     template_name = 'bank_account_page.html'
 
     def get_context_data(self, **kwargs):
@@ -107,36 +118,40 @@ class AcceptTermsView(TemplateView):
 
 class VerifyIdentityView(TemplateView):
     template_name = 'verify_identity.html'
+    identity_fields = ('first_name', 'last_name', 'ssn_last_4',
+                       'personal_id_number', 'type',)
+    address_fields = ('line1', 'city', 'postal_code', 'state', )
+    dob_fields = ('day', 'month', 'year',)
 
     def get_context_data(self, **kwargs):
         ctx = super(VerifyIdentityView, self).get_context_data(**kwargs)
         ctx['STRIPE_DEBUG'] = stripe_debug_values()
+        codesy_account = self.request.user.account()
+        ctx['fields_needed'] = codesy_account.fields_needed
         return ctx
 
     def post(self, *args, **kwargs):
         codesy_account = self.request.user.account()
+        # TODO: Cannot change if account already verified
+
         if codesy_account:
             posted = self.request.POST
-            dob = {
-                'day': posted['dob_day'],
-                'month': posted['dob_month'],
-                'year': posted['dob_year']
-            }
             stripe_acct = stripe.Account.retrieve(codesy_account.account_id)
-            # TODO: Cannot change if account already verified
-            stripe_acct.legal_entity.dob = dob
-            stripe_acct.legal_entity.first_name = posted['first_name']
-            stripe_acct.legal_entity.last_name = posted['last_name']
-            stripe_acct.legal_entity.address.line1 = posted['address_line1']
-            stripe_acct.legal_entity.address.city = posted['address_city']
-            stripe_acct.legal_entity.address.postal_code = (
-                posted['address_postal_code'])
-            stripe_acct.legal_entity.address.state = posted['address_state']
-            stripe_acct.legal_entity.ssn_last_4 = posted['ssn_last_4']
-            stripe_acct.legal_entity.personal_id_number = (
-                posted['personal_id_number'])
-            stripe_acct.legal_entity.type = posted['type']
+
+            for field in self.identity_fields:
+                if field in posted:
+                    stripe_acct.legal_entity[field] = posted[field]
+
+            for field in self.address_fields:
+                if field in posted:
+                    stripe_acct.legal_entity.address[field] = posted[field]
+
+            for field in self.dob_fields:
+                if field in posted:
+                    stripe_acct.legal_entity.dob[field] = posted[field]
+
             stripe_acct.save()
+
         return redirect('bank')
 
 
@@ -145,11 +160,9 @@ class StripeHookView(CSRFExemptMixin, View):
     def post(self, *args, **kwargs):
         message = json.loads(self.request.body)
         event_id = message['id']
+
         if not StripeEvent.objects.filter(event_id=event_id).exists():
-            new_event = StripeEvent(
-                event_id=event_id,
-                type=message['type'],
-                message_text=json.dumps(message)
-            )
+            new_event = StripeEvent(event_id=event_id, message_text=message)
             new_event.save()
+
         return HttpResponse()

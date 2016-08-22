@@ -5,6 +5,7 @@ import HTMLParser
 from decimal import Decimal
 
 from datetime import datetime, timedelta
+from django.utils import timezone
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -450,7 +451,11 @@ class Payment(models.Model):
         is_new = not self.pk
         super(Payment, self).save(*args, **kwargs)
         if is_new:
+            self.created = timezone.now()
             self.add_fees()
+        else:
+            self.modified = timezone.now()
+        super(Payment, self).save(*args, **kwargs)
 
     def add_fees():
         raise NotImplementedError
@@ -573,13 +578,11 @@ class PayoutCredit(Fee):
         return "%s credit for %s" % (self.fee_type, self.payout)
 
 
-@receiver(post_save, sender=Payout)
-@receiver(post_save, sender=Offer)
 @receiver(post_save, sender=Bid)
 @receiver(post_save, sender=Claim)
 @receiver(post_save, sender=Vote)
 def update_datetimes_for_model_save(sender, instance, created, **kwargs):
     if created:
-        sender.objects.filter(id=instance.id).update(created=datetime.now())
+        sender.objects.filter(id=instance.id).update(created=timezone.now())
     else:
-        sender.objects.filter(id=instance.id).update(modified=datetime.now())
+        sender.objects.filter(id=instance.id).update(modified=timezone.now())
