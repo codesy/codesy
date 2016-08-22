@@ -1,5 +1,3 @@
-import json
-
 from django.contrib import admin
 from .models import StripeAccount, StripeEvent
 
@@ -18,12 +16,8 @@ class StripeEventAdmin(admin.ModelAdmin):
     search_fields = ['message_text']
 
     readonly_fields = (
-        'type', 'created', 'event_id', 'processed', 'message_text',)
-
-    def message_text(self, instance):
-        # Convert the data to sorted, indented JSON
-        response = json.dumps(instance.message_text, sort_keys=True, indent=2)
-        return response
+        'user_id', 'type', 'created', 'event_id', 'verified',
+        'processed', 'message_text',)
 
 admin.site.register(StripeAccount, StripeAccountAdmin)
 admin.site.register(StripeEvent, StripeEventAdmin)
