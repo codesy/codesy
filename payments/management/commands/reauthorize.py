@@ -17,13 +17,12 @@ class Command(BaseCommand):
         parser.add_argument('day_limit', nargs='+', type=int)
 
     def handle(self, *args, **options):
-        day_limit = options['day_limit'][0]
+        day_limit = int(options['day_limit'][0])
         expires = timezone.now() - timedelta(days=day_limit)
         offers = Offer.objects.filter(
             refund_id=u'', created__lt=expires
         )
 
-        # TODO:  Add expiration to the oject filter
         for offer in offers:
             payments.refund(offer)
             new_offer = Offer(
