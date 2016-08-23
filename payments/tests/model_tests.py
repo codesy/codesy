@@ -4,31 +4,11 @@ import json
 from django.test import TestCase
 from model_mommy import mommy
 
-from ..models import StripeAccount
+from ..models import StripeAccount, StripeEvent
 from codesy.base.models import User
 
 
-account_verified = json.loads(
-    """
-        {
-            "due_by": null,
-            "fields_needed": [],
-            "disabled_reason": null
-        }
-    """
-)
-
-
-account_not_verified = json.loads("""
-        {
-            "due_by": "null",
-            "fields_needed": [
-                "legal_entity.first_name",
-                "legal_entity.last_name"
-            ],
-            "disabled_reason": null
-        }
-""")
+from . import account_verified, account_not_verified, payment_created
 
 
 class StripeAccountTest(TestCase):
@@ -77,3 +57,14 @@ class StripeAccountTest(TestCase):
         retreived_account = StripeAccount.objects.get(pk=account.id)
         self.assertEqual(retreived_account.account_id, "acct_12QkqYGSOD4VcegJ")
         account.external_account("howdy")
+
+
+class StripeEventTest(TestCase):
+
+    def test_event_create(self):
+        event = mommy.make(
+            StripeEvent, message_text=json.loads(payment_created)
+        )
+        self.assertTrue(event.verified)
+        self.assertEqual(event.type, 'payment.created')
+        self.assertTrue(event.processed)
