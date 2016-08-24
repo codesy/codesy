@@ -116,7 +116,7 @@ class WebHookProcessor(object):
         self.object = event.message['data']['object']
         super(WebHookProcessor, self).__init__(*args, **kwargs)
 
-    def process():
+    def process(self):
         raise NotImplementedError
 
 

@@ -4,11 +4,15 @@ import json
 from django.test import TestCase
 from model_mommy import mommy
 
-from ..models import StripeAccount, StripeEvent
+from ..models import (StripeAccount, StripeEvent, WebHookProcessor,
+                      AccountUpdatedProcessor)
 from codesy.base.models import User
 
 
-from . import account_verified, account_not_verified, payment_created
+from . import (
+    application_fee_created, balance_available, account_verified,
+    account_not_verified, payment_created, account_updated
+)
 
 
 class StripeAccountTest(TestCase):
@@ -61,10 +65,44 @@ class StripeAccountTest(TestCase):
 
 class StripeEventTest(TestCase):
 
-    def test_event_create(self):
+    def test_event_with_userid(self):
         event = mommy.make(
             StripeEvent, message_text=json.loads(payment_created)
         )
         self.assertTrue(event.verified)
         self.assertEqual(event.type, 'payment.created')
         self.assertTrue(event.processed)
+
+    def test_event_without_userid(self):
+        event = mommy.make(
+            StripeEvent, message_text=json.loads(application_fee_created)
+        )
+        self.assertTrue(event.verified)
+        self.assertEqual(event.type, 'payment.created')
+        self.assertTrue(event.processed)
+
+    def test_processed_failed(self):
+        pass
+
+
+class WebhookTest(TestCase):
+
+    def test_process_not_implemented(self):
+        class test_hook(WebHookProcessor):
+            pass
+        event = mommy.make(
+            StripeEvent, message_text=json.loads(balance_available)
+        )
+        with self.assertRaises(NotImplementedError):
+            test_hook(event=event).process()
+
+    def test_account_updated(self):
+        account = mommy.make(StripeAccount, account_id='acct_00000000000000')
+        event = mommy.make(StripeEvent,
+                           message_text=json.loads('{"id": "evt_1"}'))
+        # replace fake retrieved message
+        event.message_text = account_updated
+        AccountUpdatedProcessor(event=event).process()
+        account = StripeAccount.objects.get(pk=account.id)
+        self.assertEqual(account.fields_needed,
+                         ['legal_entity.verification.document'])
