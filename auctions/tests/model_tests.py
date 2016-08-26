@@ -14,7 +14,7 @@ from model_mommy import mommy
 
 from payments.models import StripeAccount
 from ..models import Bid, Claim, Issue, Vote
-from ..models import Offer, OfferFee, Payout, PayoutFee
+from ..models import Offer, OfferFee, Payout, PayoutFee, PayoutCredit
 
 from . import MarketWithBidsTestCase, MarketWithClaimTestCase
 
@@ -489,6 +489,7 @@ class PayoutTest(TestCase):
         self.bid2 = mommy.make(
             Bid, user=self.user2,
             url=self.url, issue=self.issue)
+
         self.bid2.set_offer(50)
 
     def test_payouts_property(self):
@@ -515,3 +516,31 @@ class PayoutTest(TestCase):
         self.assertEqual(len(payout.fees()), len(fees))
         sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
         self.assertEqual(sum_fees + payout.charge_amount, self.bid1.ask)
+
+    def test_payout_with_surplus(self):
+        self.bid2.set_offer(100)
+        claim = mommy.make(Claim, user=self.user1, issue=self.issue)
+        account = mommy.make(StripeAccount, user=self.user1)
+        self.assertEqual(account, self.user1.account())
+        api_request = claim.payout()
+        if api_request:
+            self.assertEqual(claim.status, 'Paid')
+        payouts = claim.payouts.all()
+        payout = payouts[0]
+        self.assertTrue(payout.api_success)
+        self.assertEqual(len(payouts), 1)
+
+        fees = PayoutFee.objects.filter(payout=payout)
+        self.assertEqual(len(fees), 2)
+        credits = PayoutCredit.objects.filter(payout=payout)
+        self.assertEqual(len(credits), 1)
+
+        self.assertEqual(len(payout.fees()), len(fees))
+        self.assertEqual(len(payout.credits()), len(credits))
+
+        sum_fees = fees.aggregate(Sum('amount'))['amount__sum']
+        sum_credits = credits.aggregate(Sum('amount'))['amount__sum']
+
+        self.assertEqual(
+            (sum_fees + payout.charge_amount - sum_credits),
+            self.bid1.ask)

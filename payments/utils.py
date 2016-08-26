@@ -112,7 +112,7 @@ def authorize(offer):
 
 
 def charge(offer, payout):
-    details = transaction_amounts(offer.amount)
+    details = transaction_amounts(payout.amount)
 
     try:
         charge = stripe.Charge.create(

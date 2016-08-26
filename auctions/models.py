@@ -222,13 +222,31 @@ class Claim(models.Model):
             ).exclude(
                 user=self.user
             )
-            # # capture payment to this users account
+            # check on a surplus
+            # TODO: move this to the payments utils
+            sum_offers = valid_offers.aggregate(Sum('amount'))['amount__sum']
+            users_ask = Bid.objects.get(user=self.user).ask
+            payout_adjustment = 1
+            if sum_offers > users_ask:
+                # surplus is the amount of offers over ask
+                surplus = sum_offers - users_ask
+                # the claim bonus is the claimaints share of the surplus
+                claim_bonus = (surplus / (valid_offers.count() + 1))
+                # giveback is the aount to distribute among the offerers
+                offer_giveback = surplus - claim_bonus
+                # this is the percent of the original payout to be charged
+                payout_adjustment = 1 - (offer_giveback / sum_offers)
+            # import ipdb; ipdb.set_trace()
+            # capture payment to this users account
             for offer in valid_offers:
                 payments.refund(offer)
+                payout_amount = (offer.amount * payout_adjustment)
+                discount_amount = offer.amount - payout_amount
                 payout = Payout(
                     user=self.user,
                     claim=self,
-                    amount=offer.amount
+                    amount=payout_amount,
+                    discount=discount_amount
                 )
                 payout.save()
                 payments.charge(offer, payout)
@@ -507,6 +525,8 @@ class Payout(Payment):
         max_length=255,
         choices=Payment.PROVIDER_CHOICES,
         default='Stripe')
+    discount = models.DecimalField(
+        max_digits=6, decimal_places=2, blank=True, default=0)
 
     def __unicode__(self):
         return u'Payout to %s for claim (%s)' % (
@@ -521,6 +541,15 @@ class Payout(Payment):
 
     def add_fees(self):
         fee_details = payments.transaction_amounts(self.amount)
+
+        if self.discount:
+            discount_fee = PayoutCredit(
+                payout=self,
+                fee_type='surplus',
+                amount=self.discount
+            )
+            discount_fee.save()
+
         stripe_fee = PayoutFee(
             payout=self,
             fee_type='Stripe',
@@ -543,7 +572,8 @@ class Fee(models.Model):
         ('PayPal', 'PayPal'),
         ('Stripe', 'Stripe'),
         ('codesy', 'codesy'),
-        ('refund', 'refund')
+        ('refund', 'refund'),
+        ('surplus', 'surplus'),
     )
     fee_type = models.CharField(
         max_length=255,
