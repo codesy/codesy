@@ -18,12 +18,17 @@ from . import (
 class StripeAccountTest(TestCase):
 
     def test_get_customer_token(self):
+        """
+            When a user saves their credit card info stripe provides
+            a credit card token.  This token is used once to get a
+            customer token when an attempt to save the cc token is made.
+            The cc token should not be saved.
+        """
         user = mommy.make(User)
         user.save()
         self.assertFalse(user.stripe_customer)
         user.stripe_card = "howdy"
         user.save()
-        # stripe card is a one-time use token and should not be saved
         self.assertFalse(user.stripe_card)
         self.assertEqual("dammit", user.stripe_customer)
 
@@ -34,16 +39,16 @@ class StripeAccountTest(TestCase):
         self.assertTrue(account.identity_verified())
 
         # test valid verification
-        account.verification = json.dumps(account_verified)
+        account.verification = account_verified
         self.assertTrue(account.identity_verified())
 
         # test invalid verification
-        account.verification = json.dumps(account_not_verified)
+        account.verification = account_not_verified
         self.assertFalse(account.identity_verified())
 
     def test_fields_needed(self):
         account = mommy.make(StripeAccount)
-        account.verification = json.dumps(account_not_verified)
+        account.verification = account_not_verified
         self.assertEqual(
             account.fields_needed,
             ['legal_entity.first_name', 'legal_entity.last_name']

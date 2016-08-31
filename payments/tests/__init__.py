@@ -43,27 +43,25 @@ def tearDownPackage(self):
 
 
 # test constants below:
-account_verified = json.loads(
-    """
-        {
-            "due_by": null,
-            "fields_needed": [],
-            "disabled_reason": null
-        }
-    """
-)
+account_verified = """
+{
+    "due_by": null,
+    "fields_needed": [],
+    "disabled_reason": null
+}
+"""
 
 
-account_not_verified = json.loads("""
-        {
-            "due_by": "null",
-            "fields_needed": [
-                "legal_entity.first_name",
-                "legal_entity.last_name"
-            ],
-            "disabled_reason": null
-        }
-""")
+account_not_verified = """
+{
+    "due_by": "null",
+    "fields_needed": [
+        "legal_entity.first_name",
+        "legal_entity.last_name"
+    ],
+    "disabled_reason": null
+}
+"""
 
 payment_created = """
 {
