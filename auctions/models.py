@@ -62,7 +62,7 @@ class Bid(models.Model):
 
     @property
     def offers(self):
-        return Offer.objects.filter(bid=self)
+        return Offer.objects.filter(bid=self, refund_id='')
 
     def set_offer(self, offer_amount):
         offer_amount = Decimal(offer_amount)
@@ -198,6 +198,10 @@ class Claim(models.Model):
             self.user, self.issue.id, self.status
         )
 
+    @property
+    def ask(self):
+        return Bid.objects.get(user=self.user, issue=self.issue).ask
+
     def save(self, *args, **kwargs):
         is_new = not self.pk
         super(Claim, self).save(*args, **kwargs)
@@ -225,7 +229,7 @@ class Claim(models.Model):
             # check on a surplus
             # TODO: move this to the payments utils
             sum_offers = valid_offers.aggregate(Sum('amount'))['amount__sum']
-            users_ask = Bid.objects.get(user=self.user).ask
+            users_ask = self.ask
             payout_adjustment = 1
             if sum_offers > users_ask:
                 # surplus is the amount of offers over ask
@@ -236,7 +240,7 @@ class Claim(models.Model):
                 offer_giveback = surplus - claim_bonus
                 # this is the percent of the original payout to be charged
                 payout_adjustment = 1 - (offer_giveback / sum_offers)
-            # import ipdb; ipdb.set_trace()
+
             # capture payment to this users account
             for offer in valid_offers:
                 payments.refund(offer)
