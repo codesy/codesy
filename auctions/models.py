@@ -230,7 +230,7 @@ class Claim(models.Model):
             # TODO: move this to the payments utils
             sum_offers = valid_offers.aggregate(Sum('amount'))['amount__sum']
             users_ask = self.ask
-            payout_adjustment = 1
+            offer_adjustment = 1
             if sum_offers > users_ask:
                 # surplus is the amount of offers over ask
                 surplus = sum_offers - users_ask
@@ -239,17 +239,17 @@ class Claim(models.Model):
                 # giveback is the aount to distribute among the offerers
                 offer_giveback = surplus - claim_bonus
                 # this is the percent of the original payout to be charged
-                payout_adjustment = 1 - (offer_giveback / sum_offers)
+                offer_adjustment = 1 - (offer_giveback / sum_offers)
 
             # capture payment to this users account
             for offer in valid_offers:
                 payments.refund(offer)
-                payout_amount = (offer.amount * payout_adjustment)
-                discount_amount = offer.amount - payout_amount
+                adjusted_offer_amount = (offer.amount * offer_adjustment)
+                discount_amount = offer.amount - adjusted_offer_amount
                 payout = Payout(
                     user=self.user,
                     claim=self,
-                    amount=payout_amount,
+                    amount=adjusted_offer_amount,
                     discount=discount_amount
                 )
                 payout.save()

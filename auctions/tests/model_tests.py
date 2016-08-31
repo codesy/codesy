@@ -467,7 +467,7 @@ class OfferTest(TestCase):
         self.assertEqual(offer.amount, 60)
         offers = Offer.objects.filter(bid=self.bid)
         self.assertEqual(len(offers), 2)
-        self.assertEqual(len(self.bid.offers), 2)
+        self.assertEqual(len(self.bid.offers), 1)
         sum_offers = offers.aggregate(Sum('amount'))['amount__sum']
         self.assertEqual(sum_offers, 110)
 
