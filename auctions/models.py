@@ -37,8 +37,8 @@ class Bid(models.Model):
     ask_match_sent = models.DateTimeField(null=True, blank=True)
     offer = models.DecimalField(max_digits=6, decimal_places=2, blank=True,
                                 default=0)
-    created = models.DateTimeField(null=True, blank=True)
-    modified = models.DateTimeField(null=True, blank=True, auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = (("user", "url"),)
@@ -180,8 +180,8 @@ class Claim(models.Model):
     )
     issue = models.ForeignKey('Issue')
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    created = models.DateTimeField(null=True, blank=True)
-    modified = models.DateTimeField(null=True, blank=True, auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
     evidence = models.URLField(blank=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     status = models.CharField(max_length=255,
@@ -354,8 +354,8 @@ class Vote(models.Model):
     claim = models.ForeignKey(Claim)
     # TODO: Vote.approved needs null=True or blank=False
     approved = models.BooleanField(default=None, blank=True)
-    created = models.DateTimeField(null=True, blank=True)
-    modified = models.DateTimeField(null=True, blank=True, auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = (("user", "claim"),)
@@ -576,13 +576,3 @@ class PayoutCredit(Fee):
 
     def __unicode__(self):
         return "%s credit for %s" % (self.fee_type, self.payout)
-
-
-@receiver(post_save, sender=Bid)
-@receiver(post_save, sender=Claim)
-@receiver(post_save, sender=Vote)
-def update_datetimes_for_model_save(sender, instance, created, **kwargs):
-    if created:
-        sender.objects.filter(id=instance.id).update(created=timezone.now())
-    else:
-        sender.objects.filter(id=instance.id).update(modified=timezone.now())

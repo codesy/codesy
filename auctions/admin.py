@@ -5,7 +5,7 @@ from .models import (Bid, Claim, Issue, Offer, OfferFee, Payout,
 
 
 class BidAdmin(admin.ModelAdmin):
-    list_display = ('user', 'url', 'ask', 'offer')
+    list_display = ('user', 'url', 'ask', 'offer', 'created', 'modified')
     list_filter = ('ask_match_sent',)
     search_fields = ['user__username', 'user__email', 'title']
 
@@ -17,7 +17,7 @@ class IssueAdmin(admin.ModelAdmin):
 
 
 class ClaimAdmin(admin.ModelAdmin):
-    list_display = ('user', 'status', 'issue')
+    list_display = ('user', 'status', 'issue', 'created', 'modified')
     list_filter = ('status',)
     search_fields = ['user__username', 'user__email', 'issue__url',
                      'issue__title']
@@ -40,7 +40,7 @@ class PayoutAdmin(admin.ModelAdmin):
 
 
 class VoteAdmin(admin.ModelAdmin):
-    list_display = ('claim', 'user', 'approved', 'created')
+    list_display = ('claim', 'user', 'approved', 'created', 'modified')
     list_filter = ('approved',)
 
 
