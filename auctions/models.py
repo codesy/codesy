@@ -5,7 +5,6 @@ import HTMLParser
 from decimal import Decimal
 
 from datetime import datetime, timedelta
-from django.utils import timezone
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -463,8 +462,8 @@ class Payment(models.Model):
         max_digits=6, decimal_places=2, blank=True, default=0)
     charge_id = models.CharField(max_length=255, blank=True)
     refund_id = models.CharField(max_length=255, blank=True)
-    created = models.DateTimeField(null=True, blank=True)
-    modified = models.DateTimeField(null=True, blank=True, auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True
@@ -473,10 +472,7 @@ class Payment(models.Model):
         is_new = not self.pk
         super(Payment, self).save(*args, **kwargs)
         if is_new:
-            self.created = timezone.now()
             self.add_fees()
-        else:
-            self.modified = timezone.now()
         super(Payment, self).save(*args, **kwargs)
 
     def add_fees():
