@@ -80,7 +80,6 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
             vote = Vote.objects.get(claim=claim, user=self.request.user)
         except:
             pass
-
         context = dict({'claim': claim, 'vote': vote})
 
         return context

@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import time
+from decimal import Decimal
 
 import fudge
 from fudge.inspector import arg
@@ -14,7 +15,9 @@ from model_mommy import mommy
 
 from payments.models import StripeAccount
 from ..models import Bid, Claim, Issue, Vote
-from ..models import Offer, OfferFee, Payout, PayoutFee, PayoutCredit
+from ..models import (
+    Offer, OfferFee, OfferCredit, Payout, PayoutFee, PayoutCredit
+)
 
 from . import MarketWithBidsTestCase, MarketWithClaimTestCase
 
@@ -466,8 +469,6 @@ class OfferTest(TestCase):
         offer = self.bid.set_offer(60)
         self.assertEqual(offer.amount, 60)
         offers = Offer.objects.filter(bid=self.bid)
-        self.assertEqual(len(offers), 2)
-        self.assertEqual(len(self.bid.offers), 1)
         sum_offers = offers.aggregate(Sum('amount'))['amount__sum']
         self.assertEqual(sum_offers, 110)
 
@@ -479,6 +480,8 @@ class PayoutTest(TestCase):
                                 email='user1@test.com')
         self.user2 = mommy.make(settings.AUTH_USER_MODEL,
                                 email='user2@test.com')
+        self.user3 = mommy.make(settings.AUTH_USER_MODEL,
+                                email='user3@test.com')
         self.url = 'http://test.com/bug/123'
         self.issue = mommy.make(Issue, url=self.url)
 
@@ -488,6 +491,10 @@ class PayoutTest(TestCase):
 
         self.bid2 = mommy.make(
             Bid, user=self.user2,
+            url=self.url, issue=self.issue)
+
+        self.bid3 = mommy.make(
+            Bid, user=self.user3,
             url=self.url, issue=self.issue)
 
         self.bid2.set_offer(50)
@@ -544,3 +551,39 @@ class PayoutTest(TestCase):
         self.assertEqual(
             (sum_fees + payout.charge_amount - sum_credits),
             self.bid1.ask)
+
+    def test_surplus_payout_from_two_bidders(self):
+        self.bid3.set_offer(50)
+        claim = mommy.make(Claim, user=self.user1, issue=self.issue)
+        account = mommy.make(StripeAccount, user=self.user1)
+        self.assertEqual(account, self.user1.account())
+        api_request = claim.payout()
+        if api_request:
+            self.assertEqual(claim.status, 'Paid')
+
+        payouts = claim.payouts.all()
+
+        offers = Offer.objects.all()
+
+        self.assertEqual(len(payouts), 2)
+        self.assertEqual(len(offers), 4)
+
+        offer_fees = OfferFee.objects.all()
+        offer_credits = OfferCredit.objects.all()
+
+        payout_fees = PayoutFee.objects.all()
+        payout_credits = PayoutCredit.objects.all()
+
+        self.assertEqual(len(offer_fees), 8)
+        self.assertEqual(len(offer_credits), 2)
+        self.assertEqual(len(payout_fees), 4)
+        self.assertEqual(len(payout_credits), 2)
+
+        sum_payout = payouts.aggregate(Sum('amount'))['amount__sum']
+
+        self.assertEqual(sum_payout, Decimal('66.66'))
+
+        sum_payout_credits = payout_credits.aggregate(
+            Sum('amount'))['amount__sum']
+
+        self.assertEqual(sum_payout_credits, Decimal('33.34'))

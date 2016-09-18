@@ -60,8 +60,12 @@ class Bid(models.Model):
             return False
 
     @property
+    def last_offer(self):
+        return Offer.objects.filter(bid=self).order_by('modified')[:1][0]
+
+    @property
     def offers(self):
-        return Offer.objects.filter(bid=self, refund_id='')
+        return Offer.objects.filter(bid=self)
 
     def set_offer(self, offer_amount):
         offer_amount = Decimal(offer_amount)
@@ -240,18 +244,28 @@ class Claim(models.Model):
                 # this is the percent of the original payout to be charged
                 offer_adjustment = 1 - (offer_giveback / sum_offers)
 
-            # capture payment to this users account
             for offer in valid_offers:
-                payments.refund(offer)
                 adjusted_offer_amount = (offer.amount * offer_adjustment)
                 discount_amount = offer.amount - adjusted_offer_amount
+                payments.refund(offer)
+                # create final adjusted offer
+                new_offer = Offer(
+                    user=offer.user,
+                    bid=offer.bid,
+                    amount=adjusted_offer_amount,
+                    discount=discount_amount
+                )
+                new_offer.save()
+
+                # capture payment to this users account
                 payout = Payout(
-                    user=self.user,
+                    user=offer.user,
                     claim=self,
                     amount=adjusted_offer_amount,
                     discount=discount_amount
                 )
                 payout.save()
+
                 payments.charge(offer, payout)
             return True
         except Exception as e:
@@ -462,6 +476,8 @@ class Payment(models.Model):
         max_digits=6, decimal_places=2, blank=True, default=0)
     charge_id = models.CharField(max_length=255, blank=True)
     refund_id = models.CharField(max_length=255, blank=True)
+    discount = models.DecimalField(
+        max_digits=6, decimal_places=2, blank=True, default=0)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -481,6 +497,7 @@ class Payment(models.Model):
 
 class Offer(Payment):
     bid = models.ForeignKey(Bid, related_name='payments')
+
     provider = models.CharField(
         max_length=255,
         choices=Payment.PROVIDER_CHOICES,
@@ -502,6 +519,15 @@ class Offer(Payment):
 
     def add_fees(self):
         fee_details = payments.transaction_amounts(self.amount)
+
+        if self.discount:
+            discount_fee = OfferCredit(
+                offer=self,
+                fee_type='surplus',
+                amount=self.discount
+            )
+            discount_fee.save()
+
         stripe_fee = OfferFee(
             offer=self,
             fee_type='Stripe',
@@ -525,8 +551,6 @@ class Payout(Payment):
         max_length=255,
         choices=Payment.PROVIDER_CHOICES,
         default='Stripe')
-    discount = models.DecimalField(
-        max_digits=6, decimal_places=2, blank=True, default=0)
 
     def __unicode__(self):
         return u'Payout to %s for claim (%s)' % (
@@ -592,6 +616,13 @@ class OfferFee(Fee):
 
     def __unicode__(self):
         return "%s fee amount:%s" % (self.fee_type, self.offer)
+
+
+class OfferCredit(Fee):
+    offer = models.ForeignKey(Offer, related_name="offer_credit", null=True)
+
+    def __unicode__(self):
+        return "%s credit for %s" % (self.fee_type, self.offer)
 
 
 class PayoutFee(Fee):
