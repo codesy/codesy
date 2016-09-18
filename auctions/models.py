@@ -61,7 +61,10 @@ class Bid(models.Model):
 
     @property
     def last_offer(self):
-        return Offer.objects.filter(bid=self).order_by('modified')[:1][0]
+        try:
+            return Offer.objects.filter(bid=self).order_by('modified')[:1][0]
+        except IndexError:
+            return None
 
     @property
     def offers(self):

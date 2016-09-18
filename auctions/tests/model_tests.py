@@ -48,6 +48,10 @@ class SimpleBidTest(TestCase):
         offers = Offer.objects.filter(bid=bid)
         self.assertEqual(len(offers), 0)
 
+    def test_last_offer_returns_none_when_no_offer(self):
+        bid_without_offer = mommy.make(Bid, ask=50)
+        self.assertEqual(None, bid_without_offer.last_offer)
+
 
 class BidTest(MarketWithBidsTestCase):
 
@@ -453,6 +457,9 @@ class OfferTest(TestCase):
     def test_key_created(self):
         offer = mommy.make(Offer, bid=self.bid)
         self.assertIsNotNone(offer.transaction_key)
+
+    def test_bid_last_offer(self):
+        self.assertEqual(self.offer, self.bid.last_offer)
 
     def test_bid_fees(self):
         offer = Offer.objects.get(bid=self.bid)
