@@ -38,12 +38,14 @@
                 {% endif %}
             {% endif %}
         </div>
-        <div class="medium-2 columns">
-            <div class="date">
-                <p class="date-label">Pays out</p>
-                <p class="date-details">{{ claim.expires|date:"M" }}<br/>{{ claim.expires|date:"j" }}</p>
-            </div>
-        </div>
+            {% if claim.status != 'Paid' %}
+                <div class="medium-2 columns">
+                    <div class="date">
+                        <p class="date-label">Pays out</p>
+                        <p class="date-details">{{ claim.expires|date:"M" }}<br/>{{ claim.expires|date:"j" }}</p>
+                    </div>
+                </div>
+            {% endif %}
     </div>
 
 {% endblock %}
