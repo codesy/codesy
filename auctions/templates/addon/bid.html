@@ -1,0 +1,17 @@
+{% extends "addon/base.html" %}
+{% load staticfiles %}
+
+{% block widget_content %}
+
+    <div id="widget-input">
+
+        <div id="widget-input-form">
+            {% include "addon/includes/bid_form.html" with target="_blank"%}
+        </div>
+
+    </div>
+
+{% endblock %}
+
+
+<!--TODO: HANDLE CLOSED CLAIMS -->

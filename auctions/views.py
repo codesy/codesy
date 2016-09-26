@@ -19,16 +19,18 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
 
     url -- url of an OSS issue or bug
     """
-    template_name = "addon/widget.html"
     login_url = '/addon-login/'
+    template_name = "addon/bid.html"
 
     def test_func(self):
         return self.request.user.is_active
+
 
     def _get_bid(self, url):
         try:
             return Bid.objects.get(user=self.request.user, url=url)
         except:
+            import ipdb; ipdb.set_trace()
             new_bid = Bid(user=self.request.user, url=url)
             new_bid.save()
             return new_bid
@@ -36,7 +38,11 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         url = self.request.GET['url']
         bid = self._get_bid(url)
-        return dict({'bid': bid, 'url': url})
+        claims = Claim.objects.filter(bid=bid)
+        if claims:
+            self.template_name = 'addon/claim.html'
+
+        return dict({'bid': bid, 'url': url, 'claims': claims})
 
     def post(self, *args, **kwargs):
         """
