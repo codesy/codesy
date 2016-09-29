@@ -30,7 +30,6 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
         try:
             return Bid.objects.get(user=self.request.user, url=url)
         except:
-            import ipdb; ipdb.set_trace()
             new_bid = Bid(user=self.request.user, url=url)
             new_bid.save()
             return new_bid
@@ -38,11 +37,21 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         url = self.request.GET['url']
         bid = self._get_bid(url)
-        claims = Claim.objects.filter(bid=bid)
-        if claims:
-            self.template_name = 'addon/claim.html'
+        # rejected claims should be ignored so new claims can be made
+        claims = Claim.objects.filter(issue=bid.issue).exclude(status='Rejected')
 
-        return dict({'bid': bid, 'url': url, 'claims': claims})
+        if claims.filter(user=self.request.user):
+            self.template_name = 'addon/claimaint.html'
+            return dict({'bid': bid, 'url': url, 'claim': claims[0]})
+
+        elif some_test_for_:
+            self.template_name = 'addon/voters.html'
+            return dict({'bid': bid, 'url': url, 'claims': claims})
+
+        else:
+            self.template_name = 'addon/bystanders.html'
+            return dict({'bid': bid, 'url': url, 'claim': claims[0]})
+
 
     def post(self, *args, **kwargs):
         """

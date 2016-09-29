@@ -114,6 +114,7 @@ class Bid(models.Model):
 
     def is_biddable_by(self, user):
         nobid_claim_statuses = ['Submitted', 'Pending', 'Approved', 'Paid']
+        import ipdb; ipdb.set_trace()
         if user == self.user and self.ask_met():
             return False
         actionable_claims = self.actionable_claims(user)

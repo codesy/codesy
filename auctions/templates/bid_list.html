@@ -25,6 +25,7 @@
                 <td><a href="{{bid.url}}"{% if target %} target="{{ target }}"{% endif %}>{{bid.issue.title}}</a></td>
                 <td>
                     {{ bid.ask }}
+                    
                     {% include "addon/includes/claim_form.html" %}
                 </td>
                 <td>

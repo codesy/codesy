@@ -1,0 +1,18 @@
+{% extends "addon/base.html" %}
+{% load staticfiles %}
+
+{% block widget_content %}
+    <div id="widget-input">
+        {% for claim in claims %}
+            {% if claim.status == 'Paid' %}
+                <p>This claim was paid; thank you!</p>
+            {% elif claim.status == 'Approved' %}
+                <p>This claim was approved; thank you!</p>
+            {% else %}
+                <p>
+                    <a class="button expanded" href="{% url 'claim-status' pk=claim.id %}" target="_blank">Vote on claim &raquo;</a>
+                </p>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock %}

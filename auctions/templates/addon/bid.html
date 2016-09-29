@@ -1,17 +1,13 @@
 {% extends "addon/base.html" %}
+{% load auctions_extras %}
 {% load staticfiles %}
 
+{% bid_is_biddable bid=bid user=request.user as biddable %}
+
 {% block widget_content %}
-
-    <div id="widget-input">
-
-        <div id="widget-input-form">
-            {% include "addon/includes/bid_form.html" with target="_blank"%}
-        </div>
-
-    </div>
-
+    {% if bid.ask_met %}
+        {% include "addon/includes/submit_claim.html" with target="_blank" %}
+    {% else %}
+        {% include "addon/includes/bid_form.html" with target="_blank" %}
+    {% endif %}
 {% endblock %}
-
-
-<!--TODO: HANDLE CLOSED CLAIMS -->
