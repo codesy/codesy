@@ -20,11 +20,10 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
     url -- url of an OSS issue or bug
     """
     login_url = '/addon-login/'
-    template_name = "addon/bid.html"
+    template_name = "addon/bidders.html"
 
     def test_func(self):
         return self.request.user.is_active
-
 
     def _get_bid(self, url):
         try:
@@ -38,20 +37,24 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
         url = self.request.GET['url']
         bid = self._get_bid(url)
         # rejected claims should be ignored so new claims can be made
-        claims = Claim.objects.filter(issue=bid.issue).exclude(status='Rejected')
+        claims = (
+            Claim.objects.filter(issue=bid.issue).exclude(status='Rejected'))
 
-        if claims.filter(user=self.request.user):
+        users_claims = claims.filter(
+            user=self.request.user).order_by('modified')
+
+        if users_claims:
             self.template_name = 'addon/claimaint.html'
-            return dict({'bid': bid, 'url': url, 'claim': claims[0]})
+            return dict({'claim': users_claims[0]})
 
-        elif some_test_for_:
-            self.template_name = 'addon/voters.html'
-            return dict({'bid': bid, 'url': url, 'claims': claims})
-
+        if claims:
+            if bid.offer:
+                self.template_name = 'addon/voters.html'
+            else:
+                self.template_name = 'addon/bid_closed.html'
+            return dict({'claims': claims})
         else:
-            self.template_name = 'addon/bystanders.html'
-            return dict({'bid': bid, 'url': url, 'claim': claims[0]})
-
+            return dict({'bid': bid, 'url': url})
 
     def post(self, *args, **kwargs):
         """

@@ -1,8 +1,5 @@
 {% extends "addon/base.html" %}
-{% load auctions_extras %}
 {% load staticfiles %}
-
-{% bid_is_biddable bid=bid user=request.user as biddable %}
 
 {% block widget_content %}
     {% if bid.ask_met %}

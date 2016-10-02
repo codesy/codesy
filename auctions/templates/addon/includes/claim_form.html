@@ -2,8 +2,14 @@
     {% if claim.status == 'Paid' %}
         This claim was paid; thank you!
     {% elif claim.status == 'Approved' %}
-        <a class="button success expanded" href="{% url 'claim-status' pk=actionable_claims.own_claim.id %}"{% if target %} target="{{ target }}"{% endif %}>Request Payout &raquo;</a>
+        <a class="button success expanded"
+        href="{% url 'claim-status' pk=claim.id %}"
+        {% if target %} target="{{ target }}"{% endif %}>
+        Request Payout &raquo;</a>
     {% else %}
-        Collecting votes for <a href="{% url 'claim-status' pk=actionable_claims.own_claim.id %}"{% if target %} target="{{ target }}"{% endif %}>your claim</a>.
+        Collecting votes for <a
+        href="{% url 'claim-status' pk=claim.id %}"
+        {% if target %} target="{{ target }}"{% endif %}>
+        your claim</a>.
     {% endif %}
 </p>
