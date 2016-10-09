@@ -263,11 +263,11 @@ class ClaimTest(MarketWithClaimTestCase):
         self.claim = Claim.objects.get(id=self.claim.id)
         self.assertEqual('Rejected', self.claim.status)
 
-    def test_expires_is_30_days_after_create(self):
+    def test_expires_is_14_days_after_create(self):
         test_claim = mommy.make(Claim)
         test_claim = Claim.objects.get(pk=test_claim.pk)
         self.assertEqual(test_claim.expires,
-                         test_claim.created + timedelta(days=30))
+                         test_claim.created + timedelta(days=14))
 
     def test_save_updates_datetimes(self):
         test_claim = mommy.make(Claim)
