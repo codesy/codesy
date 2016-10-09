@@ -75,14 +75,26 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         claim = None
         vote = None
+        total_payout = {'total': 0,
+                        'fees': {'codesy': 0, 'Stripe': 0},
+                        'credits': {'surplus': 0}
+                        }
         try:
             claim = Claim.objects.get(pk=self.kwargs['pk'])
+            for payout in claim.successful_payouts().all():
+                total_payout['total'] += payout.charge_amount
+                for fee in payout.fees():
+                    total_payout['fees'][fee.fee_type] += fee.amount
+                for credit in payout.credits():
+                    total_payout['credits'][credit.fee_type] += credit.amount
             vote = Vote.objects.get(claim=claim, user=self.request.user)
         except:
             pass
-
-        context = dict({'claim': claim, 'vote': vote})
-
+        context = dict({
+            'claim': claim,
+            'vote': vote,
+            'aggregate_payout': total_payout
+        })
         return context
 
     def post(self, request, *args, **kwargs):

@@ -5,7 +5,6 @@ import HTMLParser
 from decimal import Decimal
 
 from datetime import datetime, timedelta
-from django.utils import timezone
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -59,6 +58,13 @@ class Bid(models.Model):
             return other_bids['offer__sum'] >= self.ask
         else:
             return False
+
+    @property
+    def last_offer(self):
+        try:
+            return Offer.objects.filter(bid=self).order_by('modified')[:1][0]
+        except IndexError:
+            return None
 
     @property
     def offers(self):
@@ -198,6 +204,10 @@ class Claim(models.Model):
             self.user, self.issue.id, self.status
         )
 
+    @property
+    def ask(self):
+        return Bid.objects.get(user=self.user, issue=self.issue).ask
+
     def save(self, *args, **kwargs):
         is_new = not self.pk
         super(Claim, self).save(*args, **kwargs)
@@ -222,15 +232,43 @@ class Claim(models.Model):
             ).exclude(
                 user=self.user
             )
-            # # capture payment to this users account
+            # check on a surplus
+            # TODO: move this to the payments utils
+            sum_offers = valid_offers.aggregate(Sum('amount'))['amount__sum']
+            users_ask = self.ask
+            offer_adjustment = 1
+            if sum_offers > users_ask:
+                # surplus is the amount of offers over ask
+                surplus = sum_offers - users_ask
+                # the claim bonus is the claimaints share of the surplus
+                claim_bonus = (surplus / (valid_offers.count() + 1))
+                # giveback is the aount to distribute among the offerers
+                offer_giveback = surplus - claim_bonus
+                # this is the percent of the original payout to be charged
+                offer_adjustment = 1 - (offer_giveback / sum_offers)
+
             for offer in valid_offers:
+                adjusted_offer_amount = (offer.amount * offer_adjustment)
+                discount_amount = offer.amount - adjusted_offer_amount
                 payments.refund(offer)
+                # create final adjusted offer
+                new_offer = Offer(
+                    user=offer.user,
+                    bid=offer.bid,
+                    amount=adjusted_offer_amount,
+                    discount=discount_amount
+                )
+                new_offer.save()
+
+                # capture payment to this users account
                 payout = Payout(
-                    user=self.user,
+                    user=offer.user,
                     claim=self,
-                    amount=offer.amount
+                    amount=adjusted_offer_amount,
+                    discount=discount_amount
                 )
                 payout.save()
+
                 payments.charge(offer, payout)
             return True
         except Exception as e:
@@ -441,8 +479,10 @@ class Payment(models.Model):
         max_digits=6, decimal_places=2, blank=True, default=0)
     charge_id = models.CharField(max_length=255, blank=True)
     refund_id = models.CharField(max_length=255, blank=True)
-    created = models.DateTimeField(null=True, blank=True)
-    modified = models.DateTimeField(null=True, blank=True, auto_now=True)
+    discount = models.DecimalField(
+        max_digits=6, decimal_places=2, blank=True, default=0)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True
@@ -451,10 +491,7 @@ class Payment(models.Model):
         is_new = not self.pk
         super(Payment, self).save(*args, **kwargs)
         if is_new:
-            self.created = timezone.now()
             self.add_fees()
-        else:
-            self.modified = timezone.now()
         super(Payment, self).save(*args, **kwargs)
 
     def add_fees():
@@ -463,6 +500,7 @@ class Payment(models.Model):
 
 class Offer(Payment):
     bid = models.ForeignKey(Bid, related_name='payments')
+
     provider = models.CharField(
         max_length=255,
         choices=Payment.PROVIDER_CHOICES,
@@ -484,6 +522,15 @@ class Offer(Payment):
 
     def add_fees(self):
         fee_details = payments.transaction_amounts(self.amount)
+
+        if self.discount:
+            discount_fee = OfferCredit(
+                offer=self,
+                fee_type='surplus',
+                amount=self.discount
+            )
+            discount_fee.save()
+
         stripe_fee = OfferFee(
             offer=self,
             fee_type='Stripe',
@@ -521,6 +568,15 @@ class Payout(Payment):
 
     def add_fees(self):
         fee_details = payments.transaction_amounts(self.amount)
+
+        if self.discount:
+            discount_fee = PayoutCredit(
+                payout=self,
+                fee_type='surplus',
+                amount=self.discount
+            )
+            discount_fee.save()
+
         stripe_fee = PayoutFee(
             payout=self,
             fee_type='Stripe',
@@ -543,7 +599,8 @@ class Fee(models.Model):
         ('PayPal', 'PayPal'),
         ('Stripe', 'Stripe'),
         ('codesy', 'codesy'),
-        ('refund', 'refund')
+        ('refund', 'refund'),
+        ('surplus', 'surplus'),
     )
     fee_type = models.CharField(
         max_length=255,
@@ -562,6 +619,13 @@ class OfferFee(Fee):
 
     def __unicode__(self):
         return "%s fee amount:%s" % (self.fee_type, self.offer)
+
+
+class OfferCredit(Fee):
+    offer = models.ForeignKey(Offer, related_name="offer_credit", null=True)
+
+    def __unicode__(self):
+        return "%s credit for %s" % (self.fee_type, self.offer)
 
 
 class PayoutFee(Fee):

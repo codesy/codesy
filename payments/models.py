@@ -50,9 +50,9 @@ class StripeAccount(models.Model):
             external_account=bank_account
         )
         if stripe_account:
-            self.account_id = stripe_account.id
-            self.secret_key = stripe_account['keys'].secret
-            self.public_key = stripe_account['keys'].publishable
+            self.account_id = stripe_account['id']
+            self.secret_key = stripe_account['keys']['secret']
+            self.public_key = stripe_account['keys']['publishable']
             self.save()
 
     def external_account(self, bank_account):
@@ -116,7 +116,7 @@ class WebHookProcessor(object):
         self.object = event.message['data']['object']
         super(WebHookProcessor, self).__init__(*args, **kwargs)
 
-    def process():
+    def process(self):
         raise NotImplementedError
 
 

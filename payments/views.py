@@ -105,11 +105,19 @@ class BankAccountView(BankAccountTestsMixin, TemplateView):
 class AcceptTermsView(TemplateView):
     template_name = "accept_terms.html"
 
+    def get_client_ip(self, request):
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
+
     def post(self, *args, **kwargs):
         try:
             user = User.objects.get(id=self.request.user.id)
             user.tos_acceptance_date = datetime.datetime.now()
-            user.tos_acceptance_ip = self.request.META.get('REMOTE_ADDR')
+            user.tos_acceptance_ip = self.get_client_ip(self.request)
             user.save()
         except User.DoesNotExist:
             pass
