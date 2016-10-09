@@ -6,14 +6,11 @@ from . import views
 admin.site.site_header = u'Codesy administration'
 admin.site.site_title = u'Codesy site admin'
 
-
 urlpatterns = patterns(
     '',
     # Static home/ explanation pages
     url(r'^$', views.Home.as_view(), name='home'),
-    url(r'^card-info$', views.CardInfo.as_view(), name='card-info'),
     url(r'^legal-info$', views.LegalInfo.as_view(), name='legal-info'),
-
     # allauth
     (
         r'^accounts/logout/$', 'django.contrib.auth.views.logout',
@@ -26,6 +23,9 @@ urlpatterns = patterns(
 
     # auction and widget
     url(r'^', include('auctions.urls')),
+
+    # stripe
+    url(r'^payments/', include('payments.urls')),
 
     # API docs
     url(r'^api/docs/', include('rest_framework_swagger.urls')),

@@ -75,24 +75,17 @@ class ClaimStatusTestCase(TestCase):
         context = self.view.get_context_data()
         self.assertEqual(self.claim, context['claim'])
 
-    @fudge.patch('auctions.models.Claim.payout_request')
+    @fudge.patch('auctions.models.Claim.payout')
     @fudge.patch('auctions.views.messages')
     def test_post_success_by_claimaint(self, mock_paypal, mock_messages):
         mock_paypal.is_callable().returns(True)
         mock_messages.expects('success')
         self.payout_post(self.user1)
 
-    @fudge.patch('auctions.models.Claim.payout_request')
+    @fudge.patch('auctions.models.Claim.payout')
     @fudge.patch('auctions.views.messages')
     def test_post_fail_by_claimaint(self, mock_paypal, mock_messages):
         mock_paypal.is_callable().returns(False)
-        mock_messages.expects('error')
-        self.payout_post(self.user1)
-
-    @fudge.patch('auctions.models.Claim.payout_request')
-    @fudge.patch('auctions.views.messages')
-    def test_post_exception_by_claimaint(self, mock_paypal, mock_messages):
-        mock_paypal.is_callable().raises(Exception('Paypal error'))
         mock_messages.expects('error')
         self.payout_post(self.user1)
 

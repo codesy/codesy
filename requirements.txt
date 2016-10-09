@@ -1,4 +1,4 @@
-Django==1.9.4
+Django==1.9.10
 PyGithub==1.26.0
 dj-database-url==0.4.0
 dj-static==0.0.6
@@ -22,4 +22,3 @@ static==1.1.1
 wsgiref==0.1.2
 cffi==1.5.2
 stripe==1.32.2
-paypalrestsdk==1.11.5

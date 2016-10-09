@@ -58,6 +58,7 @@ LOCAL_APPS = (
     'codesy.base',
     'api',
     'auctions',
+    'payments',
 )
 
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -123,6 +124,7 @@ CSP_DEFAULT_SRC = ("'none'",)
 
 CSP_CONNECT_SRC = (
     "'self'",
+    '*.stripe.com',
 )
 
 CSP_FRAME_SRC = (

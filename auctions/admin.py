@@ -5,7 +5,7 @@ from .models import (Bid, Claim, Issue, Offer, OfferFee, Payout,
 
 
 class BidAdmin(admin.ModelAdmin):
-    list_display = ('user', 'url', 'ask', 'offer')
+    list_display = ('user', 'url', 'ask', 'offer', 'created', 'modified')
     list_filter = ('ask_match_sent',)
     search_fields = ['user__username', 'user__email', 'title']
 
@@ -17,15 +17,15 @@ class IssueAdmin(admin.ModelAdmin):
 
 
 class ClaimAdmin(admin.ModelAdmin):
-    list_display = ('user', 'status', 'issue')
+    list_display = ('user', 'status', 'issue', 'created', 'modified')
     list_filter = ('status',)
     search_fields = ['user__username', 'user__email', 'issue__url',
                      'issue__title']
 
 
 class OfferAdmin(admin.ModelAdmin):
-    list_display = ('user', 'bid', 'amount', 'charge_amount', 'api_success',
-                    'created')
+    list_display = ('user', 'bid', 'amount', 'charge_amount', 'refund_id',
+                    'created', 'modified')
     list_filter = ('api_success',)
     search_fields = ['bid__user__username', 'bid__user__email',
                      'error_message', 'confirmation', 'transaction_key']
@@ -33,14 +33,14 @@ class OfferAdmin(admin.ModelAdmin):
 
 class PayoutAdmin(admin.ModelAdmin):
     list_display = ('user', 'claim', 'amount', 'charge_amount', 'api_success',
-                    'created')
+                    'created', 'modified')
     list_filter = ('api_success',)
     search_fields = ['claim__user__username', 'claim__user__email',
                      'confirmation', 'transaction_key']
 
 
 class VoteAdmin(admin.ModelAdmin):
-    list_display = ('claim', 'user', 'approved', 'created')
+    list_display = ('claim', 'user', 'approved', 'created', 'modified')
     list_filter = ('approved',)
 
 

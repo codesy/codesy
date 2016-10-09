@@ -1,0 +1,80 @@
+{% extends "stripe_base.html" %}
+
+{% block content %}
+    <div class="row">
+      <div class="column medium-5 medium-offset-3 text-left">
+         <p>
+             Because it's real money, we need tp follow identity regulations.
+             We'll try to keep this to a minimum and do not save this information in our database.
+         </p>
+        <fieldset class="fieldset">
+        <form
+            role="form"
+            class="form-horizontal"
+            action="/payments/identity"
+            method="POST">
+            {% csrf_token %}
+
+            {% if 'legal_entity.first_name' in fields_needed %}
+                <label for="first_name">First Name</label>
+                <input name="first_name" type="text" class="form-control" autocomplete="off" maxlength="16" value="{{ STRIPE_DEBUG.identity.first_name}}"/>
+            {% endif %}
+            {% if 'legal_entity.last_name' in fields_needed %}
+                <label for="last_name">Last Name</label>
+                <input name="last_name" type="text" class="form-control" autocomplete="off" maxlength="16" value="{{ STRIPE_DEBUG.identity.last_name}}"/>
+            {% endif %}
+            {% if 'legal_entity.address.line1' in fields_needed %}
+                <label for="line1">Street</label>
+                <input name="line1" type="text" class="form-control" autocomplete="off" maxlength="16" value="{{ STRIPE_DEBUG.identity.street}}"/>
+            {% endif %}
+            {% if 'legal_entity.address.city' in fields_needed %}
+                <label for="city">City</label>
+                <input name="city" type="text" class="form-control" autocomplete="off" maxlength="16" value="{{ STRIPE_DEBUG.identity.city}}"/>
+                <label for="state">State</label>
+                <input name="state" type="text" class="form-control" autocomplete="off" maxlength="16" value="{{ STRIPE_DEBUG.identity.state}}"/>
+            {% endif %}
+            {% if 'legal_entity.address.postal_code' in fields_needed %}
+                <label for="postal_code">ZIP</label>
+                <input name="postal_code" type="text" class="form-control" autocomplete="off" maxlength="16" value="{{ STRIPE_DEBUG.identity.zip}}"/>
+            {% endif %}
+            {% if 'legal_entity.dob.day' in fields_needed %}
+                <fieldset >
+                    <legend>Birthdate</legend>
+                    <label for="month">Month</label>
+                    <input name="month" type="text" class="form-control" autocomplete="off" maxlength="2" value="{{ STRIPE_DEBUG.identity.month}}"/>
+                    <label for="day">Day</label>
+                    <input name="day" type="text" class="form-control" autocomplete="off" maxlength="2" value="{{ STRIPE_DEBUG.identity.day}}"/>
+                    <label for="year">Year</label>
+                    <input name="year" type="text" class="form-control" autocomplete="off" maxlength="4" value="{{ STRIPE_DEBUG.identity.year}}"/>
+                </fieldset>
+            {% endif %}
+            {% if 'legal_entity.personal_id_number' in fields_needed %}
+                <label for="personal_id_number">SSN</label>
+                <input name="personal_id_number" type="text" class="form-control" autocomplete="off" maxlength="4" value="{{ STRIPE_DEBUG.identity.ssn_full}}"/>
+            {% endif %}
+            {% if 'legal_entity.ssn_last_4' in fields_needed %}
+                <label for="ssn_last_4">Last four SSN digits</label>
+                <input name="ssn_last_4" type="text" class="form-control" autocomplete="off" maxlength="4" value="{{ STRIPE_DEBUG.identity.ssn_last_4}}"/>
+            {% endif %}
+            {% if 'legal_entity.type' in fields_needed %}
+                <fieldset >
+                    <legend>Account Type</legend>
+                    <label for="indiv">Individual</label>
+                    <input name="type" type="radio" data-stripe="account_holder_type" value="individual" id="indiv" required checked="checked">
+                    <label for="company">Company</label>
+                    <input name="type" type="radio" data-stripe="account_holder_type" value="company" id="company">
+                </fieldset>
+            {% endif %}
+
+            <button
+                class="button success track-btn"
+                data-category="Stripe"
+                data-label="Authorize">Save.
+            </button>
+        </form>
+      </fieldset>
+      </div>
+    </div>
+{% endblock %}
+{# #}
+{% block scripts %}{# stripe.js not needed #} {% endblock %}
