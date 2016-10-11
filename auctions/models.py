@@ -517,6 +517,10 @@ class Offer(Payment):
         return OfferFee.objects.filter(offer=self)
 
     @property
+    def net_offer(self):
+        return (self.amount + self.discount)
+
+    @property
     def sum_fees(self):
         return self.fees.aggregate(Sum('amount'))['amount__sum']
 
@@ -559,6 +563,10 @@ class Payout(Payment):
         return u'Payout to %s for claim (%s)' % (
             self.user, self.claim.id
         )
+
+    @property
+    def less_discount(self):
+        return (self.amount - self.discount)
 
     def fees(self):
         return PayoutFee.objects.filter(payout=self)

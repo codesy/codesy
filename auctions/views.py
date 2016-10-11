@@ -46,7 +46,6 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
         if users_claims:
             self.template_name = 'addon/claimaint.html'
             return dict({'claim': users_claims[0]})
-
         if claims:
             if bid.offer:
                 self.template_name = 'addon/voters.html'

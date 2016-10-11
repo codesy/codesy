@@ -29,7 +29,7 @@
                 <td>
                     {% if bid.last_offer %}
                         <table>
-                            <tr><td>Offer</td><td>{{ bid.last_offer.amount|add:bid.last_offer.discount}}</td></tr>
+                            <tr><td>Offer</td><td>{{ bid.last_offer.net_offer }}</td></tr>
                             {% if bid.last_offer.discount %}
                                 <tr><td>surplus</td><td>({{ bid.last_offer.discount }})</td></tr>
                             {% endif %}
