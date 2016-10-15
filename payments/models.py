@@ -36,8 +36,11 @@ class StripeAccount(models.Model):
 
     @property
     def fields_needed(self):
-        verification = json.loads(self.verification)
-        return verification['fields_needed']
+        try:
+            verification = json.loads(self.verification)['fields_needed']
+        except ValueError:
+            verification = json.loads('{}')
+        return verification
 
     def new_managed_account(self, bank_account):
         stripe_account = stripe.Account.create(
