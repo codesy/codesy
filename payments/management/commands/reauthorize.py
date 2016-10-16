@@ -21,20 +21,23 @@ class Command(BaseCommand):
         expires = timezone.now() - timedelta(days=day_limit)
         offers = Offer.objects.filter(
             refund_id=u'', created__lt=expires
+        ).exclude(
+            charge_id=u''
         )
 
         for offer in offers:
-            payments.refund(offer)
-            new_offer = Offer(
-                user=offer.user,
-                amount=offer.amount,
-                bid=offer.bid,
-            )
-            new_offer.save()
+            attempt_refund = payments.refund(offer)
+            if attempt_refund:
+                new_offer = Offer(
+                    user=offer.user,
+                    amount=offer.amount,
+                    bid=offer.bid,
+                )
+                new_offer.save()
 
-            payments.authorize(new_offer)
+                payments.authorize(new_offer)
 
-            print (
-                '%s was refunded. New authorized charge is %s' %
-                (offer.charge_id, new_offer.charge_id)
-            )
+                print (
+                    '%s was refunded. New authorized charge is %s' %
+                    (offer.charge_id, new_offer.charge_id)
+                )
