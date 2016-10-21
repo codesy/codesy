@@ -11,13 +11,13 @@
             <input type="text" class="form-control" data-stripe="routing_number" autocomplete="off" value="{{ STRIPE_DEBUG.bank.routing_number}}" maxlength="16" />
             <label for="acct-number">Account Number</label>
             <input type="text" class="form-control" data-stripe="account_number" autocomplete="off" value="{{ STRIPE_DEBUG.bank.account_number}}" maxlength="16" />
-            <fieldset >
-                <legend>Acount Type</legend>
-                <input type="radio" data-stripe="account_holder_type" value="individual" id="indiv" required checked="checked">
-                <label for="indiv">Individual</label>
-                <input type="radio" data-stripe="account_holder_type" value="company" id="company">
+            <div >
+                <label>Acount Type</label>
+                <input type="radio" name="account_holder_type" data-stripe="account_holder_type" value="individual" id="individual" required checked="checked">
+                <label for="individual">Individual</label>
+                <input type="radio" name="account_holder_type" data-stripe="account_holder_type" value="company" id="company">
                 <label for="company">Company</label>
-            </fieldset>
+            </div>
         </div>
         <button id="stripe-submit" class="button success track-btn"
                 data-category="Stripe" data-label="Authorize">
