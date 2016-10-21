@@ -4,6 +4,8 @@
         {% csrf_token %}
         <input type="hidden" data-stripe="country" value="US">
         <input type="hidden" data-stripe="currency" value="USD">
+        <input type="hidden" id="account_holder_type" data-stripe="account_holder_type" value="individual">
+
         <div class="form-group">
             <label for="name">Name on the account</label>
             <input type="text" class="form-control" data-stripe="account_holder_name" autocomplete="off" value="{{ STRIPE_DEBUG.bank.name}}" maxlength="16" />
@@ -12,10 +14,10 @@
             <label for="acct-number">Account Number</label>
             <input type="text" class="form-control" data-stripe="account_number" autocomplete="off" value="{{ STRIPE_DEBUG.bank.account_number}}" maxlength="16" />
             <div >
-                <label>Acount Type</label>
-                <input type="radio" name="account_holder_type" data-stripe="account_holder_type" value="individual" id="individual" required checked="checked">
+                <label>Account Type</label>
+                <input type="radio" name="form_holder_type" value="individual" id="individual" required checked="checked">
                 <label for="individual">Individual</label>
-                <input type="radio" name="account_holder_type" data-stripe="account_holder_type" value="company" id="company">
+                <input type="radio" name="form_holder_type" value="company" id="company">
                 <label for="company">Company</label>
             </div>
         </div>
