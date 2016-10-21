@@ -15,6 +15,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 email_template = get_template('../templates/email/need_validation.html')
 
+
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
@@ -23,10 +24,12 @@ class Command(BaseCommand):
             try:
                 stripe_account = stripe.Account.retrieve(account.account_id)
                 if account.verification != stripe_account.verification:
-                    account.verification = json.dumps(stripe_account.verification)
+                    account.verification = json.dumps(
+                        stripe_account.verification)
                     account.save()
                     if stripe_account.verification.fields_needed:
-                        email_context = ({'expiration':stripe_account.verification.due_by})
+                        email_context = (
+                            {'expiration': stripe_account.verification.due_by})
                         message = email_template.render(email_context)
                         send_mail(
                             '[codesy] Account validation needed',

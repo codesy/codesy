@@ -28,6 +28,19 @@ class StripeAccount(models.Model):
     verification = models.TextField(default='', blank=True)
 
     def identity_verified(self):
+        # codesy verification field holds verification requirement from stripe
+        # identity is verified if verification is blank or due_by is None
+
+        # first, see if an account_id has been assigned by stripe
+        # and check on verification
+        if self.account_id:
+            stripe_account = stripe.Account.retrieve(self.account_id)
+            self.verification = json.dumps(stripe_account.verification)
+            self.save()
+        else:
+            # returning True will allow the bank account_id to be assigned
+            return True
+
         if not self.verification:
             return True
         else:
