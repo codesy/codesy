@@ -40,7 +40,6 @@ class StripeAccount(models.Model):
         else:
             # returning True will allow the bank account_id to be assigned
             return True
-
         if not self.verification:
             return True
         else:

@@ -259,7 +259,6 @@ class Claim(models.Model):
                     discount=discount_amount
                 )
                 new_offer.save()
-
                 # capture payment to this users account
                 payout = Payout(
                     user=offer.user,

@@ -84,6 +84,7 @@ def refund(offer):
         )
         if refund:
             offer.refund_id = refund.id
+            offer.save()
     except Exception as e:
         print e.message
         offer.error_message = e.message
