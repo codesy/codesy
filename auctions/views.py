@@ -71,20 +71,24 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
         Save changes to bid and get payment for offer
         """
         url = self._url_path_only(self.request.POST['url'])
-        new_ask_amount = self.request.POST['ask']
-        new_offer_amount = self.request.POST['offer']
+        ask_amount = self.request.POST['ask']
+        offer_amount = self.request.POST['offer']
 
         bid = self._get_bid(url)
         if bid is None:
             bid = Bid(user=self.request.user, url=url)
 
-        if new_ask_amount:
-            bid.ask = new_ask_amount
+        if ask_amount:
+            bid.ask = ask_amount
             bid.save()
             messages.success(self.request, "Thanks for the ask!")
 
-        if new_offer_amount and Decimal(new_offer_amount) > 0.0:
-            new_offer = bid.set_offer(new_offer_amount)
+        if (
+            offer_amount and
+            Decimal(offer_amount) > 0.0 and
+            Decimal(offer_amount) != bid.offer
+        ):
+            new_offer = bid.set_offer(offer_amount)
             if new_offer.error_message:
                 messages.error(self.request, new_offer.error_message)
             else:
