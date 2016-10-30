@@ -78,8 +78,12 @@ class Bid(models.Model):
         ).filter(
             refund_id=u''
         )
-        for offer in previous_offers:
-            payments.refund(offer)
+        if not previous_offers:
+            self.offer = offer_amount
+            self.save()
+        else:
+            for offer in previous_offers:
+                payments.refund(offer)
 
         new_offer = Offer(
             user=self.user,
