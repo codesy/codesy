@@ -2,9 +2,10 @@ window.codesy = {
 };
 
 function submitForm(e) {
-  e.preventDefault();
+  e.preventDefault()
   form = $(this)
   var csrf_token = form.find('input[name=csrfmiddlewaretoken]').val()
+
   var api_call = $.ajax({
     url: form.attr('action'),
     method: form.data("method"),
@@ -15,9 +16,20 @@ function submitForm(e) {
     },
     contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
 
-  });
+  })
 
-  api_call.always(function(data, textStatus, jqXHR) {
+  api_call.error(function(data, textStatus, jqXHR) {
+    $.each(data.responseJSON, function(key, value) {
+      $('#codesy_widget').prepend(
+        '<div class="callout warning expanded" data-closable>' +
+          '<button class="close-button" data-close>&times;</button>' +
+          '<p class="alert alert-error">' + value + '</p>' +
+        '</div>'
+      )
+    });
+  })
+
+  api_call.done(function(data, textStatus, jqXHR) {
     window.location.reload()
   })
 
