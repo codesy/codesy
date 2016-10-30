@@ -115,7 +115,6 @@ def authorize(offer):
 def charge(offer, payout):
     details = transaction_amounts(payout.amount)
 
-    import ipdb; ipdb.set_trace()
     try:
         charge = stripe.Charge.create(
             customer=offer.user.stripe_customer,
@@ -131,6 +130,11 @@ def charge(offer, payout):
             payout.charge_id = charge.id
             payout.api_success = True
             payout.save()
+
+            offer.api_success = True
+            offer.charge_id = charge.id
+            offer.save()
+
             payout.claim.status = 'Paid'
             payout.claim.save()
         else:
