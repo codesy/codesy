@@ -6,8 +6,13 @@ $(window).load(function () {
             return function (status, response) {
                 if (response.error) {
                     console.error("Stripe failed to tokenize");
-                    $('#payment-errors').text(response.error.message);
-                    document.location.reload();
+                    $('#stripe-form').prepend(
+                      '<div class="callout warning expanded" data-closable>' +
+                        '<button class="close-button" data-close>&times;</button>' +
+                        '<p class="alert alert-error">' + response.error.message + '</p>' +
+                      '</div>'
+                    )
+                    $('#stripe-submit').text('Ecrypt Credit Card Information');
                 } else {
                     $.ajax({
                         method: "PATCH",
