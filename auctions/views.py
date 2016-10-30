@@ -1,3 +1,5 @@
+from urlparse import urldefrag
+
 from django.shortcuts import redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import messages
@@ -35,8 +37,11 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
         except:
             return None
 
+    def _url_path_only(self, url):
+        return urldefrag(url)[0]
+
     def get_context_data(self, **kwargs):
-        url = self.request.GET['url']
+        url = self._url_path_only(self.request.GET['url'])
         bid = self._get_bid(url)
         if bid is None:
             return dict({'bid': bid, 'url': url})
@@ -64,7 +69,7 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
         """
         Save changes to bid and get payment for offer
         """
-        url = self.request.POST['url']
+        url = self._url_path_only(self.request.POST['url'])
         new_ask_amount = self.request.POST['ask']
         new_offer_amount = self.request.POST['offer']
 
