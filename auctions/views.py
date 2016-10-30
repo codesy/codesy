@@ -23,7 +23,11 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
     template_name = "addon/bidders.html"
 
     def test_func(self):
-        return self.request.user.is_active
+        if self.request.user.is_active:
+            if not self.request.user.stripe_customer:
+                self.template_name = "addon/register_card.html"
+            return True
+        return False
 
     def _get_bid(self, url):
         try:

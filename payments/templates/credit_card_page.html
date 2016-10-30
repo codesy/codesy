@@ -2,7 +2,7 @@
 {% block content %}
     <div class="row">
         <div class="column medium-4 medium-offset-4 text-left">
-            {% if request.user.stripe_bank_account %}
+            {% if request.user.stripe_customer %}
                 You have already registered a credit card with us.  You can use this form to change the card information.
             {% else %}
                 To make offers, you need to register a credit card.  This information is not stored in codesy's database.
