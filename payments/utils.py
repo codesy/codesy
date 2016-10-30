@@ -88,6 +88,7 @@ def refund(offer):
         print e.message
         offer.error_message = e.message
     offer.save()
+    return offer.error_message == u''
 
 
 def authorize(offer):

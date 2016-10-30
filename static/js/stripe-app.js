@@ -38,6 +38,12 @@ $(window).load(function () {
 
     $('#stripe-submit').click(function (e) {
         e.preventDefault();
+
+        // add account_holder_type for bank account and identity forms
+        let holder_type = $("input[name=form_holder_type]:checked").val()
+        if (holder_type) {
+            $('#account_holder_type').val(holder_type)
+        }
         $('#stripe-submit').text('Encrypting ... ');
         Stripe[account_type].createToken($form, handleResponse);
     });

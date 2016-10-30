@@ -11,7 +11,7 @@ from codesy.base.models import User
 
 from . import (
     application_fee_created, balance_available, account_verified,
-    account_not_verified, payment_created, account_updated
+    account_not_verified, payment_created, account_updated, setup_mock_account
 )
 
 
@@ -38,12 +38,14 @@ class StripeAccountTest(TestCase):
         # new accounts should pass
         self.assertTrue(account.identity_verified())
 
+        account.account_id = "something"
+
         # test valid verification
-        account.verification = account_verified
+        setup_mock_account(verification=account_verified)
         self.assertTrue(account.identity_verified())
 
         # test invalid verification
-        account.verification = account_not_verified
+        setup_mock_account(verification=account_not_verified)
         self.assertFalse(account.identity_verified())
 
     def test_fields_needed(self):

@@ -1,0 +1,18 @@
+Hi
+
+Thanks for using codesy.  We need some more information to keep transferring money to your bank account.
+
+As a reminder, codesy.io only passes this information to Stripe, our payment provider, and we do not store it.
+
+{% if expiration %}
+    Please visit https://codesy.io/payments/identity to update before {{expiration}} to keep the transfers coming.
+
+{% else %}
+
+    Please visit https://codesy.io/payments/identity to update your account info.
+
+{% endif %}
+
+Sincerely,
+
+the codesy.io team
