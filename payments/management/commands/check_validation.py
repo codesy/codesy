@@ -19,7 +19,7 @@ email_template = get_template('../templates/email/need_validation.html')
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        accounts = StripeAccount.objects.filter()
+        accounts = StripeAccount.objects.all()
         for account in accounts:
             try:
                 stripe_account = stripe.Account.retrieve(account.account_id)
