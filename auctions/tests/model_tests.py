@@ -471,13 +471,21 @@ class OfferTest(TestCase):
         offer_with_fees = offer.amount + sum_fees
         self.assertEqual(offer_with_fees, offer.charge_amount)
 
-    def test_new_offer(self):
+    def test_new_offer_refunds_previous_offer(self):
+        first_offer = self.bid.last_offer
         self.assertEqual(self.bid.offer, 50)
         offer = self.bid.set_offer(60)
         self.assertEqual(offer.amount, 60)
         offers = Offer.objects.filter(bid=self.bid)
-        sum_offers = offers.aggregate(Sum('amount'))['amount__sum']
-        self.assertEqual(sum_offers, 110)
+        for offer in offers:
+            if offer.id == first_offer.id:
+                self.assertEqual(offer.refund_id, 'dammit')
+
+    def test_set_offer_on_new_bid_without_previous_offers(self):
+        test_bid = Bid(user=self.user1, url='http://test.com/bug/987')
+        test_bid.set_offer(99)
+
+        self.assertEqual(test_bid.offer, 99)
 
 
 class PayoutTest(TestCase):
