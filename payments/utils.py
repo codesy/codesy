@@ -115,10 +115,11 @@ def authorize(offer):
 def charge(offer, payout):
     details = transaction_amounts(payout.amount)
 
+    import ipdb; ipdb.set_trace()
     try:
         charge = stripe.Charge.create(
             customer=offer.user.stripe_customer,
-            destination=payout.user.account().account_id,
+            destination=payout.claim.user.account().account_id,
             amount=int(details['charge_amount'] * 100),
             currency="usd",
             description="Payout for: " + offer.bid.url,
