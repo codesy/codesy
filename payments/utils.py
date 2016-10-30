@@ -118,7 +118,7 @@ def charge(offer, payout):
     try:
         charge = stripe.Charge.create(
             customer=offer.user.stripe_customer,
-            destination=payout.user.account().account_id,
+            destination=payout.claim.user.account().account_id,
             amount=int(details['charge_amount'] * 100),
             currency="usd",
             description="Payout for: " + offer.bid.url,
@@ -130,6 +130,11 @@ def charge(offer, payout):
             payout.charge_id = charge.id
             payout.api_success = True
             payout.save()
+
+            offer.api_success = True
+            offer.charge_id = charge.id
+            offer.save()
+
             payout.claim.status = 'Paid'
             payout.claim.save()
         else:

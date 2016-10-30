@@ -46,6 +46,7 @@ labelDiff = function(type, $from_elem, $to_elem){
         } else if (diff > 0 ) {
             confirmTemplate = ["Your offer increased. $",diff," will be authorized your credit card."]
         } else if (diff < 0) {
+            $('#submitForm').hide()
             confirmTemplate = ["Sorry, you can't decrease your offer."]
             $from_elem.val(original_value)
         }
