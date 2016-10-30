@@ -27,6 +27,14 @@ class BidStatusTestCase(TestCase):
         context = self.view.get_context_data()
         self.assertEqual(self.bid1, context['bid'])
 
+    def test_get_by_url_doesnt_create_bid(self):
+        url = 'https://github.com/codesy/codesy/issues/419'
+        self.view.request = (fudge.Fake()
+                             .has_attr(GET={'url': url})
+                             .has_attr(user=self.user1))
+        context = self.view.get_context_data()
+        self.assertIsNone(context['bid'])
+
     @fudge.patch('auctions.views.messages')
     def test_post_new_offer(self, mock_messages):
         mock_messages.is_a_stub()
@@ -40,6 +48,21 @@ class BidStatusTestCase(TestCase):
         self.view.post()
         retreive_bid = Bid.objects.get(pk=self.bid1.id)
         self.assertEqual(retreive_bid.offer, 44)
+
+    @fudge.patch('auctions.views.messages')
+    def test_post_new_ask_with_0_offer(self, mock_messages):
+        mock_messages.is_a_stub()
+        self.view.request = (fudge.Fake().has_attr(
+            POST={
+                'url': self.url,
+                'ask': 5,
+                'offer': 0,
+            })
+            .has_attr(user=self.user1))
+        self.view.post()
+        retreive_bid = Bid.objects.get(pk=self.bid1.id)
+        self.assertEqual(retreive_bid.offer, 0)
+        self.assertEqual(retreive_bid.ask, 5)
 
 
 class ClaimStatusTestCase(TestCase):

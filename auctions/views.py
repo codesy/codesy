@@ -29,13 +29,14 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
         try:
             return Bid.objects.get(user=self.request.user, url=url)
         except:
-            new_bid = Bid(user=self.request.user, url=url)
-            new_bid.save()
-            return new_bid
+            return None
 
     def get_context_data(self, **kwargs):
         url = self.request.GET['url']
         bid = self._get_bid(url)
+        if bid is None:
+            return dict({'bid': bid, 'url': url})
+
         # rejected claims should be ignored so new claims can be made
         claims = (
             Claim.objects.filter(issue=bid.issue).exclude(status='Rejected'))
@@ -64,12 +65,15 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
         new_offer_amount = self.request.POST['offer']
 
         bid = self._get_bid(url)
+        if bid is None:
+            bid = Bid(user=self.request.user, url=url)
 
         if new_ask_amount:
             bid.ask = new_ask_amount
             bid.save()
+            messages.success(self.request, "Thanks for the ask!")
 
-        if new_offer_amount:
+        if new_offer_amount and int(new_offer_amount) > 0:
             new_offer = bid.set_offer(new_offer_amount)
             if new_offer.error_message:
                 messages.error(self.request, new_offer.error_message)
