@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import fudge
 
 from django.conf import settings
@@ -42,12 +44,12 @@ class BidStatusTestCase(TestCase):
             POST={
                 'url': self.url,
                 'ask': 0,
-                'offer': 44,
+                'offer': 44.3,
             })
             .has_attr(user=self.user1))
         self.view.post()
         retreive_bid = Bid.objects.get(pk=self.bid1.id)
-        self.assertEqual(retreive_bid.offer, 44)
+        self.assertEqual(retreive_bid.offer, Decimal('44.30'))
 
     def test_url_path_only(self):
         self.assertEqual(

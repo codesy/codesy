@@ -1,3 +1,4 @@
+from decimal import Decimal
 from urlparse import urldefrag
 
 from django.shortcuts import redirect, get_object_or_404
@@ -82,7 +83,7 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
             bid.save()
             messages.success(self.request, "Thanks for the ask!")
 
-        if new_offer_amount and int(new_offer_amount) > 0:
+        if new_offer_amount and Decimal(new_offer_amount) > 0.0:
             new_offer = bid.set_offer(new_offer_amount)
             if new_offer.error_message:
                 messages.error(self.request, new_offer.error_message)
