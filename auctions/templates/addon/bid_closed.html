@@ -1,0 +1,18 @@
+{% extends "addon/base.html" %}
+{% load staticfiles %}
+
+{% block widget_content %}
+    <div id="widget-input">
+        {% for claim in claims %}
+            {% if claim.status == 'Paid' %}
+                <p>A claim was paid on this issue</p>
+            {% elif claim.status == 'Approved' %}
+                <p>A claim was approved for this issue</p>
+            {% else %}
+                <p>
+                    Bids for this issue are closed because a claim has been made.
+                </p>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock %}

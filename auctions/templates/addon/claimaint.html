@@ -1,0 +1,12 @@
+{% extends "addon/base.html" %}
+{% load auctions_extras %}
+{% load staticfiles %}
+
+{% block widget_content %}
+
+    <div id="widget-input">
+
+        {% include "addon/includes/claim_form.html" with target="_blank"%}
+
+    </div>
+{% endblock %}

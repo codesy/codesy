@@ -1,0 +1,10 @@
+{% extends "addon/base.html" %}
+{% load staticfiles %}
+
+{% block widget_content %}
+    {% if bid.ask_met %}
+        {% include "addon/includes/submit_claim.html" with target="_blank" %}
+    {% else %}
+        {% include "addon/includes/bid_form.html" with target="_blank" %}
+    {% endif %}
+{% endblock %}
