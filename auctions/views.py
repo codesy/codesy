@@ -114,8 +114,9 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
                         'fees': {'codesy': 0, 'Stripe': 0},
                         'credits': {'surplus': 0}
                         }
+        claim = get_object_or_404(Claim, pk=self.kwargs['pk'])
+
         try:
-            claim = Claim.objects.get(pk=self.kwargs['pk'])
             for payout in claim.successful_payouts().all():
                 total_payout['total'] += payout.charge_amount
                 for fee in payout.fees():
