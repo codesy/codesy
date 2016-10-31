@@ -6,14 +6,9 @@ $(window).load(function () {
             return function (status, response) {
                 if (response.error) {
                     console.error("Stripe failed to tokenize");
-                    $('#stripe-form').prepend(
-                      '<div class="callout warning expanded" data-closable>' +
-                        '<button class="close-button" data-close>&times;</button>' +
-                        '<p class="alert alert-error">' + response.error.message + '</p>' +
-                      '</div>'
-                    )
-                    $('#stripe-submit').text('Ecrypt Credit Card Information');
+                    message_array[3] = response.error.message
                 } else {
+                    message_array[3] = "Account Information successfully encrypted"
                     $.ajax({
                         method: "PATCH",
                         url: "/users/update/",
@@ -27,12 +22,11 @@ $(window).load(function () {
                         error: function(err) {
                             console.error("Error updating user.");
                             console.error(err);
-                        },
-                        complete: function(){
-                            document.location.reload();
                         }
                     });
                 }
+                $('#stripe-form').prepend(message_array.join(""))
+                $('#stripe-submit').text('Encrypt Account Information');
             }
         })(this)
     }
@@ -40,6 +34,11 @@ $(window).load(function () {
     let handleResponse = new stripeResponse($('form input[name="csrfmiddlewaretoken"]').val())
     let $form = $('#stripe-form')
     let account_type = $form.attr('stripe-account-type')
+    let message_array = ['<div class="callout warning expanded" data-closable>',
+        '<button class="close-button" data-close>&times;</button>',
+        '<p class="alert alert-error">',
+        'MESSSAGE GOES IN POS 3',
+        '</p></div>']
 
     $('#stripe-submit').click(function (e) {
         e.preventDefault();
