@@ -5,8 +5,9 @@
             {% if request.user.stripe_bank_account %}
                 You have already registered a bank acount with us.  You can use this form to change the account.
             {% else %}
-                To receive payouts, you need to register a bank account.  This information is not stored in codesy's database.
+                To receive payouts, you need to register a bank account.
             {% endif %}
+                We tokenize this information with Stripe so it is not stored in codesy's database.
             {% include "bank_account_form.html" %}
         </div>
     </div>

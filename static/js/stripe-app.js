@@ -26,7 +26,7 @@ $(window).load(function () {
                     });
                 }
                 $('#stripe-form').prepend(message_array.join(""))
-                $('#stripe-submit').text('Encrypt Account Information');
+                $('#stripe-submit').text('Tokenize Account Information');
             }
         })(this)
     }
@@ -48,7 +48,7 @@ $(window).load(function () {
         if (holder_type) {
             $('#account_holder_type').val(holder_type)
         }
-        $('#stripe-submit').text('Encrypting ... ');
+        $('#stripe-submit').text('Tokenizing ... ');
         Stripe[account_type].createToken($form, handleResponse);
     });
 

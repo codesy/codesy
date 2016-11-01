@@ -10,6 +10,6 @@
         <input type="text" class="form-control" data-stripe="exp_year" autocomplete="off" value="{{ STRIPE_DEBUG.card.cc_ex_year}}" maxlength="4" size="4"/>
         <label for="cvc">Card Verification Code (CVC)</label>
         <input type="text" class="form-control" data-stripe="cvc" autocomplete="off" value="{{ STRIPE_DEBUG.card.cvc}}" maxlength="4" size="4"/>
-        <button id="stripe-submit" class="button success track-btn" data-category="Stripe" data-label="Authorize">Encrypt Account Information</button>
+        <button id="stripe-submit" class="button success track-btn" data-category="Stripe" data-label="Authorize">Tokenize Account Information</button>
     </form>
 </fieldset>
