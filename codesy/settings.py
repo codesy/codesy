@@ -118,6 +118,8 @@ DATABASES = {'default': config(
     default="postgres://postgres@localhost:5432/codesy",
     cast=dj_database_url.parse)}
 
+DATABASES['default']['ATOMIC_REQUESTS'] = True
+
 # CSP settings
 
 CSP_DEFAULT_SRC = ("'none'",)
