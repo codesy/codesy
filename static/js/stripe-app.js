@@ -1,14 +1,23 @@
 $(window).load(function () {
     Stripe.setPublishableKey($('#codesy-html').data('stripe_key'));
+    function response_div(message){
+        return `
+            <div class="callout warning expanded" data-closable>
+                <button class="close-button" data-close>&times;</button>
+                <p class="alert alert-error">
+                    ${message}
+                </p>
+            </div>`
+    }
     let stripeResponse = function (csrf_token) {
         this.csrf_token = csrf_token
         return (function(_this){
             return function (status, response) {
                 if (response.error) {
                     console.error("Stripe failed to tokenize");
-                    message_array[3] = response.error.message
+                    response_message = response.error.message
                 } else {
-                    message_array[3] = "Account Information successfully encrypted"
+                    response_message = "Account information successfully tokenized"
                     $.ajax({
                         method: "PATCH",
                         url: "/users/update/",
@@ -25,7 +34,7 @@ $(window).load(function () {
                         }
                     });
                 }
-                $('#stripe-form').prepend(message_array.join(""))
+                $('#stripe-form').prepend(response_div(response_message))
                 $('#stripe-submit').text('Tokenize Account Information');
             }
         })(this)
@@ -34,15 +43,9 @@ $(window).load(function () {
     let handleResponse = new stripeResponse($('form input[name="csrfmiddlewaretoken"]').val())
     let $form = $('#stripe-form')
     let account_type = $form.attr('stripe-account-type')
-    let message_array = ['<div class="callout warning expanded" data-closable>',
-        '<button class="close-button" data-close>&times;</button>',
-        '<p class="alert alert-error">',
-        'MESSSAGE GOES IN POS 3',
-        '</p></div>']
 
     $('#stripe-submit').click(function (e) {
         e.preventDefault();
-
         // add account_holder_type for bank account and identity forms
         let holder_type = $("input[name=form_holder_type]:checked").val()
         if (holder_type) {
