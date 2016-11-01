@@ -1,7 +1,5 @@
 import re
-from datetime import datetime
 from datetime import timedelta
-
 from django.utils import timezone
 
 from decouple import config
@@ -55,4 +53,4 @@ def update_issue_states(since=None):
     for issue in Issue.objects.filter(last_fetched__lt=since):
         state = issue_state(issue.url, gh_client)
         if state:
-            update(issue, last_fetched=datetime.now(), state=state)
+            update(issue, last_fetched=timezone.now(), state=state)
