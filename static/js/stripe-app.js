@@ -1,14 +1,16 @@
 $(window).load(function () {
     Stripe.setPublishableKey($('#codesy-html').data('stripe_key'));
     function response_div(message){
-        return `
+        $div= $(`
             <div class="callout warning expanded" data-closable>
                 <button class="close-button" data-close>&times;</button>
                 <p class="alert alert-error">
-                    ${message}
                 </p>
-            </div>`
+            </div>`)
+        $div.find('p').text(message)
+        return $div
     }
+
     let stripeResponse = function (csrf_token) {
         this.csrf_token = csrf_token
         return (function(_this){
@@ -34,6 +36,7 @@ $(window).load(function () {
                         }
                     });
                 }
+
                 $('#stripe-form').prepend(response_div(response_message))
                 $('#stripe-submit').text('Tokenize Account Information');
             }
