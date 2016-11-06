@@ -18,7 +18,6 @@
                 data-original-value="{{bid.ask}}"
                 value="{% if bid.ask > 0 %}{{bid.ask}}{% endif %}">
             </label>
-            <label id="ask-confirm" class="callout small codesy_confirm hide" ></label>
 
             <label class="codesy_hide" >
             {% if bid.offer > 0 %}You have offered{% else %}You can offer{% endif %}
@@ -29,12 +28,11 @@
                     data-original-value="{{bid.offer}}"
                     value="{% if bid.offer > 0 %}{{bid.offer}}{% endif %}">
             </label>
-            <label id="offer-confirm" class="callout small codesy_confirm hide" ></label>
 
             <input
                 id="submitForm"
                 type="submit"
-                class="button expanded success codesy_confirm hide"
+                class="button expanded success hide"
                 value="CONFIRM"
             />
 
