@@ -4,39 +4,54 @@ class WidgetApp {
         this.$form = $form
         $form.find('input#submitForm').submit(this.submit.bind(this))
         $form.find('button#ShowSubmit').click(this.show.bind(this))
-        $form.find('button#cancelSubmit').click(this.reload.bind(this))
+        $form.find('input#cancelSubmit').click(this.reload.bind(this))
     }
     show(e) {
         e.preventDefault()
+        $('.codesy_hide').hide()
+        $('.codesy_confirm').removeClass('hide')
         var valid_offer = this.validate($("input#offer"))
         var valid_ask = this.validate($("input#ask"))
         if (valid_offer || valid_ask){
             this.$form.find('#submitForm').removeClass('hide')
         }
-        $('.codesy_hide').hide()
-        $('.codesy_confirm').removeClass('hide')
     }
     validate($input){
         var original_value = $input.data("original-value")
         var new_value = $input.val()
         var diff = new_value - original_value
-        const $message = $('<label id="ask-confirm" class="callout small codesy_confirm hide" ></label>')
+        var input_type = $input.attr('id')
+        const $message = $(`<label id="${input_type}-confirm" class="callout small codesy_confirm" ></label>`)
         var validated = true
         var offer_notice = ''
         var direction = ''
-        var input_type = $input.attr('id')
+        var introduction = ''
+
+        this.$form.parent().prepend($message)
+
+        if (new_value>0 && new_value<1){
+            $message.text('Sorry, bids cannot be less than $1.')
+            $input.val(original_value)
+            return false
+        }
+
+        if (new_value<0){
+            $message.text('Sorry, bids cannot be negative.')
+            $input.val(original_value)
+            return false
+        }
 
         if (diff === 0){
-            direction = 'did not change.'
+            direction = 'not changing'
             validated = false
         }
         else if (diff > 0 ) {
-            direction = `is increasing to $${new_value}`
+            direction = `increasing`
         } else if (diff < 0) {
-            direction = `is decreasing to $${new_value}`
+            direction = `decreasing`
         }
 
-        let introduction = `Your ${input_type} ${direction}.`
+        introduction = `You are ${direction} your ${input_type}.`
 
         if (input_type === "offer"){
             if (diff < 0) {
@@ -45,14 +60,10 @@ class WidgetApp {
                 $input.val(original_value)
                 validated = false
             } else if (diff>0){
-                offer_notice =`
-                    This ${ original_value === "" || original_value === 0 ? "new" : ""}
-                    offer will be authorized on your credit card
-                `
+                offer_notice =`Your credit card will be authorized for $${new_value}.`
             }
         }
         $message.text([introduction,offer_notice].join(' '))
-        this.$form.prepend($message)
         return validated
     }
     submit(e){
