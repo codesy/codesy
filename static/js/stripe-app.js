@@ -1,19 +1,25 @@
 $(window).load(function () {
     Stripe.setPublishableKey($('#codesy-html').data('stripe_key'));
+    function response_div(message){
+        $div= $(`
+            <div class="callout warning expanded" data-closable>
+                <button class="close-button" data-close>&times;</button>
+                <p class="alert alert-error">
+                </p>
+            </div>`)
+        $div.find('p').text(message)
+        return $div
+    }
+
     let stripeResponse = function (csrf_token) {
         this.csrf_token = csrf_token
         return (function(_this){
             return function (status, response) {
                 if (response.error) {
                     console.error("Stripe failed to tokenize");
-                    $('#stripe-form').prepend(
-                      '<div class="callout warning expanded" data-closable>' +
-                        '<button class="close-button" data-close>&times;</button>' +
-                        '<p class="alert alert-error">' + response.error.message + '</p>' +
-                      '</div>'
-                    )
-                    $('#stripe-submit').text('Ecrypt Credit Card Information');
+                    response_message = response.error.message
                 } else {
+                    response_message = "Account information successfully tokenized"
                     $.ajax({
                         method: "PATCH",
                         url: "/users/update/",
@@ -27,12 +33,12 @@ $(window).load(function () {
                         error: function(err) {
                             console.error("Error updating user.");
                             console.error(err);
-                        },
-                        complete: function(){
-                            document.location.reload();
                         }
                     });
                 }
+
+                $('#stripe-form').prepend(response_div(response_message))
+                $('#stripe-submit').text('Tokenize Account Information');
             }
         })(this)
     }
@@ -43,13 +49,12 @@ $(window).load(function () {
 
     $('#stripe-submit').click(function (e) {
         e.preventDefault();
-
         // add account_holder_type for bank account and identity forms
         let holder_type = $("input[name=form_holder_type]:checked").val()
         if (holder_type) {
             $('#account_holder_type').val(holder_type)
         }
-        $('#stripe-submit').text('Encrypting ... ');
+        $('#stripe-submit').text('Tokenizing ... ');
         Stripe[account_type].createToken($form, handleResponse);
     });
 

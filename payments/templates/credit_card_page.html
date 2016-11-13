@@ -5,8 +5,9 @@
             {% if request.user.stripe_customer %}
                 You have a credit card registered with us.  You can use this form to change the card information.
             {% else %}
-                To make offers, you need to register a credit card.  This information is not stored in codesy's database.
+                To make offers, you need to register a credit card.
             {% endif %}
+                We tokenize this information with Stripe so it is not stored in codesy's database.
             {% include "credit_card_form.html" %}
         </div>
     </div>
