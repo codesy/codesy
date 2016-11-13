@@ -1,16 +1,28 @@
-<form id="codesy_claim"
-      class="ajaxSubmit"
-      action="//{{current_site.domain}}{% url 'claim-list' %}"
-      data-method="POST" >
-      <label>Your ask was met!</label>
-      {% csrf_token %}
-      <input name="issue" type="hidden" value="{{ bid.issue.id }}" />
-         <input
-            id="evidence"
-            name="evidence"
-            type="text"
-            placeholder="Provide a URL."
-         />
-         <input type="submit" class="button success expanded" value="Claim your {{bid.ask}}"></input>
-   </fieldset>
+<form 
+  id="codesy_claim"
+  class="ajaxSubmit"
+  action="//{{current_site.domain}}{% url 'claim-list' %}"
+  data-method="POST"
+  >
+    <label>
+      Your ask was met! <br>
+      Fix the bug and then submit a URL of your merged fix:
+    </label>
+    {% csrf_token %}
+    <input
+      name="issue"
+      type="hidden"
+      value="{{ bid.issue.id }}"
+    />
+    <input
+      id="evidence"
+      name="evidence"
+      type="text"
+      placeholder="URL of your fix."
+    />
+    <input
+      type="submit"
+      class="button success expanded"
+      value="Claim your {{bid.ask}}"
+    />
 </form>

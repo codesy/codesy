@@ -1,32 +1,30 @@
 <div id="widget-input">
     <div id="widget-input-form">
-        <form id="codesy_bid"
-            action="//{{current_site.domain}}{% url 'bid-status' %}"
-            method="POST"
-            > <!-- end of FORM tag -->
+        <form id="codesy_bid" action="//{{current_site.domain}}{% url 'bid-status' %}" method="POST">
             {% csrf_token %}
-            <input name="url" type="hidden" value="{{ url }}"></input>
+            <input name="url" type="hidden" value="{{ url }}">
 
             <label class="codesy_hide" >
-
-             {% if bid.ask > 0 %}You have asked for{% else %}You can ask for {% endif %}
-            <input id="ask"
-                name="ask"
-                type="text"
-                class="codesy_hide"
-                placeholder="What you'd want."
-                data-original-value="{{bid.ask}}"
-                value="{% if bid.ask > 0 %}{{bid.ask}}{% endif %}">
+            {% if bid.offer > 0 %}You have offered:{% else %}Offer:{% endif %}
+              <input id="offer"
+                  name="offer"
+                  type="text"
+                  placeholder="What you'd pay."
+                  data-original-value="{{bid.offer}}"
+                  value="{% if bid.offer > 0 %}{{bid.offer}}{% endif %}"
+              />
             </label>
 
             <label class="codesy_hide" >
-            {% if bid.offer > 0 %}You have offered{% else %}You can offer{% endif %}
-                <input id="offer"
-                    name="offer"
-                    type="text"
-                    placeholder="What you'd pay."
-                    data-original-value="{{bid.offer}}"
-                    value="{% if bid.offer > 0 %}{{bid.offer}}{% endif %}">
+            {% if bid.ask > 0 %}You have asked for:{% else %}Ask for:{% endif %}
+              <input id="ask"
+                  name="ask"
+                  type="text"
+                  class="codesy_hide"
+                  placeholder="What you'd want."
+                  data-original-value="{{bid.ask}}"
+                  value="{% if bid.ask > 0 %}{{bid.ask}}{% endif %}"
+              />
             </label>
 
             <input
@@ -44,11 +42,12 @@
             />
 
             <button
-                type="button"
-                id="ShowSubmit"
-                class="button expanded success codesy_hide">
+              type="button"
+              id="ShowSubmit"
+              class="button expanded success codesy_hide">
                 {%  if bid.offer > 0 or bid.ask > 0 %}Change your Bid{% else %}Make a bid{% endif %}
             </button>
+
         </form>
     </div>
 </div>

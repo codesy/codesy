@@ -15,9 +15,9 @@ body {
   border-radius: 3px;
 }
 
-#widget-input::before, #widget-input::after {
+#widget-input-header::before, #widget-input-header::after {
   position: absolute;
-  top: 11px;
+  top: 16px;
   right: 100%;
   left: -16px;
   display: block;
@@ -28,12 +28,12 @@ body {
   border-style: solid solid outset;
 }
 
-#widget-input::before {
+#widget-input-header::before {
   border-width: 8px;
   border-right-color: #bfccd1;
 }
 
-#widget-input::after {
+#widget-input-header::after {
   margin-top: 1px;
   margin-left: 2px;
   border-width: 7px;
@@ -50,10 +50,11 @@ body {
 #widget-input-header {
   background-color: #f2f8fa;
   color: #767676;
-  border-bottom: 1px solid #dde4e6;
+  border: 1px solid #dde4e6;
   border-radius: 3px 3px 0 0;
   text-align: center;
   padding: 3px 0px;
+  position: relative;
 }
 
 #widget-input-form {

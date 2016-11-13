@@ -1,7 +1,8 @@
 <p>
     {% if claim.status == 'Paid' %}
-        This claim was paid; thank you!
+        This claim was paid; thank&nbsp;you!
     {% elif claim.status == 'Approved' %}
+        Your claim was approved!
         <a class="button success expanded"
         href="{% url 'claim-status' pk=claim.id %}"
         {% if target %} target="{{ target }}"{% endif %}>
@@ -10,6 +11,6 @@
         Collecting votes for <a
         href="{% url 'claim-status' pk=claim.id %}"
         {% if target %} target="{{ target }}"{% endif %}>
-        your claim</a>.
+        your&nbsp;claim</a>.
     {% endif %}
 </p>
