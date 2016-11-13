@@ -4,7 +4,9 @@ import re
 import HTMLParser
 from decimal import Decimal
 
-from datetime import datetime, timedelta
+from datetime import timedelta
+from django.utils import timezone
+
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -156,7 +158,7 @@ def notify_matching_askers(sender, instance, **kwargs):
                 [bid.user.email]
             )
             # use .update to avoid recursive signal processing
-            Bid.objects.filter(id=bid.id).update(ask_match_sent=datetime.now())
+            Bid.objects.filter(id=bid.id).update(ask_match_sent=timezone.now())
 
 
 @receiver(post_save, sender=Bid)

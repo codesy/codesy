@@ -4,7 +4,8 @@ from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.http import HttpResponse
 from django.conf import settings
-import datetime
+from django.utils import timezone
+
 # stripe related:
 from codesy.base.models import User
 from .models import StripeEvent
@@ -117,7 +118,7 @@ class AcceptTermsView(TemplateView):
     def post(self, *args, **kwargs):
         try:
             user = User.objects.get(id=self.request.user.id)
-            user.tos_acceptance_date = datetime.datetime.now()
+            user.tos_acceptance_date = timezone.now()
             user.tos_acceptance_ip = self.get_client_ip(self.request)
             user.save()
         except User.DoesNotExist:
