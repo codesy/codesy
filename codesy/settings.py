@@ -161,6 +161,10 @@ CSP_FONT_SRC = (
     'https://cdn.jsdelivr.net'
 )
 
+CSP_FRAME_ANCESTORS = (
+    "'self'",
+    'https://github.com'
+)
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
