@@ -1,9 +1,6 @@
-Hi,
+{% extends "email/base.html" %}
 
+{% block email_body %}
 Your claim for {{url} }has been rejected.
 https://{{site}}
-
-
-Sincerely,
-
-The codesy.io team
+{% endblock %}
