@@ -14,6 +14,8 @@ from django.db import models
 from django.db.models import Sum
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.template.loader import get_template
+
 
 from mailer import send_mail
 
@@ -136,24 +138,17 @@ class Bid(models.Model):
 
 @receiver(post_save, sender=Bid)
 def notify_matching_askers(sender, instance, **kwargs):
-    # TODO: make a nicer HTML email template
-    ASKER_NOTIFICATION_EMAIL_STRING = """
-    Bidders have met your asking price for {url}.
-    If you fix the issue, you may claim the payout by visiting the issue url:
-    {url}
-    """
-
+    email_template = get_template('../templates/email/ask_met.html')
     unnotified_asks = Bid.objects.filter(
         url=instance.url, ask_match_sent=None).exclude(ask__lte=0)
 
     for bid in unnotified_asks:
         if bid.ask_met():
+            email_context = {'ask': bid.ask, 'url': bid.url}
+            message = email_template.render(email_context)
             send_mail(
-                "[codesy] Your ask for %(ask)d for %(url)s has been met" %
-                (
-                    {'ask': bid.ask, 'url': bid.url}
-                ),
-                ASKER_NOTIFICATION_EMAIL_STRING.format(url=bid.url),
+                "[codesy] Your ask has been met!",
+                message,
                 settings.DEFAULT_FROM_EMAIL,
                 [bid.user.email]
             )
@@ -336,15 +331,8 @@ def notify_matching_offerers(sender, instance, created, **kwargs):
     if not created:
         return True
 
-    # TODO: make a nicer HTML email template
-    OFFERER_NOTIFICATION_EMAIL_STRING = """
-    {user} has claimed the payout for {url}.
+    email_template = get_template('../templates/email/claim_notify.html')
 
-    codesy.io will pay your offer of {offer} to {user}.
-
-    To approve or reject this claim, go to:
-    https://{site}{claim_link}
-    """
     current_site = Site.objects.get_current()
 
     self_Q = models.Q(user=instance.user)
@@ -356,18 +344,17 @@ def notify_matching_offerers(sender, instance, created, **kwargs):
     )
 
     for bid in others_bids:
+        email_context = ({
+            'user': instance.user,
+            'url': instance.issue.url,
+            'offer': bid.offer,
+            'site': current_site,
+            'claim_link': instance.get_absolute_url(),
+        })
+        message = email_template.render(email_context)
         send_mail(
-            "[codesy] %(user)s has claimed payout for %(url)s" %
-            (
-                {'user': instance.user, 'url': instance.issue.url}
-            ),
-            OFFERER_NOTIFICATION_EMAIL_STRING.format(
-                user=instance.user,
-                url=instance.issue.url,
-                offer=bid.offer,
-                site=current_site,
-                claim_link=instance.get_absolute_url()
-            ),
+            "[codesy] A claim needs your vote!",
+            message,
             settings.DEFAULT_FROM_EMAIL,
             [bid.user.email]
         )
@@ -434,35 +421,34 @@ def notify_approved_claim(sender, instance, created, **kwargs):
     votes_needed = claim.offers.count()
 
     if claim.num_rejections == votes_needed:
+        email_template = get_template('../templates/email/claim_reject.html')
+
         current_site = Site.objects.get_current()
-        # TODO: make a nicer HTML email template
-        CLAIM_REJECTED_EMAIL_STRING = """
-        Your claim for {url} has been rejected.
-        https://{site}
-        """
+        email_context = ({
+            'url': claim.issue.url,
+            'site': current_site,
+        })
+        message = email_template.render(email_context)
         send_mail(
             "[codesy] Your claimed has been rejected",
-            CLAIM_REJECTED_EMAIL_STRING.format(
-                url=claim.issue.url,
-                site=current_site,
-            ),
+            message,
             settings.DEFAULT_FROM_EMAIL,
             [claim.user.email]
         )
 
     if votes_needed == claim.num_approvals:
+        email_template = get_template('../templates/email/claim_approved.html')
+
         current_site = Site.objects.get_current()
-        # TODO: make a nicer HTML email template
-        CLAIM_APPROVED_EMAIL_STRING = """
-        Your claim for {url} has been approved.
-        https://{site}
-        """
+        email_context = ({
+            'url': claim.issue.url,
+            'site': current_site,
+        })
+        message = email_template.render(email_context)
+
         send_mail(
             "[codesy] Your claimed has been approved",
-            CLAIM_APPROVED_EMAIL_STRING.format(
-                url=claim.issue.url,
-                site=current_site,
-            ),
+            message,
             settings.DEFAULT_FROM_EMAIL,
             [claim.user.email]
         )
