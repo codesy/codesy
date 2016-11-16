@@ -181,13 +181,13 @@ class NotifyMatchersReceiverTest(MarketWithBidsTestCase):
         user = mommy.make(settings.AUTH_USER_MODEL)
 
         mock_send_mail.expects_call().with_args(
-            self._add_url('[codesy] Your ask for 50 for {url} has been met'),
+            arg.any(),
             arg.any(),
             arg.any(),
             ['user1@test.com']
         )
         mock_send_mail.next_call().with_args(
-            self._add_url('[codesy] Your ask for 100 for {url} has been met'),
+            arg.any(),
             arg.any(),
             arg.any(),
             ['user2@test.com']
@@ -205,7 +205,7 @@ class NotifyMatchersReceiverTest(MarketWithBidsTestCase):
         self.bid1.save()
 
         mock_send_mail.expects_call().with_args(
-            self._add_url('[codesy] Your ask for 100 for {url} has been met'),
+            arg.any(),
             arg.any(),
             arg.any(),
             ['user2@test.com']
@@ -224,7 +224,7 @@ class NotifyMatchersReceiverTest(MarketWithBidsTestCase):
 
         mock_send_mail.expects_call().with_args(
             arg.any(),
-            arg.contains("visiting the issue url:\n"),
+            arg.any(),
             arg.any(),
             ['user2@test.com']
         )
