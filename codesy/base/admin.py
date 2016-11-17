@@ -22,4 +22,5 @@ class CodesyUserAdmin(UserAdmin):
          ),
     )
 
+
 admin.site.register(User, CodesyUserAdmin)

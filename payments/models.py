@@ -122,6 +122,7 @@ class StripeEvent(models.Model):
             pass
         super(StripeEvent, self).save(*args, **kwargs)
 
+
 webhooks = {}
 
 
@@ -148,6 +149,7 @@ class AccountUpdatedProcessor(WebHookProcessor):
             # TODO: Tell someone this happened
             pass
 
+
 webhooks['account.updated'] = AccountUpdatedProcessor
 
 
@@ -162,6 +164,7 @@ class BalanceAvailableProcessor(WebHookProcessor):
         except StripeAccount.DoesNotExist:
             pass
 
+
 webhooks['balance.available'] = BalanceAvailableProcessor
 
 
@@ -171,6 +174,7 @@ class ChargeUpdatedProcessor(WebHookProcessor):
             pass
         except:
             pass
+
 
 webhooks['charge.updated'] = ChargeUpdatedProcessor
 
@@ -182,5 +186,6 @@ class PaymentCreatedProcessor(WebHookProcessor):
             pass
         except:
             pass
+
 
 webhooks['payment.created'] = PaymentCreatedProcessor

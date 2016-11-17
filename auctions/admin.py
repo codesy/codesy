@@ -58,6 +58,7 @@ class OfferFeeAdmin(admin.ModelAdmin):
     list_display = ('offer', 'fee_type', 'amount', 'description')
     search_fields = ['description']
 
+
 admin.site.register(Bid, BidAdmin)
 admin.site.register(Issue, IssueAdmin)
 admin.site.register(Claim, ClaimAdmin)
