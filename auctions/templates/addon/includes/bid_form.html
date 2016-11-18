@@ -1,6 +1,6 @@
 <div id="widget-input">
     <div id="widget-input-form">
-        <form id="codesy_bid" action="//{{current_site.domain}}{% url 'bid-status' %}" method="POST">
+        <form id="codesy_form" action="//{{current_site.domain}}{% url 'bid-status' %}" method="POST">
             {% csrf_token %}
             <input name="url" type="hidden" value="{{ url }}">
 
@@ -28,7 +28,6 @@
             </label>
 
             <input
-                id="submitForm"
                 type="submit"
                 class="button expanded success hide"
                 value="CONFIRM"
