@@ -5,9 +5,9 @@
     <div id="widget-input">
         {% for claim in claims %}
             {% if claim.status == 'Paid' %}
-                <p>This claim was paid; thank you!</p>
+                <p>This claim was paid; thank&nbsp;you!</p>
             {% elif claim.status == 'Approved' %}
-                <p>This claim was approved; thank you!</p>
+                <p>This claim was approved; thank&nbsp;you!</p>
             {% else %}
                 <p>
                     A claim was made that needs your review.

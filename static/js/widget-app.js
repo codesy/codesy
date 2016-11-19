@@ -2,7 +2,7 @@ window.codesy={}
 class WidgetApp {
     constructor($form) {
         this.$form = $form
-        $form.find('input#submitForm').submit(this.submit.bind(this))
+        $form.submit(this.submit.bind(this))
         $form.find('button#ShowSubmit').click(this.show.bind(this))
         $form.find('input#cancelSubmit').click(this.reload.bind(this))
     }
@@ -10,10 +10,10 @@ class WidgetApp {
         e.preventDefault()
         $('.codesy_hide').hide()
         $('.codesy_confirm').removeClass('hide')
-        var valid_offer = this.validate($("input#offer"))
         var valid_ask = this.validate($("input#ask"))
+        var valid_offer = this.validate($("input#offer"))
         if (valid_offer || valid_ask){
-            this.$form.find('#submitForm').removeClass('hide')
+            this.$form.find('input[type="submit"]').removeClass('hide')
         }
     }
     validate($input){
@@ -72,7 +72,7 @@ class WidgetApp {
         var csrf_token = form.find('input[name=csrfmiddlewaretoken]').val()
         var api_call = $.ajax({
             url: form.attr('action'),
-            method: form.data("method"),
+            method: form.attr("method"),
             data: form.serialize(),
             processData: false,
             headers: {
@@ -86,7 +86,7 @@ class WidgetApp {
                 });
             })
             .done(function(data, textStatus, jqXHR) {
-                this.reload()
+                window.location.reload()
             })
     }
     reload() {
@@ -105,5 +105,5 @@ class WidgetApp {
 }//end class
 
 $(document).ready(function() {
-    codesy.app = new WidgetApp($('#codesy_bid'))
+    codesy.app = new WidgetApp($('#codesy_form'))
 });

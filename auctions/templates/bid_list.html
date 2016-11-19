@@ -44,9 +44,9 @@
                     {% if actionable_claims.other_claims != None %}
                         {% for other_claim in actionable_claims.other_claims %}
                             {% if other_claim.status == 'Paid' %}
-                                <p>This claim was paid; thank you!</p>
+                                <p>This claim was paid; thank&nbsp;you!</p>
                             {% elif other_claim.status == 'Approved' %}
-                                <p>This claim was approved; thank you!</p>
+                                <p>This claim was approved; thank&nbsp;you!</p>
                             {% elif other_claim.status == 'Rejected' %}
                                 <p>This claim was rejected.</p>
                             {% else %}
