@@ -1,7 +1,7 @@
 {% load staticfiles %}
 {% load socialaccount %}
 
-<div class="home-section text-center">
+<div class="text-center">
   {% if not request.user.is_authenticated %}
 
     <a class="button gh-button track-btn" data-category="sign-in" href="{% provider_login_url "github" %}"><i class="fi-social fi-social-github medium"></i> Sign in with GitHub to get started</a>

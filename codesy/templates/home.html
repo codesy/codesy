@@ -7,12 +7,17 @@ codesy is a pay-what-you-want market for the open source community where we can 
 
 {% endblock %}
 
-{% block jumbotron %}
+{% block content %}
+  <div class="row">
+
+    <div class="home-section medium-12 columns">
     {% if not request.user.is_authenticated %}
         <div class="row">
             <div class="medium-6 columns medium-offset-3">
-                <p>
-                    codesy is a <strong>pay-what-you-want</strong> market for the open source community where we can tip each other to fix important bugs.
+                <p class="home-tagline">
+                codesy is a <strong>pay-what-you-want</strong> market <br>
+                for the open source community <br>
+                where we can tip each other to fix important bugs.
                 </p>
                 <div class="flex-video ">
                     <iframe width="420" height="315" src="https://www.youtube.com/embed/red28nAEllM" frameborder="0" allowfullscreen></iframe>
@@ -20,21 +25,21 @@ codesy is a pay-what-you-want market for the open source community where we can 
             </div>
         </div>
     {% endif %}
-{% endblock %}
+    {% include "includes/get_started.html" %}
+    </div>
 
-{% block content %}
-  <div class="row">
-   {% include "includes/get_started.html" %}
    <hr/>
    {% include "includes/how_it_works.html" %}
-   <hr/>
-   {% include "includes/cross_browser.html" %}
    <hr/>
    {% include "includes/open_source.html" %}
    <hr/>
    {% include "includes/closed_bids.html" %}
    <hr/>
+   {% include "includes/cross_browser.html" %}
+   <hr/>
    {% include "includes/faq.html" %}
+   <hr/>
+   {% include "includes/get_started.html" %}
   </div>
 {% endblock %}
 
