@@ -179,15 +179,16 @@ class NotifyMatchersReceiverTest(MarketWithBidsTestCase):
     @fudge.patch('auctions.models.send_mail')
     def test_send_mail_to_matching_askers(self, mock_send_mail):
         user = mommy.make(settings.AUTH_USER_MODEL)
-
+        bid1_subject = "[codesy] There's $50 waiting for you!"
+        bid2_subject = "[codesy] There's $100 waiting for you!"
         mock_send_mail.expects_call().with_args(
-            arg.any(),
+            bid1_subject,
             arg.any(),
             arg.any(),
             ['user1@test.com']
         )
         mock_send_mail.next_call().with_args(
-            arg.any(),
+            bid2_subject,
             arg.any(),
             arg.any(),
             ['user2@test.com']
@@ -203,9 +204,10 @@ class NotifyMatchersReceiverTest(MarketWithBidsTestCase):
         user = mommy.make(settings.AUTH_USER_MODEL)
         self.bid1.ask_match_sent = timezone.now()
         self.bid1.save()
+        subject = "[codesy] There's $100 waiting for you!"
 
         mock_send_mail.expects_call().with_args(
-            arg.any(),
+            subject,
             arg.any(),
             arg.any(),
             ['user2@test.com']
@@ -221,10 +223,11 @@ class NotifyMatchersReceiverTest(MarketWithBidsTestCase):
         user = mommy.make(settings.AUTH_USER_MODEL)
         self.bid1.ask_match_sent = timezone.now()
         self.bid1.save()
+        # import ipdb; ipdb.set_trace()
 
         mock_send_mail.expects_call().with_args(
             arg.any(),
-            arg.any(),
+            arg.contains(self.bid1.url),
             arg.any(),
             ['user2@test.com']
         )

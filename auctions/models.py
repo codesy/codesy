@@ -145,9 +145,12 @@ def notify_matching_askers(sender, instance, **kwargs):
     for bid in unnotified_asks:
         if bid.ask_met():
             email_context = {'ask': bid.ask, 'url': bid.url}
+            subject = (
+                "[codesy] There's $%(ask)d waiting for you!" % email_context
+            )
             message = email_template.render(email_context)
             send_mail(
-                "[codesy] Your ask has been met!",
+                subject,
                 message,
                 settings.DEFAULT_FROM_EMAIL,
                 [bid.user.email]
@@ -430,7 +433,7 @@ def notify_approved_claim(sender, instance, created, **kwargs):
         })
         message = email_template.render(email_context)
         send_mail(
-            "[codesy] Your claimed has been rejected",
+            "[codesy] Your claim has been rejected",
             message,
             settings.DEFAULT_FROM_EMAIL,
             [claim.user.email]
@@ -447,7 +450,7 @@ def notify_approved_claim(sender, instance, created, **kwargs):
         message = email_template.render(email_context)
 
         send_mail(
-            "[codesy] Your claimed has been approved",
+            "[codesy] Your claim has been approved",
             message,
             settings.DEFAULT_FROM_EMAIL,
             [claim.user.email]
