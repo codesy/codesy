@@ -6,6 +6,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 codesy_pct = Decimal('0.025')
 stripe_pct = Decimal('0.029')
+stripe_transfer = Decimal('0.005')
 stripe_transaction = Decimal('0.30')
 
 
@@ -19,8 +20,12 @@ def calculate_codesy_fee(amount):
 
 def calculate_stripe_fee(amount):
     return round_penny(
-        (amount * stripe_pct) + stripe_transaction
+        (amount * (stripe_pct+ stripe_transfer)) + stripe_transaction
     )
+
+
+def calculate_stripe_transfer(amount):
+    return round_penny(amount * stripe_transfer)
 
 
 def calculate_charge_amount(goal):
@@ -32,12 +37,13 @@ def calculate_charge_amount(goal):
 def calculate_offer_charge(goal):
     return round_penny(
         (goal + (stripe_transaction / 2))
-        / (1 - (stripe_pct / 2))
+        / (1 - ((stripe_pct + stripe_transfer) / 2))
     )
 
 
 def transaction_amounts(amount):
     codesy_fee_amount = calculate_codesy_fee(amount)
+
     charge_amount = calculate_offer_charge(
         amount
         + codesy_fee_amount
@@ -65,6 +71,17 @@ def transaction_amounts(amount):
         + (codesy_fee_amount * 2)
     )
 
+    gross_transfer_fee = calculate_stripe_transfer(amount)
+
+    actual_transfer_fee = (
+        calculate_stripe_transfer(payout_amount)
+    )
+
+    transfer_overage = (
+        gross_transfer_fee
+        - actual_transfer_fee
+    )
+
     return {
         'amount': amount,
         'charge_amount': round_penny(charge_amount),
@@ -73,7 +90,10 @@ def transaction_amounts(amount):
         'total_stripe_fee': total_stripe_fee,
         'offer_stripe_fee': offer_stripe_fee,
         'payout_stripe_fee': payout_stripe_fee,
-        'application_fee': application_fee
+        'application_fee': application_fee,
+        'gross_transfer_fee': gross_transfer_fee,
+        'actual_transfer_fee': actual_transfer_fee,
+        'transfer_overage': transfer_overage
     }
 
 
