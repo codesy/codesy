@@ -5,7 +5,8 @@ from django.core.management.base import BaseCommand
 
 from ... import utils
 
-pp = pprint.PrettyPrinter(indent=4,width=-1)
+pp = pprint.PrettyPrinter(indent=4, width=-1)
+
 
 class Command(BaseCommand):
 

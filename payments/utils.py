@@ -20,7 +20,7 @@ def calculate_codesy_fee(amount):
 
 def calculate_stripe_fee(amount):
     return round_penny(
-        (amount * (stripe_pct+ stripe_transfer)) + stripe_transaction
+        (amount * (stripe_pct + stripe_transfer)) + stripe_transaction
     )
 
 
