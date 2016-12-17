@@ -223,7 +223,6 @@ class NotifyMatchersReceiverTest(MarketWithBidsTestCase):
         user = mommy.make(settings.AUTH_USER_MODEL)
         self.bid1.ask_match_sent = timezone.now()
         self.bid1.save()
-        # import ipdb; ipdb.set_trace()
 
         mock_send_mail.expects_call().with_args(
             arg.any(),
