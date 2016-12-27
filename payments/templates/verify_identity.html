@@ -4,7 +4,7 @@
     <div class="row">
       <div class="column medium-5 medium-offset-3 text-left">
          <p>
-             Because it's real money, we need tp follow identity regulations.
+             Because it's real money, we need to follow identity regulations.
              We'll try to keep this to a minimum and do not save this information in our database.
          </p>
         <fieldset class="fieldset">
@@ -61,12 +61,15 @@
                 <input name="ssn_last_4" type="text" class="form-control" autocomplete="off" maxlength="4" value="{{ STRIPE_DEBUG.identity.ssn_last_4}}"/>
             {% endif %}
             {% if 'legal_entity.type' in fields_needed %}
-                <div >
-                    <legend>Account Type</legend>
-                    <label for="indiv">Individual</label>
-                    <input name="type" type="radio" data-stripe="account_holder_type" value="individual" id="indiv" required checked="checked">
-                    <label for="company">Company</label>
-                    <input name="type" type="radio" data-stripe="account_holder_type" value="company" id="company">
+                <div class="row">
+                    <div class="small-6 columns">
+                        <input type="radio" name="form_holder_type" value="individual" id="individual" required checked="checked">
+                        <label for="individual" class="text-left">Individual</label>
+                    </div>
+                    <div class="small-6 columns">
+                        <input type="radio" name="form_holder_type" value="company" id="company">
+                        <label for="company" class="text-left">Company</label>
+                    </div>
                 </div>
             {% endif %}
 
