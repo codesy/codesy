@@ -12,6 +12,7 @@
          </p>
         <fieldset class="fieldset">
         <form
+            id="stripe-identity-form"
             role="form"
             class="form-horizontal"
             action="/payments/identity"
@@ -65,6 +66,7 @@
             {% endif %}
             {% if 'legal_entity.type' in fields_needed %}
                 <div class="row">
+                    <input type="hidden" id="type" = name="type" value="individual">
                     <div class="small-6 columns">
                         <input type="radio" name="form_holder_type" value="individual" id="individual" required checked="checked">
                         <label for="individual" class="text-left">Individual</label>
@@ -77,9 +79,10 @@
             {% endif %}
 
             <button
+                id="codesy-submit"
                 class="button success track-btn"
                 data-category="Stripe"
-                data-label="Authorize">Send to Stripe.
+                data-label="Authorize">Send to Stripe
             </button>
         </form>
         </fieldset>
@@ -93,5 +96,3 @@
       </div>
     </div>
 {% endblock %}
-{# #}
-{% block scripts %}{# stripe.js not needed #} {% endblock %}
