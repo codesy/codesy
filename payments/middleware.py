@@ -8,6 +8,7 @@ class IdentityVerificationMiddleware(object):
 
     def process_request(self, request):
         if request.method == 'GET':
-            user_account = request.user.account()
-            if not user_account.identity_verified():
-                messages.warning(request, 'stripe_info_verify')
+            if hasattr(request.user, 'account'):
+                user_account = request.user.account()
+                if not user_account.identity_verified():
+                    messages.warning(request, 'stripe_info_verify')
