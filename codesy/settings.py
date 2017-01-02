@@ -72,8 +72,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-
+    'payments.middleware.IdentityVerificationMiddleware',
 )
+
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'codesy.context_processors.conf_settings',
@@ -118,6 +119,8 @@ DATABASES = {'default': config(
     default="postgres://postgres@localhost:5432/codesy",
     cast=dj_database_url.parse)}
 
+DATABASES['default']['ATOMIC_REQUESTS'] = True
+
 # CSP settings
 
 CSP_DEFAULT_SRC = ("'none'",)
@@ -159,6 +162,10 @@ CSP_FONT_SRC = (
     'https://cdn.jsdelivr.net'
 )
 
+CSP_FRAME_ANCESTORS = (
+    "'self'",
+    'https://github.com'
+)
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/

@@ -1,3 +1,6 @@
+from decimal import Decimal
+from urlparse import urldefrag
+
 from django.shortcuts import redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import messages
@@ -19,41 +22,73 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
 
     url -- url of an OSS issue or bug
     """
-    template_name = "addon/widget.html"
     login_url = '/addon-login/'
+    template_name = "addon/bidders.html"
 
     def test_func(self):
-        return self.request.user.is_active
+        if self.request.user.is_active:
+            if not self.request.user.stripe_customer:
+                self.template_name = "addon/register_card.html"
+            return True
+        return False
 
     def _get_bid(self, url):
         try:
             return Bid.objects.get(user=self.request.user, url=url)
         except:
-            new_bid = Bid(user=self.request.user, url=url)
-            new_bid.save()
-            return new_bid
+            return None
+
+    def _url_path_only(self, url):
+        return urldefrag(url)[0]
 
     def get_context_data(self, **kwargs):
-        url = self.request.GET['url']
+        url = self._url_path_only(self.request.GET['url'])
         bid = self._get_bid(url)
-        return dict({'bid': bid, 'url': url})
+        if bid is None:
+            return dict({'bid': bid, 'url': url})
+
+        # rejected claims should be ignored so new claims can be made
+        claims = (
+            Claim.objects.filter(issue=bid.issue).exclude(status='Rejected'))
+
+        users_claims = claims.filter(
+            user=self.request.user).order_by('modified')
+
+        if users_claims:
+            self.template_name = 'addon/claimaint.html'
+            return dict({'claim': users_claims[0]})
+        if claims:
+            if bid.offer:
+                self.template_name = 'addon/voters.html'
+            else:
+                self.template_name = 'addon/bid_closed.html'
+            return dict({'claims': claims})
+        else:
+            return dict({'bid': bid, 'url': url})
 
     def post(self, *args, **kwargs):
         """
         Save changes to bid and get payment for offer
         """
-        url = self.request.POST['url']
-        new_ask_amount = self.request.POST['ask']
-        new_offer_amount = self.request.POST['offer']
+        url = self._url_path_only(self.request.POST['url'])
+        ask_amount = self.request.POST['ask']
+        offer_amount = self.request.POST['offer']
 
         bid = self._get_bid(url)
+        if bid is None:
+            bid = Bid(user=self.request.user, url=url)
 
-        if new_ask_amount:
-            bid.ask = new_ask_amount
+        if ask_amount:
+            bid.ask = ask_amount
             bid.save()
+            messages.success(self.request, "Thanks for the ask!")
 
-        if new_offer_amount:
-            new_offer = bid.set_offer(new_offer_amount)
+        if (
+            offer_amount and
+            Decimal(offer_amount) > 0.0 and
+            Decimal(offer_amount) != bid.offer
+        ):
+            new_offer = bid.set_offer(offer_amount)
             if new_offer.error_message:
                 messages.error(self.request, new_offer.error_message)
             else:
@@ -79,8 +114,9 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
                         'fees': {'codesy': 0, 'Stripe': 0},
                         'credits': {'surplus': 0}
                         }
+        claim = get_object_or_404(Claim, pk=self.kwargs['pk'])
+
         try:
-            claim = Claim.objects.get(pk=self.kwargs['pk'])
             for payout in claim.successful_payouts().all():
                 total_payout['total'] += payout.charge_amount
                 for fee in payout.fees():

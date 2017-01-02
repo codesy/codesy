@@ -34,9 +34,9 @@
           <div class="medium-6 columns">
             <table>
               <tbody>
-                <tr><td>Ask</td><td>{{ payout.amount }}</td></tr>
+                <tr><td>Ask</td><td>{{ payout.less_discount  }}</td></tr>
                 {% for credit in payout.credits %}
-                  <tr><td>{{ credit.description }}</td><td>{{ credit.amount }}</td></tr>
+                  <tr><td>{{ credit.fee_type }}</td><td>{{ credit.amount }}</td></tr>
                 {% endfor %}
                 {% for fee in payout.fees %}
                   <tr><td>{{ fee.fee_type }}</td><td>({{ fee.amount }})</td></tr>

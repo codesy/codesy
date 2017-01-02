@@ -28,6 +28,18 @@ class StripeAccount(models.Model):
     verification = models.TextField(default='', blank=True)
 
     def identity_verified(self):
+        # codesy verification field holds verification requirement from stripe
+        # identity is verified if verification is blank or due_by is None
+
+        # first, see if an account_id has been assigned by stripe
+        # and check on verification
+        if self.account_id:
+            stripe_account = stripe.Account.retrieve(self.account_id)
+            self.verification = json.dumps(stripe_account.verification)
+            self.save()
+        else:
+            # returning True will allow the bank account_id to be assigned
+            return True
         if not self.verification:
             return True
         else:
@@ -36,8 +48,11 @@ class StripeAccount(models.Model):
 
     @property
     def fields_needed(self):
-        verification = json.loads(self.verification)
-        return verification['fields_needed']
+        try:
+            verification = json.loads(self.verification)['fields_needed']
+        except ValueError:
+            verification = json.loads('{}')
+        return verification
 
     def new_managed_account(self, bank_account):
         stripe_account = stripe.Account.create(
@@ -107,6 +122,7 @@ class StripeEvent(models.Model):
             pass
         super(StripeEvent, self).save(*args, **kwargs)
 
+
 webhooks = {}
 
 
@@ -133,6 +149,7 @@ class AccountUpdatedProcessor(WebHookProcessor):
             # TODO: Tell someone this happened
             pass
 
+
 webhooks['account.updated'] = AccountUpdatedProcessor
 
 
@@ -147,6 +164,7 @@ class BalanceAvailableProcessor(WebHookProcessor):
         except StripeAccount.DoesNotExist:
             pass
 
+
 webhooks['balance.available'] = BalanceAvailableProcessor
 
 
@@ -156,6 +174,7 @@ class ChargeUpdatedProcessor(WebHookProcessor):
             pass
         except:
             pass
+
 
 webhooks['charge.updated'] = ChargeUpdatedProcessor
 
@@ -167,5 +186,6 @@ class PaymentCreatedProcessor(WebHookProcessor):
             pass
         except:
             pass
+
 
 webhooks['payment.created'] = PaymentCreatedProcessor

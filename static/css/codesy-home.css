@@ -4,11 +4,6 @@ body {
   color: #444;
 }
 
-.home-section {
-  padding-top: 6rem;
-  padding-bottom: 6rem;
-}
-
 a {
   color: #666;
   text-decoration: underline;
@@ -16,12 +11,26 @@ a {
 }
 
 ol {
-  padding:1em;
+  padding: 2rem;
+}
+
+li {
+  margin-bottom: 1rem;
 }
 
 dt {
   margin-bottom: .3rem;
   font-weight: 700;
+}
+
+.home-tagline {
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.home-section {
+  padding-top: 6rem;
+  padding-bottom: 6rem;
 }
 
 tr.total {

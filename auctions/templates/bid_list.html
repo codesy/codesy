@@ -25,12 +25,11 @@
                 <td><a href="{{bid.url}}"{% if target %} target="{{ target }}"{% endif %}>{{bid.issue.title}}</a></td>
                 <td>
                     {{ bid.ask }}
-                    {% include "addon/includes/claim_form.html" %}
                 </td>
                 <td>
                     {% if bid.last_offer %}
                         <table>
-                            <tr><td>Offer</td><td>{{ bid.last_offer.amount|add:bid.last_offer.discount}}</td></tr>
+                            <tr><td>Offer</td><td>{{ bid.last_offer.net_offer }}</td></tr>
                             {% if bid.last_offer.discount %}
                                 <tr><td>surplus</td><td>({{ bid.last_offer.discount }})</td></tr>
                             {% endif %}
@@ -39,27 +38,20 @@
                             {% endfor %}
                             <tr class="total"><td>Total</td><td>{{ bid.last_offer.charge_amount }}</td></tr>
                         </table>
-                    {% else %}
-
-
-
 
                     {% endif %}
 
                     {% if actionable_claims.other_claims != None %}
                         {% for other_claim in actionable_claims.other_claims %}
                             {% if other_claim.status == 'Paid' %}
-
-
-
-                                <p>This claim was paid; thank you!</p>
+                                <p>This claim was paid; thank&nbsp;you!</p>
                             {% elif other_claim.status == 'Approved' %}
-                                <p>This claim was approved; thank you!</p>
+                                <p>This claim was approved; thank&nbsp;you!</p>
                             {% elif other_claim.status == 'Rejected' %}
                                 <p>This claim was rejected.</p>
                             {% else %}
                                 <p>
-                                    <a class="button expanded" href="{% url 'claim-status' pk=other_claim.id %}"{% if target %} target="{{ target }}"{% endif %}>Vote on claim &raquo;</a>
+                                    <a class="button expanded" href="{% url 'claim-status' pk=other_claim.id %}" {% if target %} target="{{ target }}"{% endif %}>Vote on claim &raquo;</a>
                                 </p>
                             {% endif %}
                         {% endfor %}
@@ -74,6 +66,5 @@
 {% block scripts %}
    {% if request.user.is_authenticated %}
       <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-      <script src="{% static "js/home-app.js" %}" ></script>
    {% endif %}
 {% endblock %}

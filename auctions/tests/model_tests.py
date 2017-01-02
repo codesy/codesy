@@ -1,4 +1,6 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
+from django.utils import timezone
+
 import time
 from decimal import Decimal
 
@@ -93,7 +95,7 @@ class BidTest(MarketWithBidsTestCase):
         test_bid = Bid.objects.get(pk=test_bid.pk)
         test_bid_created = test_bid.created
         self.assertTrue(
-            datetime.now() >= test_bid_created.replace(tzinfo=None),
+            timezone.now() >= test_bid_created.replace(),
             "Bid.created should be auto-populated."
         )
         time.sleep(1)
@@ -106,7 +108,7 @@ class BidTest(MarketWithBidsTestCase):
         self.assertTrue(test_bid_modified >= test_bid_created,
                         "Bid.modified should be auto-populated on update.")
         self.assertTrue(
-            datetime.now() >= test_bid_modified.replace(tzinfo=None),
+            timezone.now() >= test_bid_modified.replace(),
             "Bid.modified should be auto-populated."
         )
 
@@ -177,15 +179,16 @@ class NotifyMatchersReceiverTest(MarketWithBidsTestCase):
     @fudge.patch('auctions.models.send_mail')
     def test_send_mail_to_matching_askers(self, mock_send_mail):
         user = mommy.make(settings.AUTH_USER_MODEL)
-
+        bid1_subject = "[codesy] There's $50 waiting for you!"
+        bid2_subject = "[codesy] There's $100 waiting for you!"
         mock_send_mail.expects_call().with_args(
-            self._add_url('[codesy] Your ask for 50 for {url} has been met'),
+            bid1_subject,
             arg.any(),
             arg.any(),
             ['user1@test.com']
         )
         mock_send_mail.next_call().with_args(
-            self._add_url('[codesy] Your ask for 100 for {url} has been met'),
+            bid2_subject,
             arg.any(),
             arg.any(),
             ['user2@test.com']
@@ -199,11 +202,12 @@ class NotifyMatchersReceiverTest(MarketWithBidsTestCase):
     @fudge.patch('auctions.models.send_mail')
     def test_only_send_mail_to_unsent_matching_askers(self, mock_send_mail):
         user = mommy.make(settings.AUTH_USER_MODEL)
-        self.bid1.ask_match_sent = datetime.now()
+        self.bid1.ask_match_sent = timezone.now()
         self.bid1.save()
+        subject = "[codesy] There's $100 waiting for you!"
 
         mock_send_mail.expects_call().with_args(
-            self._add_url('[codesy] Your ask for 100 for {url} has been met'),
+            subject,
             arg.any(),
             arg.any(),
             ['user2@test.com']
@@ -217,12 +221,12 @@ class NotifyMatchersReceiverTest(MarketWithBidsTestCase):
     @fudge.patch('auctions.models.send_mail')
     def test_mail_contains_text_for_claiming_via_url(self, mock_send_mail):
         user = mommy.make(settings.AUTH_USER_MODEL)
-        self.bid1.ask_match_sent = datetime.now()
+        self.bid1.ask_match_sent = timezone.now()
         self.bid1.save()
 
         mock_send_mail.expects_call().with_args(
             arg.any(),
-            arg.contains("visiting the issue url:\n"),
+            arg.contains(self.bid1.url),
             arg.any(),
             ['user2@test.com']
         )
@@ -281,7 +285,7 @@ class ClaimTest(MarketWithClaimTestCase):
         test_claim = Claim.objects.get(pk=test_claim.pk)
         test_claim_created = test_claim.created
         self.assertTrue(
-            datetime.now() >= test_claim_created.replace(tzinfo=None),
+            timezone.now() >= test_claim_created.replace(),
             "Claim.created should be auto-populated."
         )
         time.sleep(1)
@@ -293,7 +297,7 @@ class ClaimTest(MarketWithClaimTestCase):
         self.assertTrue(test_claim_modified >= test_claim_created,
                         "Claim.modified should be auto-populated on update.")
         self.assertTrue(
-            datetime.now() >= test_claim_modified.replace(tzinfo=None),
+            timezone.now() >= test_claim_modified.replace(),
             "Claim.modified should be auto-populated."
         )
 
@@ -339,7 +343,7 @@ class NotifyMatchingOfferersTest(MarketWithBidsTestCase):
             user=self.user1,
             issue=self.issue,
             evidence=self.evidence,
-            created=datetime.now()
+            created=timezone.now()
         )
 
     @fudge.patch('auctions.models.send_mail')
@@ -356,7 +360,7 @@ class NotifyMatchingOfferersTest(MarketWithBidsTestCase):
             user=self.user1,
             issue=self.issue,
             evidence=self.evidence,
-            created=datetime.now()
+            created=timezone.now()
         )
 
     @fudge.patch('auctions.models.send_mail')
@@ -366,7 +370,7 @@ class NotifyMatchingOfferersTest(MarketWithBidsTestCase):
             Claim,
             user=self.user1,
             issue=self.issue,
-            created=datetime.now()
+            created=timezone.now()
         )
         claim.evidence = 'http://test.com/updated-evidence'
         claim.save()
@@ -402,7 +406,7 @@ class VoteTest(TestCase):
         test_vote = Vote.objects.get(pk=test_vote.pk)
         test_vote_created = test_vote.created
         self.assertTrue(
-            datetime.now() >= test_vote_created.replace(tzinfo=None),
+            timezone.now() >= test_vote_created.replace(),
             "Vote.created should be auto-populated."
         )
         time.sleep(1)
@@ -414,7 +418,7 @@ class VoteTest(TestCase):
         self.assertTrue(test_vote_modified >= test_vote_created,
                         "Vote.modified should be auto-populated on update.")
         self.assertTrue(
-            datetime.now() >= test_vote_modified.replace(tzinfo=None),
+            timezone.now() >= test_vote_modified.replace(),
             "Vote.modified should be auto-populated."
         )
 
@@ -471,13 +475,21 @@ class OfferTest(TestCase):
         offer_with_fees = offer.amount + sum_fees
         self.assertEqual(offer_with_fees, offer.charge_amount)
 
-    def test_new_offer(self):
+    def test_new_offer_refunds_previous_offer(self):
+        first_offer = self.bid.last_offer
         self.assertEqual(self.bid.offer, 50)
         offer = self.bid.set_offer(60)
         self.assertEqual(offer.amount, 60)
         offers = Offer.objects.filter(bid=self.bid)
-        sum_offers = offers.aggregate(Sum('amount'))['amount__sum']
-        self.assertEqual(sum_offers, 110)
+        for offer in offers:
+            if offer.id == first_offer.id:
+                self.assertEqual(offer.refund_id, 'dammit')
+
+    def test_set_offer_on_new_bid_without_previous_offers(self):
+        test_bid = Bid(user=self.user1, url='http://test.com/bug/987')
+        test_bid.set_offer(99)
+
+        self.assertEqual(test_bid.offer, 99)
 
 
 class PayoutTest(TestCase):

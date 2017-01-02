@@ -1,14 +1,18 @@
 {% extends "stripe_base.html" %}
+{% load staticfiles %}
 
 {% block content %}
     <div class="row">
       <div class="column medium-5 medium-offset-3 text-left">
          <p>
-             Because it's real money, we need tp follow identity regulations.
-             We'll try to keep this to a minimum and do not save this information in our database.
+            Occasionally, to follow banking regulations, Stripe will ask for
+            more identity details.  Please use this form to keep your account
+            active. As always, this information is sent directly to Stripe and
+            we do not save it in the codesy database.
          </p>
         <fieldset class="fieldset">
         <form
+            id="stripe-identity-form"
             role="form"
             class="form-horizontal"
             action="/payments/identity"
@@ -18,6 +22,10 @@
             {% if 'legal_entity.first_name' in fields_needed %}
                 <label for="first_name">First Name</label>
                 <input name="first_name" type="text" class="form-control" autocomplete="off" maxlength="16" value="{{ STRIPE_DEBUG.identity.first_name}}"/>
+            {% endif %}
+            {% if 'legal_entity.business_name' in fields_needed %}
+                <label for="business_name">Business Name</label>
+                <input name="business_name" type="text" class="form-control" autocomplete="off" maxlength="16" value="{{ STRIPE_DEBUG.identity.business_name}}"/>
             {% endif %}
             {% if 'legal_entity.last_name' in fields_needed %}
                 <label for="last_name">Last Name</label>
@@ -57,24 +65,34 @@
                 <input name="ssn_last_4" type="text" class="form-control" autocomplete="off" maxlength="4" value="{{ STRIPE_DEBUG.identity.ssn_last_4}}"/>
             {% endif %}
             {% if 'legal_entity.type' in fields_needed %}
-                <fieldset >
-                    <legend>Account Type</legend>
-                    <label for="indiv">Individual</label>
-                    <input name="type" type="radio" data-stripe="account_holder_type" value="individual" id="indiv" required checked="checked">
-                    <label for="company">Company</label>
-                    <input name="type" type="radio" data-stripe="account_holder_type" value="company" id="company">
-                </fieldset>
+                <div class="row">
+                    <input type="hidden" id="type" = name="type" value="individual">
+                    <div class="small-6 columns">
+                        <input type="radio" name="form_holder_type" value="individual" id="individual" required checked="checked">
+                        <label for="individual" class="text-left">Individual</label>
+                    </div>
+                    <div class="small-6 columns">
+                        <input type="radio" name="form_holder_type" value="company" id="company">
+                        <label for="company" class="text-left">Company</label>
+                    </div>
+                </div>
             {% endif %}
 
             <button
+                id="codesy-submit"
                 class="button success track-btn"
                 data-category="Stripe"
-                data-label="Authorize">Save.
+                data-label="Authorize">Send to Stripe
             </button>
         </form>
-      </fieldset>
+        </fieldset>
+        </div>
+    </div>
+    <div class="row">
+     <div class="column medium-4 medium-offset-3 text-left">
+          <a href="https://stripe.com" target="_blank">
+              <img src="{% static 'img/stripe/powered_by_stripe.png' %}" alt="" />
+          </a>
       </div>
     </div>
 {% endblock %}
-{# #}
-{% block scripts %}{# stripe.js not needed #} {% endblock %}

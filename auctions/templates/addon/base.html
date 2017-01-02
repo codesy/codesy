@@ -27,6 +27,19 @@
           </div>
      {% endif %}
 
-      {% block widget_content %}{% endblock %}
+    <div id="widget-wrapper">
+
+         <img id="widget-avatar" src="{{ user.get_gravatar_url }}" width="48" height="48"></img>
+
+         <div id="widget-input-header">
+             <a href="https://{{current_site.domain}}" target="_blank">
+                 <img id="widget-header-logo" src="{% static "img/codesy_300dpi_323x80.png" %}" width="161" height="40"></img>
+             </a>
+         </div>
+
+        {% block widget_content %}{% endblock %}
+
+    </div>
+
    </div>
 </body>

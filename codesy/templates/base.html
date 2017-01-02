@@ -1,4 +1,4 @@
-    {% load staticfiles %}
+{% load staticfiles %}
 {% load socialaccount %}
 <!DOCTYPE html>
 <html id="codesy-html" class="no-js" lang="en" data-stripe_key="{{ settings.STRIPE_PUBLIC_KEY }}" data-ga_id="{{ settings.GOOGLE_ANALYTICS_ID }}" data-ga_filename="analytics{% if settings.DEBUG %}_debug{% endif %}.js">
@@ -49,23 +49,30 @@
    {% if messages %}
         <div class="row">
       {% for message in messages %}
-         <div class="callout warning expanded" data-closable>
-            <button class="close-button" data-close>&times;</button>
-            <p class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</p>
-         </div>
+        {% if message.message == "stripe_info_verify" %}
+            <div class="callout warning expanded" data-closable>
+                <button class="close-button" data-close>&times;</button>
+                <p class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    Hi, we need more information to validate your
+                    <a href="{% url 'identity' %}"> bank account.</a>
+                </p>
+            </div>
+        {% else %}
+            <div class="callout warning expanded" data-closable>
+               <button class="close-button" data-close>&times;</button>
+               <p class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</p>
+            </div>
+        {% endif %}
       {% endfor %}
         </div>
    {% endif %}
-
-    {% block jumbotron %}
-    {% endblock %}
-
 
     {% block content %}{% endblock %}
 
     <hr/>
     <footer class="footer">
         <div class="row">
+            <div class="medium-6 columns">
             <p>
             <i class="fi-web"></i>
                 <a href="/legal-info#terms">Terms of Service</a>
@@ -73,15 +80,12 @@
                 <a href="/legal-info#privacy">Privacy Policy</a>
             <i class="fi-social-github"></i> <a href="https://github.com/codesy/codesy">Source Code</a>
             </p>
+            </div>
+            <div class="medium-6 columns">
             <p>
-                <a rel="license"
-                    href="http://creativecommons.org/licenses/by-sa/4.0/">
-                <img alt="Creative Commons License"
-                    src="https://licensebuttons.net/l/by-sa/4.0/80x15.png"
-                />
-                </a> codesy.io llc; Git Logo <a rel="license" href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" src="https://licensebuttons.net/l/by/3.0/80x15.png" /></a> <a href="http://www.jasonlong.me/">Jason Long</a>; Icons by
-                <a href="http://zurb.com/playground/foundation-icon-fonts-3/">Foundation</a>
+                <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" src="https://licensebuttons.net/l/by-sa/4.0/80x15.png" /></a> codesy.io llc; Git Logo <a rel="license" href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" src="https://licensebuttons.net/l/by/3.0/80x15.png" /></a> <a href="http://www.jasonlong.me/">Jason Long</a>
             </p>
+            </div>
         </div>
     </footer>
 

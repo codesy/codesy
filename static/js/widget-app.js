@@ -1,74 +1,109 @@
-window.codesy = {
-};
-
-function submitForm(e) {
-  e.preventDefault();
-  form = $(this)
-  var csrf_token = form.find('input[name=csrfmiddlewaretoken]').val()
-  var api_call = $.ajax({
-    url: form.attr('action'),
-    method: form.data("method"),
-    data: form.serialize(),
-    processData: false,
-    headers: {
-      'X-CSRFToken': csrf_token
-    },
-    contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
-
-  });
-
-  api_call.always(function(data, textStatus, jqXHR) {
-    window.location.reload()
-  })
-
-}
-
-// TODO: foo these functions out of the global scope
-labelDiff = function(type, $from_elem, $to_elem){
-    var original_value = $from_elem.data("original-value")
-    var new_value = $from_elem.val()
-    var diff = new_value - original_value
-    var confirmTemplate =[]
-
-    if (type === "ask"){
-        if (diff === 0 ){
-            confirmTemplate=["Your ask did not change"]
-        } else if (diff > 0 ) {
-            confirmTemplate = ["Your ask is increasing to ",new_value]
-        } else if (diff < 0) {
-            confirmTemplate = ["Your ask is decreasing to ",new_value]
+window.codesy={}
+class WidgetApp {
+    constructor($form) {
+        this.$form = $form
+        $form.submit(this.submit.bind(this))
+        $form.find('button#ShowSubmit').click(this.show.bind(this))
+        $form.find('input#cancelSubmit').click(this.reload.bind(this))
+    }
+    show(e) {
+        e.preventDefault()
+        $('.codesy_hide').hide()
+        $('.codesy_confirm').removeClass('hide')
+        var valid_ask = this.validate($("input#ask"))
+        var valid_offer = this.validate($("input#offer"))
+        if (valid_offer || valid_ask){
+            this.$form.find('input[type="submit"]').removeClass('hide')
         }
     }
+    validate($input){
+        var original_value = $input.data("original-value")
+        var new_value = $input.val()
+        var diff = new_value - original_value
+        var input_type = $input.attr('id')
+        const $message = $(`<label id="${input_type}-confirm" class="callout small codesy_confirm" ></label>`)
+        var validated = true
+        var offer_notice = ''
+        var direction = ''
+        var introduction = ''
 
-    if (type === "offer"){
-        if (diff === 0 ){
-            confirmTemplate=["Your offer did not change."]
-        } else if (diff > 0 ) {
-            confirmTemplate = ["Your offer increased. $",diff," will be authorized your credit card."]
-        } else if (diff < 0) {
-            confirmTemplate = ["Sorry, you can't decrease your offer."]
-            $from_elem.val(original_value)
+        this.$form.parent().prepend($message)
+
+        if (new_value>0 && new_value<1){
+            $message.text('Sorry, bids cannot be less than $1.')
+            $input.val(original_value)
+            return false
         }
+
+        if (new_value<0){
+            $message.text('Sorry, bids cannot be negative.')
+            $input.val(original_value)
+            return false
+        }
+
+        if (diff === 0){
+            direction = 'not changing'
+            validated = false
+        }
+        else if (diff > 0 ) {
+            direction = `increasing`
+        } else if (diff < 0) {
+            direction = `decreasing`
+        }
+
+        introduction = `You are ${direction} your ${input_type}.`
+
+        if (input_type === "offer"){
+            if (diff < 0) {
+                introduction =''
+                offer_notice = "Sorry, you can't decrease your offer."
+                $input.val(original_value)
+                validated = false
+            } else if (diff>0){
+                offer_notice =`Your credit card will be authorized for $${new_value}.`
+            }
+        }
+        $message.text([introduction,offer_notice].join(' '))
+        return validated
     }
-
-    $to_elem.text(confirmTemplate.join(""))
-}
-
-
-function reloadPlease(){
-    window.location.reload()
-}
-
-function ShowSubmit(e) {
-    e.preventDefault();labelDiff
-    labelDiff("ask",$("input#ask"),$('label#ask-confirm'))
-    labelDiff("offer",$("input#offer"),$('label#offer-confirm'))
-    $('.codesy_hide').hide()
-    $('.codesy_confirm').removeClass('hide')
-}
+    submit(e){
+        e.preventDefault()
+        var form = this.$form
+        var csrf_token = form.find('input[name=csrfmiddlewaretoken]').val()
+        var api_call = $.ajax({
+            url: form.attr('action'),
+            method: form.attr("method"),
+            data: form.serialize(),
+            processData: false,
+            headers: {
+              'X-CSRFToken': csrf_token
+            },
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
+            })
+            .error(function(data, textStatus, jqXHR) {
+                $.each(data.responseJSON, function(key, value) {
+                    this.error(value)
+                });
+            })
+            .done(function(data, textStatus, jqXHR) {
+                window.location.reload()
+            })
+    }
+    reload() {
+        window.location.reload()
+    }
+    error(message){
+        $div= $(`
+            <div class="callout warning expanded" data-closable>
+                <button class="close-button" data-close>&times;</button>
+                <p class="alert alert-error">
+                </p>
+            </div>`)
+        $div.find('p').text(message)
+        return $div
+    }
+}//end class
 
 $(document).ready(function() {
-  $('form.ajaxSubmit').submit(submitForm)
-  $('button#ShowSubmit').click(ShowSubmit)
-  $('button#cancelSubmit').click(reloadPlease)
+    codesy.app = new WidgetApp($('#codesy_form'))
 });

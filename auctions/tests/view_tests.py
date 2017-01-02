@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import fudge
 
 from django.conf import settings
@@ -27,6 +29,14 @@ class BidStatusTestCase(TestCase):
         context = self.view.get_context_data()
         self.assertEqual(self.bid1, context['bid'])
 
+    def test_get_by_url_doesnt_create_bid(self):
+        url = 'https://github.com/codesy/codesy/issues/419'
+        self.view.request = (fudge.Fake()
+                             .has_attr(GET={'url': url})
+                             .has_attr(user=self.user1))
+        context = self.view.get_context_data()
+        self.assertIsNone(context['bid'])
+
     @fudge.patch('auctions.views.messages')
     def test_post_new_offer(self, mock_messages):
         mock_messages.is_a_stub()
@@ -34,12 +44,82 @@ class BidStatusTestCase(TestCase):
             POST={
                 'url': self.url,
                 'ask': 0,
-                'offer': 44,
+                'offer': 44.3,
             })
             .has_attr(user=self.user1))
         self.view.post()
         retreive_bid = Bid.objects.get(pk=self.bid1.id)
-        self.assertEqual(retreive_bid.offer, 44)
+        self.assertEqual(retreive_bid.offer, Decimal('44.30'))
+
+    def test_url_path_only(self):
+        self.assertEqual(
+            'https://github.com/codesy/codesy/issues/380',
+            self.view._url_path_only(
+                'https://github.com/codesy/codesy/issues/380#issue-163534117'
+            )
+        )
+        self.assertEqual(
+            'https://github.com/codesy/codesy/issues/380',
+            self.view._url_path_only(
+                'https://github.com/codesy/codesy/issues/380'
+            )
+        )
+
+    @fudge.patch('auctions.views.messages')
+    def test_post_new_ask_with_0_offer(self, mock_messages):
+        mock_messages.is_a_stub()
+        self.view.request = (fudge.Fake().has_attr(
+            POST={
+                'url': self.url,
+                'ask': 5,
+                'offer': 0,
+            })
+            .has_attr(user=self.user1))
+        self.view.post()
+        retreive_bid = Bid.objects.get(pk=self.bid1.id)
+        self.assertEqual(retreive_bid.offer, 0)
+        self.assertEqual(retreive_bid.ask, 5)
+
+    @fudge.patch('auctions.views.messages')
+    def test_post_new_ask_with_same_offer_only_asks(self, mock_messages):
+        mock_messages.is_a_stub()
+        self.view.request = (fudge.Fake().has_attr(
+            POST={
+                'url': self.url,
+                'ask': 50,
+                'offer': 5,
+            })
+            .has_attr(user=self.user1))
+        self.view.post()
+        retreive_bid = Bid.objects.get(pk=self.bid1.id)
+        self.assertEqual(retreive_bid.offer, 5)
+        self.assertEqual(retreive_bid.ask, 50)
+
+    @fudge.patch('auctions.views.messages')
+    def test_GET_POST_with_url_fragment(self, mock_messages):
+        mock_messages.is_a_stub()
+        url = 'https://github.com/codesy/codesy/issues/380'
+        url_with_frag = '%s#issue-163534117' % url
+        self.view.request = (fudge.Fake().has_attr(
+            POST={
+                'url': url_with_frag,
+                'ask': 5,
+                'offer': 0,
+            })
+            .has_attr(user=self.user1))
+        self.view.post()
+
+        self.view.request = (fudge.Fake()
+                             .has_attr(GET={'url': url_with_frag})
+                             .has_attr(user=self.user1))
+        context = self.view.get_context_data()
+        self.assertEqual(url, context['bid'].url)
+
+        self.view.request = (fudge.Fake()
+                             .has_attr(GET={'url': url})
+                             .has_attr(user=self.user1))
+        context = self.view.get_context_data()
+        self.assertEqual(url, context['bid'].url)
 
 
 class ClaimStatusTestCase(TestCase):

@@ -4,6 +4,8 @@
         {% csrf_token %}
         <input type="hidden" data-stripe="country" value="US">
         <input type="hidden" data-stripe="currency" value="USD">
+        <input type="hidden" id="account_holder_type" data-stripe="account_holder_type" value="individual">
+
         <div class="form-group">
             <label for="name">Name on the account</label>
             <input type="text" class="form-control" data-stripe="account_holder_name" autocomplete="off" value="{{ STRIPE_DEBUG.bank.name}}" maxlength="16" />
@@ -11,17 +13,29 @@
             <input type="text" class="form-control" data-stripe="routing_number" autocomplete="off" value="{{ STRIPE_DEBUG.bank.routing_number}}" maxlength="16" />
             <label for="acct-number">Account Number</label>
             <input type="text" class="form-control" data-stripe="account_number" autocomplete="off" value="{{ STRIPE_DEBUG.bank.account_number}}" maxlength="16" />
-            <fieldset >
-                <legend>Acount Type</legend>
-                <input type="radio" data-stripe="account_holder_type" value="individual" id="indiv" required checked="checked">
-                <label for="indiv">Individual</label>
-                <input type="radio" data-stripe="account_holder_type" value="company" id="company">
-                <label for="company">Company</label>
-            </fieldset>
+            <div class="row">
+                <div class="small-12 columns">
+                    <label class="text-middle">Account Type</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="small-6 columns">
+                    <input type="radio" name="form_holder_type" value="individual" id="individual" required checked="checked">
+                    <label for="individual" class="text-left">Individual</label>
+                </div>
+                <div class="small-6 columns">
+                    <input type="radio" name="form_holder_type" value="company" id="company">
+                    <label for="company" class="text-left">Company</label>
+                </div>
+            </div>
         </div>
+
+
         <button id="stripe-submit" class="button success track-btn"
                 data-category="Stripe" data-label="Authorize">
-                Encrypt Bank Account Information
+                Tokenize Account Information
         </button>
+
+
     </form>
 </fieldset>

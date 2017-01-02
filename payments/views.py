@@ -4,7 +4,8 @@ from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.http import HttpResponse
 from django.conf import settings
-import datetime
+from django.utils import timezone
+
 # stripe related:
 from codesy.base.models import User
 from .models import StripeEvent
@@ -30,7 +31,8 @@ def stripe_debug_values():
                 'zip': '74103',
                 'state': 'OK',
                 'ssn_last_4': '0000',
-                'ssn_full': '000000000'
+                'ssn_full': '000000000',
+                'business_name': 'Howdy Dammit LLC'
             },
             'card': {
                 'cc_number': '4111111111111111',
@@ -116,7 +118,7 @@ class AcceptTermsView(TemplateView):
     def post(self, *args, **kwargs):
         try:
             user = User.objects.get(id=self.request.user.id)
-            user.tos_acceptance_date = datetime.datetime.now()
+            user.tos_acceptance_date = timezone.now()
             user.tos_acceptance_ip = self.get_client_ip(self.request)
             user.save()
         except User.DoesNotExist:
@@ -127,7 +129,7 @@ class AcceptTermsView(TemplateView):
 class VerifyIdentityView(TemplateView):
     template_name = 'verify_identity.html'
     identity_fields = ('first_name', 'last_name', 'ssn_last_4',
-                       'personal_id_number', 'type',)
+                       'personal_id_number', 'type', 'business_name')
     address_fields = ('line1', 'city', 'postal_code', 'state', )
     dob_fields = ('day', 'month', 'year',)
 

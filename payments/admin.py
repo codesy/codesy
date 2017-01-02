@@ -19,5 +19,6 @@ class StripeEventAdmin(admin.ModelAdmin):
         'user_id', 'type', 'created', 'event_id', 'verified',
         'processed', 'message_text',)
 
+
 admin.site.register(StripeAccount, StripeAccountAdmin)
 admin.site.register(StripeEvent, StripeEventAdmin)
