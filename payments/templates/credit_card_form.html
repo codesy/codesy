@@ -1,15 +1,37 @@
 <fieldset class="fieldset">
-    <legend>Credit Card Information</legend>
+    <legend>Credit Card</legend>
     <form id="stripe-form" stripe-account-type="card" role="form" class="form-horizontal">
         {% csrf_token %}
-        <label for="cc-number">Card Number</label>
-        <input type="text" class="form-control" data-stripe="number" autocomplete="off" value="{{ STRIPE_DEBUG.card.cc_number}}" maxlength="16" />
-        <label for="cc-ex-month">Month</label>
-        <input type="text" class="form-control" data-stripe="exp_month" autocomplete="off" value="{{ STRIPE_DEBUG.card.cc_ex_month}}" maxlength="2" size="2"/>
-        <label for="cc-ex-month">Year</label>
-        <input type="text" class="form-control" data-stripe="exp_year" autocomplete="off" value="{{ STRIPE_DEBUG.card.cc_ex_year}}" maxlength="4" size="4"/>
-        <label for="cvc">Card Verification Code (CVC)</label>
-        <input type="text" class="form-control" data-stripe="cvc" autocomplete="off" value="{{ STRIPE_DEBUG.card.cvc}}" maxlength="4" size="4"/>
+        <div class="row">
+            <div class="small-7 columns">
+                <label for="cc-number">Number</label>
+                <input type="text" class="form-control" data-stripe="number" autocomplete="off" value="{{ STRIPE_DEBUG.card.cc_number}}" maxlength="16" placeholder="#### #### #### ####"/>
+            </div>
+            <div class="small-5 columns">
+                <label for="cvc" >CVC</label>
+                <input type="text" class="form-control" data-stripe="cvc" autocomplete="off" value="{{ STRIPE_DEBUG.card.cvc}}" maxlength="4" size="4" placeholder="###"/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-12 columns">
+                <label class="text-middle">Expiration</label>
+            </div>
+        </div>
+        <div class="row">
+
+            <div class="small-3 columns">
+                <label class="text-middle">Month</label>
+                <input type="text" class="form-control" data-stripe="exp_month" autocomplete="off" value="{{ STRIPE_DEBUG.card.cc_ex_month}}" maxlength="2" size="2" placeholder="MM"/>
+            </div>
+
+            <div class="small-4 columns">
+                <label class="text-middle">Year</label>
+                <input type="text" class="form-control" data-stripe="exp_year" autocomplete="off" value="{{ STRIPE_DEBUG.card.cc_ex_year}}" maxlength="4" size="4" placeholder="YYYY"/>
+            </div>
+            <div class="small-4 columns">
+            </div>
+
+        </div>
         <button id="stripe-submit" class="button success track-btn" data-category="Stripe" data-label="Authorize">Tokenize Account Information</button>
     </form>
 </fieldset>

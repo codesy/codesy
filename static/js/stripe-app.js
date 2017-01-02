@@ -47,6 +47,16 @@ $(window).load(function () {
     let $form = $('#stripe-form')
     let account_type = $form.attr('stripe-account-type')
 
+    $('#codesy-submit').click(function (e) {
+        // add account_holder_type for bank account and identity forms
+        let holder_type = $("input[name=form_holder_type]:checked").val()
+        if (holder_type) {
+            $('#type').val(holder_type)
+        }
+    });
+
+
+
     $('#stripe-submit').click(function (e) {
         e.preventDefault();
         // add account_holder_type for bank account and identity forms

@@ -1,14 +1,23 @@
 {% extends "stripe_base.html" %}
+{% load staticfiles %}
 {% block content %}
     <div class="row">
         <div class="column medium-4 medium-offset-4 text-left">
             {% if request.user.stripe_customer %}
-                You have a credit card registered with us.  You can use this form to change the card information.
+                You already have a credit card registered with us.
+                We do not store the card details in codesy's database so you can only use this form to re-register or change the card you use for codesy bids.
             {% else %}
-                To make offers, you need to register a credit card.
+                You need to register a credit card to be able to make offers.
+                We use Stripe to handle this information and it is never stored in codesy's database.
             {% endif %}
-                We tokenize this information with Stripe so it is not stored in codesy's database.
             {% include "credit_card_form.html" %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="column medium-4 medium-offset-4 text-left">
+            <a href="https://stripe.com" target="_blank">
+                <img src="{% static 'img/stripe/powered_by_stripe.png' %}" alt="" />
+            </a>
         </div>
     </div>
 {% endblock %}

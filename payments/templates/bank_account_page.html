@@ -1,4 +1,6 @@
 {% extends "stripe_base.html" %}
+{% load staticfiles %}
+
 {% block content %}
     <div class="row">
         <div class="column medium-4 medium-offset-4 text-left">
@@ -11,4 +13,12 @@
             {% include "bank_account_form.html" %}
         </div>
     </div>
+    <div class="row">
+        <div class="column medium-4 medium-offset-4 text-left">
+            <a href="https://stripe.com" target="_blank">
+                <img src="{% static 'img/stripe/powered_by_stripe.png' %}" alt="" />
+            </a>
+        </div>
+    </div>
+
 {% endblock %}

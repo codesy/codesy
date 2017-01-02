@@ -1,4 +1,4 @@
-    {% load staticfiles %}
+{% load staticfiles %}
 {% load socialaccount %}
 <!DOCTYPE html>
 <html id="codesy-html" class="no-js" lang="en" data-stripe_key="{{ settings.STRIPE_PUBLIC_KEY }}" data-ga_id="{{ settings.GOOGLE_ANALYTICS_ID }}" data-ga_filename="analytics{% if settings.DEBUG %}_debug{% endif %}.js">
@@ -49,10 +49,20 @@
    {% if messages %}
         <div class="row">
       {% for message in messages %}
-         <div class="callout warning expanded" data-closable>
-            <button class="close-button" data-close>&times;</button>
-            <p class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</p>
-         </div>
+        {% if message.message == "stripe_info_verify" %}
+            <div class="callout warning expanded" data-closable>
+                <button class="close-button" data-close>&times;</button>
+                <p class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    Hi, we need more information to validate your
+                    <a href="{% url 'identity' %}"> bank account.</a>
+                </p>
+            </div>
+        {% else %}
+            <div class="callout warning expanded" data-closable>
+               <button class="close-button" data-close>&times;</button>
+               <p class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</p>
+            </div>
+        {% endif %}
       {% endfor %}
         </div>
    {% endif %}

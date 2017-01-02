@@ -13,17 +13,29 @@
             <input type="text" class="form-control" data-stripe="routing_number" autocomplete="off" value="{{ STRIPE_DEBUG.bank.routing_number}}" maxlength="16" />
             <label for="acct-number">Account Number</label>
             <input type="text" class="form-control" data-stripe="account_number" autocomplete="off" value="{{ STRIPE_DEBUG.bank.account_number}}" maxlength="16" />
-            <div >
-                <label>Account Type</label>
-                <input type="radio" name="form_holder_type" value="individual" id="individual" required checked="checked">
-                <label for="individual">Individual</label>
-                <input type="radio" name="form_holder_type" value="company" id="company">
-                <label for="company">Company</label>
+            <div class="row">
+                <div class="small-12 columns">
+                    <label class="text-middle">Account Type</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="small-6 columns">
+                    <input type="radio" name="form_holder_type" value="individual" id="individual" required checked="checked">
+                    <label for="individual" class="text-left">Individual</label>
+                </div>
+                <div class="small-6 columns">
+                    <input type="radio" name="form_holder_type" value="company" id="company">
+                    <label for="company" class="text-left">Company</label>
+                </div>
             </div>
         </div>
+
+
         <button id="stripe-submit" class="button success track-btn"
                 data-category="Stripe" data-label="Authorize">
                 Tokenize Account Information
         </button>
+
+
     </form>
 </fieldset>
