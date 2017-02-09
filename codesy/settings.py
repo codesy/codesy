@@ -167,6 +167,8 @@ CSP_FRAME_ANCESTORS = (
     'https://github.com'
 )
 
+CSP_REPORT_URI = "https://codesy.report-uri.io/r/default/csp/enforce"
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
