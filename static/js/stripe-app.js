@@ -19,7 +19,7 @@ $(window).load(function () {
                     console.error("Stripe failed to tokenize");
                     response_message = response.error.message
                 } else {
-                    response_message = "Account information successfully tokenized"
+                    response_message = "Account information successfully submitted"
                     $.ajax({
                         method: "PATCH",
                         url: "/users/update/",
@@ -38,7 +38,7 @@ $(window).load(function () {
                 }
 
                 $('#stripe-form').prepend(response_div(response_message))
-                $('#stripe-submit').text('Tokenize Account Information');
+                $('#stripe-submit').text('Submit Account Information');
             }
         })(this)
     }
@@ -64,7 +64,7 @@ $(window).load(function () {
         if (holder_type) {
             $('#account_holder_type').val(holder_type)
         }
-        $('#stripe-submit').text('Tokenizing ... ');
+        $('#stripe-submit').text('Submitting ... ');
         Stripe[account_type].createToken($form, handleResponse);
     });
 
