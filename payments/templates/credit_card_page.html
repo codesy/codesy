@@ -4,14 +4,23 @@
     <div class="row">
         <div class="column medium-4 medium-offset-4 text-left">
             {% if request.user.stripe_customer %}
-                {{request.user.brand}} XXXX-XXXX-XXXX-{{ request.user.last4}}
-                You already have a credit card registered with us.
-                We do not store the card details in codesy's database so you can only use this form to re-register or change the card you use for codesy bids.
+                We saved your <b> {{request.user.brand}}</b> card ending in <b> {{ request.user.last4}} </b> with Stripe.
+
+                <div class="reveal" id="credit_card_form" data-reveal>
+                    {% include "credit_card_form.html" %}
+                    <button class="close-button" data-close aria-label="Close modal" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <p><a data-open="credit_card_form">Change this card.</a></p>
+
             {% else %}
                 You need to register a credit card to be able to make offers.
                 We use Stripe to handle this information and it is never stored in codesy's database.
+                {% include "credit_card_form.html" %}
+
             {% endif %}
-            {% include "credit_card_form.html" %}
         </div>
     </div>
     <div class="row">
