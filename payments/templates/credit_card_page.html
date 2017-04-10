@@ -4,6 +4,7 @@
     <div class="row">
         <div class="column medium-4 medium-offset-4 text-left">
             {% if request.user.stripe_customer %}
+                {{request.user.brand}} XXXX-XXXX-XXXX-{{ request.user.last4}}
                 You already have a credit card registered with us.
                 We do not store the card details in codesy's database so you can only use this form to re-register or change the card you use for codesy bids.
             {% else %}

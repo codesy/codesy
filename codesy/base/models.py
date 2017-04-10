@@ -17,6 +17,8 @@ class User(AbstractUser):
     stripe_bank_account = models.CharField(max_length=100, blank=True)
     tos_acceptance_date = models.DateTimeField(null=True, blank=True)
     tos_acceptance_ip = models.CharField(max_length=20, blank=True)
+    last4 = models.CharField(max_length=4, blank=True)
+    brand = models.CharField(max_length=100, blank=True)
     USERNAME_FIELD = 'username'
 
     def get_gravatar_url(self):
