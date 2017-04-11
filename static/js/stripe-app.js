@@ -1,5 +1,7 @@
+
 $(window).load(function () {
     Stripe.setPublishableKey($('#codesy-html').data('stripe_key'));
+
     function response_div(message){
         $div= $(`
             <div class="callout warning expanded" data-closable>
@@ -12,22 +14,20 @@ $(window).load(function () {
     }
 
     let stripeResponse = function (csrf_token) {
-
-        const prepare_data = ({type, id, card, bank_account }) => {
+        function prepare_data ({type, id, card, bank_account }){
             switch (type) {
                 case 'card':
-                    const stripe_card = id
-                    const {last4,brand} = card
-                    return {stripe_card, last4, brand}
+                    ( {last4, brand} = card)
+                    return {stripe_card: id, last4, brand}
                     break;
                 case 'bank_account':
-                    const stripe_bank_account = id
-                    return {stripe_bank_account}
+                    return {stripe_bank_account: id}
                     break;
                 default:
-                return {}
+                    return {}
             }
         }
+
         return function (status, response) {
             if (response.error) {
                 console.error(`Stripe failed to tokenize: ${response.error.message}`);
@@ -37,17 +37,10 @@ $(window).load(function () {
                 $.ajax({
                     method: "PATCH",
                     url: "/users/update/",
-                    beforeSend: function(xhr, settings) {
-                        xhr.setRequestHeader('X-CSRFToken', csrf_token);
-                    },
+                    beforeSend: (xhr, settings) => xhr.setRequestHeader('X-CSRFToken', csrf_token),
                     data: prepare_data(response),
-                    success: function(data, status, jqXHR) {
-                        console.log("Updated user.");
-                    },
-                    error: function(err) {
-                        console.error("Error updating user.");
-                        console.error(err);
-                    }
+                    success: (data, status, jqXHR) =>console.log("Updated user."),
+                    error: (err) => console.error(err)
                 });
             }
             $('#stripe-form').prepend(response_div(response_message))
@@ -66,8 +59,6 @@ $(window).load(function () {
             $('#type').val(holder_type)
         }
     });
-
-
 
     $('#stripe-submit').click(function (e) {
         e.preventDefault();
