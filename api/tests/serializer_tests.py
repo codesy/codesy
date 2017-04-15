@@ -17,9 +17,9 @@ class UserSerializerTest(TestCase):
             rest_framework.serializers.HyperlinkedModelSerializer)
         self.assertEqual(self.serializer.Meta.model, User)
         self.assertEqual(
-            self.serializer.Meta.fields,
-            ('id', 'username', 'stripe_card',
-                'stripe_customer', 'stripe_bank_account')
+            self.serializer.Meta.fields, (
+                'id', 'username', 'stripe_card', 'stripe_customer',
+                'stripe_bank_account', 'card_last4', 'card_brand')
         )
         self.assertEqual(
             self.serializer.Meta.read_only_fields, ('id', 'username'))

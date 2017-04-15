@@ -20,6 +20,12 @@ class CodesyUserAdmin(UserAdmin):
                 ('stripe_card', 'stripe_customer', 'stripe_bank_account')
              }
          ),
+        ('CC information',
+            {'fields':
+                ('card_brand', 'card_last4')
+             }
+         ),
+
     )
 
 
