@@ -37,8 +37,6 @@
                             <li><a href="{% url 'account_logout' %}">Sign out</a></li>
                         </ul>
                     </li>
-                {% else %}
-                    <li><a class="button gh-button track-btn" data-category="sign-in" href="{% provider_login_url "github" %}"><i class="fi-social fi-social-github medium"></i> Sign in with GitHub</a></li>
                 {% endif %}
                 </ul>
             </div>
