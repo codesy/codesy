@@ -9,7 +9,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = (
             'id', 'username', 'stripe_card', 'stripe_customer',
-            'stripe_bank_account', 'last4', 'brand')
+            'stripe_bank_account', 'card_last4', 'card_brand')
         read_only_fields = ('id', 'username')
 
 

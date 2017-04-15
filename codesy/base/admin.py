@@ -22,7 +22,7 @@ class CodesyUserAdmin(UserAdmin):
          ),
         ('CC information',
             {'fields':
-                ('brand', 'last4')
+                ('card_brand', 'card_last4')
              }
          ),
 

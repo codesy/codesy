@@ -17,8 +17,8 @@ $(window).load(function () {
         function prepare_data ({type, id, card, bank_account }){
             switch (type) {
                 case 'card':
-                    ( {last4, brand} = card)
-                    return {stripe_card: id, last4, brand}
+                    ;( {last4: card_last4, brand: card_brand} = card)
+                    return {stripe_card: id, card_last4, card_brand}
                     break;
                 case 'bank_account':
                     return {stripe_bank_account: id}
