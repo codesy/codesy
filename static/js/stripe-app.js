@@ -57,7 +57,7 @@ $(window).load(function () {
     const csrf_token_value = $form.find('input[name="csrfmiddlewaretoken"]').val()
     const handleResponse = new stripeResponse(csrf_token_value, stripe_account_type)
 
-    $('#codesy-submit-identity').click( (e) => set_holder_type($('#type') );
+    $('#codesy-submit-identity').click( (e)=> set_holder_type($('#type')) );
 
     $('#stripe-submit').click(function (e) {
         e.preventDefault();

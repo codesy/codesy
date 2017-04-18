@@ -51,4 +51,7 @@
 {% endblock %}
 
 {% block scripts %}
+   {% if request.user.is_authenticated %}
+      <script type="text/javascript" src="{% static 'js/vote-app.js' %}" ></script>
+   {% endif %}
 {% endblock %}
