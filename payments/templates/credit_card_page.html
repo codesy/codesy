@@ -1,4 +1,4 @@
-{% extends "stripe_base.html" %}
+{% extends "base.html" %}
 {% load staticfiles %}
 {% block content %}
     <div class="row">
@@ -33,12 +33,4 @@
             </a>
         </div>
     </div>
-{% endblock %}
-
-
-{% block scripts %}
-   {% if request.user.is_authenticated %}
-      <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-      <script type="text/javascript" src="{% static 'js/stripe-app.js' %}" ></script>
-   {% endif %}
 {% endblock %}

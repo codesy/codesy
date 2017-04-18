@@ -89,9 +89,12 @@
 
     <script src="https://cdn.jsdelivr.net/jquery/2.2.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/foundation/6.1.2/foundation.min.js"></script>
-    <script src="{% static "js/base.js" %}" ></script>
+    <script src="{% static "js/codesy-app.js" %}" ></script>
     <script src="{% static "js/analytics.js" %}" ></script>
     {% block scripts %}
+       {% if request.user.is_authenticated %}
+          <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+       {% endif %}
     {% endblock %}
   </body>
 </html>
