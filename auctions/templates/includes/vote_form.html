@@ -1,7 +1,7 @@
 <h3>Do you approve this claim?</h3>
 <div class="row">
   <div class="medium-6 columns">
-    <form id="codesy_approve" class="ajaxSubmit" action="{% url 'vote-list' %}" data-method="POST">
+    <form id="codesy_approve" class="vote-submit" action="{% url 'vote-list' %}" data-method="POST">
       {% csrf_token %}
       <input type="hidden" name="claim" value="{{claim.id}}">
       <input type="hidden" name="approved" value="True">

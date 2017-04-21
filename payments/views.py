@@ -32,7 +32,8 @@ def stripe_debug_values():
                 'state': 'OK',
                 'ssn_last_4': '0000',
                 'ssn_full': '000000000',
-                'business_name': 'Howdy Dammit LLC'
+                'business_name': 'Howdy Dammit LLC',
+                'business_tax_id': '000000000'
             },
             'card': {
                 'cc_number': '4111111111111111',
@@ -129,7 +130,8 @@ class AcceptTermsView(TemplateView):
 class VerifyIdentityView(TemplateView):
     template_name = 'verify_identity.html'
     identity_fields = ('first_name', 'last_name', 'ssn_last_4',
-                       'personal_id_number', 'type', 'business_name')
+                       'personal_id_number', 'type', 'business_name',
+                       'business_tax_id')
     address_fields = ('line1', 'city', 'postal_code', 'state', )
     dob_fields = ('day', 'month', 'year',)
 
