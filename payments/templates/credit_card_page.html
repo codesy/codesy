@@ -1,4 +1,4 @@
-{% extends "stripe_base.html" %}
+{% extends "base.html" %}
 {% load staticfiles %}
 {% block content %}
     <div class="row">
@@ -7,7 +7,9 @@
                 We saved your <b> {{request.user.card_brand}}</b> card ending in <b> {{ request.user.card_last4}} </b> with Stripe.
 
                 <div class="reveal" id="credit_card_form" data-reveal>
+
                     {% include "credit_card_form.html" %}
+
                     <button class="close-button" data-close aria-label="Close modal" type="button">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -18,6 +20,7 @@
             {% else %}
                 You need to register a credit card to be able to make offers.
                 We use Stripe to handle this information and it is never stored in codesy's database.
+
                 {% include "credit_card_form.html" %}
 
             {% endif %}

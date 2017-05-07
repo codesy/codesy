@@ -1,4 +1,4 @@
-{% extends "stripe_base.html" %}
+{% extends "base.html" %}
 {% load staticfiles %}
 
 {% block content %}
@@ -27,6 +27,12 @@
                 <label for="business_name">Business Name</label>
                 <input name="business_name" type="text" class="form-control" autocomplete="off" maxlength="16" value="{{ STRIPE_DEBUG.identity.business_name}}"/>
             {% endif %}
+            {% if 'legal_entity.business_tax_id' in fields_needed %}
+                <label for="business_tax_id">Business Tax ID</label>
+                <input name="business_tax_id" type="text" class="form-control" autocomplete="off" maxlength="16" value="{{ STRIPE_DEBUG.identity.business_tax_id}}"/>
+            {% endif %}
+
+
             {% if 'legal_entity.last_name' in fields_needed %}
                 <label for="last_name">Last Name</label>
                 <input name="last_name" type="text" class="form-control" autocomplete="off" maxlength="16" value="{{ STRIPE_DEBUG.identity.last_name}}"/>
@@ -79,7 +85,7 @@
             {% endif %}
 
             <button
-                id="codesy-submit"
+                id="codesy-submit-identity"
                 class="button success track-btn"
                 data-category="Stripe"
                 data-label="Authorize">Send to Stripe
