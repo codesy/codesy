@@ -101,7 +101,7 @@ class BankAccountView(BankAccountTestsMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super(BankAccountView, self).get_context_data(**kwargs)
-        ctx['return_url'] = self.request.GET.get('return_url','')
+        ctx['return_url'] = self.request.GET.get('return_url', '')
         ctx['STRIPE_DEBUG'] = stripe_debug_values()
         return ctx
 
@@ -164,8 +164,6 @@ class VerifyIdentityView(TemplateView):
                     stripe_acct.legal_entity.dob[field] = posted[field]
 
             stripe_acct.save()
-
-
 
         return redirect('bank')
 
