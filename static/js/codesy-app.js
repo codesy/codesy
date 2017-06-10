@@ -50,24 +50,47 @@ $(window).load(function () {
     }
 
     function stripeResponse (csrf_token, response_filter) {
-        return function (status, response) {
-            let message = "Account information successfully submitted"
+        redirect = (url) => {window.location = url};
+        const return_url = $('#return_url').val()
+
+        function complete_submit (message) {
+            $('#stripe-response').remove();
+            $('#stripe-form').prepend(response_div(message));
+            $('#stripe-submit').text('Submit Account Information');
+        }
+
+        function ajax_before (xhr, settings) {
+            xhr.setRequestHeader('X-CSRFToken', csrf_token)
+        }
+
+        function ajax_success (data, status, jqXHR) {
+            console.log("Updated user.");
+            if ( return_url ) {
+                redirect(return_url)
+            } else {
+                complete_submit("Account information successfully submitted")
+            };
+        }
+
+        function ajax_error (jqXHR, textStatus, errorThrown){
+            console.error(errorThrown, textStatus)
+            complete_submit(textStatus)
+        }
+
+        return function (status, response){
             if (response.error) {
-                message = response.error.message;
-                console.error(`Stripe failed to tokenize: ${message}`);
+                console.error(`Stripe failed to tokenize: ${response.error.message}`);
+                complete_submit(response.error.message)
             } else {
                 $.ajax({
                     method: "PATCH",
                     url: "/users/update/",
-                    beforeSend: (xhr, settings) => xhr.setRequestHeader('X-CSRFToken', csrf_token),
+                    beforeSend: ajax_before,
                     data: response_filter(response),
-                    success: (data, status, jqXHR) => console.log("Updated user."),
-                    error: ()=>console.error("nope")
-                });
+                    success: ajax_success,
+                    error: ajax_error
+                })
             }
-            $('#stripe-response').remove()
-            $('#stripe-form').prepend(response_div(message))
-            $('#stripe-submit').text('Submit Account Information');
         }
     }
 
