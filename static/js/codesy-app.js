@@ -34,7 +34,9 @@ $(window).load(function () {
         }
     }
 
-    function make_filter (account_type){
+    function stripe_to_codesy (account_type){
+        // returns a function to read stripe response and return update parameters
+        // for codesy based on what type of account is being updated
         switch (account_type) {
             case 'card':
                 return ({ id, card: {last4: card_last4 , brand: card_brand} }) => {
@@ -42,21 +44,23 @@ $(window).load(function () {
                 }
                 break;
             case 'bankAccount':
-                return ({id: stripe_bank_account}) => {return {stripe_bank_account}};
+                return ({id: stripe_bank_account}) => {stripe_bank_account};
                 break;
             default:
                 return ()=>{}
         };
     }
 
-    function stripeResponse (csrf_token, response_filter) {
+    function stripeResponse (csrf_token, get_parameters) {
         redirect = (url) => {window.location = url};
         const return_url = $('#return_url').val()
+        const button_text = $('#stripe-submit').text()
+        const success_msg = "Account information successfully submitted"
 
         function complete_submit (message) {
             $('#stripe-response').remove();
             $('#stripe-form').prepend(response_div(message));
-            $('#stripe-submit').text('Submit Account Information');
+            $('#stripe-submit').text(button_text);
         }
 
         function ajax_before (xhr, settings) {
@@ -68,7 +72,7 @@ $(window).load(function () {
             if ( return_url ) {
                 redirect(return_url)
             } else {
-                complete_submit("Account information successfully submitted")
+                complete_submit(success_msg)
             };
         }
 
@@ -76,7 +80,7 @@ $(window).load(function () {
             console.error(errorThrown, textStatus)
             complete_submit(textStatus)
         }
-
+        //receives the results of Stripe.createToken and updates codesy database
         return function (status, response){
             if (response.error) {
                 console.error(`Stripe failed to tokenize: ${response.error.message}`);
@@ -86,7 +90,7 @@ $(window).load(function () {
                     method: "PATCH",
                     url: "/users/update/",
                     beforeSend: ajax_before,
-                    data: response_filter(response),
+                    data: get_parameters(response),
                     success: ajax_success,
                     error: ajax_error
                 })
@@ -104,8 +108,8 @@ $(window).load(function () {
     $($stripe_form).ready( () => {
         Stripe.setPublishableKey($('#codesy-html').data('stripe_key'));
         const stripe_account_type = $stripe_form .attr('stripe-account-type')
-        const response_filter = make_filter(stripe_account_type)
-        const handleResponse = new stripeResponse(csrf_token_value, response_filter)
+        const get_parameters = stripe_to_codesy(stripe_account_type)
+        const handleResponse = new stripeResponse(csrf_token_value, get_parameters)
 
         $('#stripe-submit').click(function (e) {
             e.preventDefault();
