@@ -17,7 +17,9 @@
             action="{% url 'terms' %}"
             method="POST">
             {% csrf_token %}
-
+            {%if return_url %}
+                <input type="hidden" id="return_url" value="{{return_url}}">
+            {% endif %}
             <button
                 class="button success track-btn"
                 data-category="Stripe"

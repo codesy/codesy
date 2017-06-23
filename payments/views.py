@@ -109,6 +109,11 @@ class BankAccountView(BankAccountTestsMixin, TemplateView):
 class AcceptTermsView(TemplateView):
     template_name = "accept_terms.html"
 
+    def get_context_data(self, **kwargs):
+        ctx = super(AcceptTermsView, self).get_context_data(**kwargs)
+        ctx['return_url'] = self.request.GET.get('return_url', '')
+        return ctx
+
     def get_client_ip(self, request):
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
@@ -125,7 +130,10 @@ class AcceptTermsView(TemplateView):
             user.save()
         except User.DoesNotExist:
             pass
-        return redirect('bank')
+            
+        redirect_url = posted['return_url'] or 'bank'
+
+        return redirect(redirect_url)
 
 
 class VerifyIdentityView(TemplateView):
@@ -139,6 +147,7 @@ class VerifyIdentityView(TemplateView):
     def get_context_data(self, **kwargs):
         ctx = super(VerifyIdentityView, self).get_context_data(**kwargs)
         ctx['STRIPE_DEBUG'] = stripe_debug_values()
+        ctx['return_url'] = self.request.GET.get('return_url', '')
         codesy_account = self.request.user.account()
         ctx['fields_needed'] = codesy_account.fields_needed
         return ctx
@@ -165,7 +174,9 @@ class VerifyIdentityView(TemplateView):
 
             stripe_acct.save()
 
-        return redirect('bank')
+        redirect_url = posted['return_url'] or 'bank'
+
+        return redirect(redirect_url)
 
 
 class StripeHookView(CSRFExemptMixin, View):
