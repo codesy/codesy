@@ -113,20 +113,12 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
         payout_totals = {'fees': 0, 'credits': 0, 'final_payout': 0}
         claim = get_object_or_404(Claim, pk=self.kwargs['pk'])
         try:
-            for payout in claim.successful_payouts().all():
-                for credit in payout.credits():
-                    payout_totals['credits'] += payout.amount
-                for fee in payout.fees():
-                    payout_totals['fees'] += fee.amount
-                payout_totals['final_payout'] += payout.charge_amount
-
             vote = Vote.objects.get(claim=claim, user=self.request.user)
         except:
             pass
         context = dict({
             'claim': claim,
             'vote': vote,
-            'payout_totals': payout_totals
         })
         return context
 

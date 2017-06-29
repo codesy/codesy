@@ -26,9 +26,9 @@
             <table>
               <tbody>
                 <tr><td>Ask</td><td>{{ claim.ask  }}</td></tr>
-                <tr><td>Credits </td><td>{{ payout_totals.credits }}</td></tr>
-                <tr><td>Fees</td><td>({{ payout_totals.fees }})</td></tr>
-                <tr><td>Final payout</td><td>{{ payout_totals.final_payout }}</td></tr>
+                <tr><td>Credits </td><td>{{ claim.sum_credits }}</td></tr>
+                <tr><td>Fees</td><td>({{ claim.sum_fees }})</td></tr>
+                <tr><td>Final payout</td><td>{{ claim.sum_payouts }}</td></tr>
               </tbody>
             </table>
           </div>

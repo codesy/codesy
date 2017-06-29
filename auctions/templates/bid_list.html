@@ -31,11 +31,10 @@
                         <table>
                             <tr><td>Offer</td><td>{{ bid.last_offer.net_offer }}</td></tr>
                             {% if bid.last_offer.discount %}
-                                <tr><td>surplus</td><td>({{ bid.last_offer.discount }})</td></tr>
+                                <tr><td>Credits</td><td>({{ bid.last_offer.discount }})</td></tr>
+                                <tr><td>Fees</td><td>{{ bid.last_offer.sum_fees }}</td></tr>
+
                             {% endif %}
-                            {% for fee in bid.last_offer.fees %}
-                                <tr><td>{{ fee.fee_type }}</td><td>{{ fee.amount }}</td></tr>
-                            {% endfor %}
                             <tr class="total"><td>Total</td><td>{{ bid.last_offer.charge_amount }}</td></tr>
                         </table>
 
