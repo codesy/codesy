@@ -110,7 +110,6 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         claim = None
         vote = None
-        payout_totals = {'fees': 0, 'credits': 0, 'final_payout': 0}
         claim = get_object_or_404(Claim, pk=self.kwargs['pk'])
         try:
             vote = Vote.objects.get(claim=claim, user=self.request.user)
