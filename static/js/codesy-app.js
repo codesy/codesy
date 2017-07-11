@@ -34,7 +34,9 @@ $(window).load(function () {
         }
     }
 
-    function make_filter (account_type){
+    function stripe_to_codesy (account_type){
+        // returns a function to read stripe response and return update parameters
+        // for codesy based on what type of account is being updated
         switch (account_type) {
             case 'card':
                 return ({ id, card: {last4: card_last4 , brand: card_brand} }) => {
@@ -49,25 +51,50 @@ $(window).load(function () {
         };
     }
 
-    function stripeResponse (csrf_token, response_filter) {
-        return function (status, response) {
-            let message = "Account information successfully submitted"
+    function stripeResponse (csrf_token, get_parameters) {
+        redirect = (url) => {window.location = url};
+        const return_url = $('#return_url').val()
+        const button_text = $('#stripe-submit').text()
+        const success_msg = "Account information successfully submitted"
+
+        function complete_submit (message) {
+            $('#stripe-response').remove();
+            $('#stripe-form').prepend(response_div(message));
+            $('#stripe-submit').text(button_text);
+        }
+
+        function ajax_before (xhr, settings) {
+            xhr.setRequestHeader('X-CSRFToken', csrf_token)
+        }
+
+        function ajax_success (data, status, jqXHR) {
+            console.log("Updated user.");
+            if ( return_url ) {
+                redirect(return_url)
+            } else {
+                complete_submit(success_msg)
+            };
+        }
+
+        function ajax_error (jqXHR, textStatus, errorThrown){
+            console.error(errorThrown, textStatus)
+            complete_submit(textStatus)
+        }
+        //receives the results of Stripe.createToken and updates codesy database
+        return function (status, response){
             if (response.error) {
-                message = response.error.message;
-                console.error(`Stripe failed to tokenize: ${message}`);
+                console.error(`Stripe failed to tokenize: ${response.error.message}`);
+                complete_submit(response.error.message)
             } else {
                 $.ajax({
                     method: "PATCH",
                     url: "/users/update/",
-                    beforeSend: (xhr, settings) => xhr.setRequestHeader('X-CSRFToken', csrf_token),
-                    data: response_filter(response),
-                    success: (data, status, jqXHR) => console.log("Updated user."),
-                    error: ()=>console.error("nope")
-                });
+                    beforeSend: ajax_before,
+                    data: get_parameters(response),
+                    success: ajax_success,
+                    error: ajax_error
+                })
             }
-            $('#stripe-response').remove()
-            $('#stripe-form').prepend(response_div(message))
-            $('#stripe-submit').text('Submit Account Information');
         }
     }
 
@@ -81,8 +108,8 @@ $(window).load(function () {
     $($stripe_form).ready( () => {
         Stripe.setPublishableKey($('#codesy-html').data('stripe_key'));
         const stripe_account_type = $stripe_form .attr('stripe-account-type')
-        const response_filter = make_filter(stripe_account_type)
-        const handleResponse = new stripeResponse(csrf_token_value, response_filter)
+        const get_parameters = stripe_to_codesy(stripe_account_type)
+        const handleResponse = new stripeResponse(csrf_token_value, get_parameters)
 
         $('#stripe-submit').click(function (e) {
             e.preventDefault();

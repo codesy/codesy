@@ -127,6 +127,7 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
         except:
             pass
         context = dict({
+            'return_url': self.request.path,
             'claim': claim,
             'vote': vote,
             'aggregate_payout': total_payout

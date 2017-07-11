@@ -143,14 +143,14 @@ class ClaimStatusTestCase(TestCase):
 
     def test_get_by_id_returns_context(self):
         self.view.request = (fudge.Fake()
-                             .has_attr(user=self.user1))
+                             .has_attr(user=self.user1, path=""))
         self.view.kwargs = {'pk': self.claim.id}
         context = self.view.get_context_data()
         self.assertEqual(self.claim, context['claim'])
 
     def test_get_by_non_claimaint_returns_context(self):
         self.view.request = (fudge.Fake()
-                             .has_attr(user=self.user2))
+                             .has_attr(user=self.user2, path=""))
         self.view.kwargs = {'pk': self.claim.id}
         context = self.view.get_context_data()
         self.assertEqual(self.claim, context['claim'])

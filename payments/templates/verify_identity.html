@@ -18,7 +18,9 @@
             action="/payments/identity"
             method="POST">
             {% csrf_token %}
-
+            {%if return_url %}
+                <input type="hidden" id="return_url" value="{{return_url}}">
+            {% endif %}
             {% if 'legal_entity.first_name' in fields_needed %}
                 <label for="first_name">First Name</label>
                 <input name="first_name" type="text" class="form-control" autocomplete="off" maxlength="16" value="{{ STRIPE_DEBUG.identity.first_name}}"/>

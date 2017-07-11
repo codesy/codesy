@@ -15,8 +15,7 @@
        {% else %}
 
            <h3>You need to tell us where to send your payout.</h3>
-
-           <li><a class="success button expanded" href="{% url 'bank' %}">Register a bank account</a></li>
+           <li><a class="success button expanded" href="{% url 'bank' %}?return_url={{ return_url }}">Register a bank account</a></li>
 
        {% endif %}
 
