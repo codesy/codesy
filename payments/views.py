@@ -1,3 +1,5 @@
+import urllib
+
 from django.views.generic import View, TemplateView
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse_lazy
@@ -70,7 +72,7 @@ class BankAccountTestsMixin(UserPassesTestMixin):
     redirect_field_name = None
 
     def test_func(self):
-        # settting the login_url determnes redirect if test returns false
+        # settting the login_url determines redirect if test returns false
         if self.request.user.accepted_terms():
             self.login_url = self.reverse_lazy_with_param('identity')
         else:
@@ -94,9 +96,8 @@ class CodesyRedirectView(TemplateView):
 
     def reverse_lazy_with_param(self, template_name):
         request_dict = self.request.GET or self.request.POST
-        return_url = request_dict.get('return_url', '')
-        return_param = '?return_url=' + return_url
-        return reverse_lazy(template_name) + return_param
+        return_param = urllib.urlencode(request_dict)
+        return '%s?%s' % (reverse_lazy(template_name), return_param)
 
     def get_context_data(self, **kwargs):
         ctx = super(TemplateView, self).get_context_data(**kwargs)

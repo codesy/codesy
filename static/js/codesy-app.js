@@ -44,7 +44,7 @@ $(window).load(function () {
                 }
                 break;
             case 'bankAccount':
-                return ({id: stripe_bank_account}) =>{return {stripe_bank_account}};
+                return ({id: stripe_bank_account}) => {return {stripe_bank_account}};
                 break;
             default:
                 return ()=>{}
