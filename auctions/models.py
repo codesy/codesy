@@ -284,6 +284,24 @@ class Claim(models.Model):
     def successful_payouts(self):
         return Payout.objects.filter(claim=self, api_success=True)
 
+    @property
+    def sum_payouts(self):
+        return (
+            self.successful_payouts()
+            .aggregate(Sum('charge_amount'))['charge_amount__sum'])
+
+    @property
+    def sum_fees(self):
+        sum_of = 0
+        for payout in self.successful_payouts():
+            sum_of += payout.sum_fees
+        return sum_of
+
+    @property
+    def sum_credits(self):
+        # these are the claim credits not payout credits!
+        return self.sum_payouts - self.ask + self.sum_fees
+
     def votes_by_approval(self, approved):
         return (Vote.objects
                     .filter(claim=self, approved=approved)
@@ -554,7 +572,7 @@ class Payout(Payment):
         default='Stripe')
 
     def __unicode__(self):
-        return u'Payout to %s for claim (%s)' % (
+        return u'Payout by %s for claim (%s)' % (
             self.user, self.claim.id
         )
 
@@ -567,6 +585,20 @@ class Payout(Payment):
 
     def credits(self):
         return PayoutCredit.objects.filter(payout=self)
+
+    @property
+    def sum_fees(self):
+        sum_of = 0
+        for fee in self.fees():
+            sum_of += fee.amount
+        return sum_of
+
+    @property
+    def sum_credits(self):
+        sum_of = 0
+        for credit in self.credits():
+            sum_of += credit.amount
+        return sum_of
 
     def add_fees(self):
         fee_details = payments.transaction_amounts(self.amount)
