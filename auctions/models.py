@@ -596,8 +596,8 @@ class Payout(Payment):
     @property
     def sum_credits(self):
         sum_of = 0
-        for fee in self.credits():
-            sum_of += fee.amount
+        for credit in self.credits():
+            sum_of += credit.amount
         return sum_of
 
     def add_fees(self):
