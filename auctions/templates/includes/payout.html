@@ -15,38 +15,23 @@
        {% else %}
 
            <h3>You need to tell us where to send your payout.</h3>
-
-           <li><a class="success button expanded" href="{% url 'bank' %}">Register a bank account</a></li>
+           <li><a class="success button expanded" href="{% url 'bank' %}?return_url={{ return_url }}">Register a bank account</a></li>
 
        {% endif %}
 
     {% elif claim.status == "Paid" %}
-      {% for payout in claim.successful_payouts.all %}
         <div class="payout row">
-          <div class="medium-6 columns">
-            <dl>
-              <dt>Provider</dt>
-              <dd>{{ payout.provider }}</dd>
-              <dt>Transaction ID</dt>
-              <dd>{{ payout.transaction_key }}</dd>
-            </dl>
-          </div>
           <div class="medium-6 columns">
             <table>
               <tbody>
-                <tr><td>Ask</td><td>{{ payout.less_discount  }}</td></tr>
-                {% for credit in payout.credits %}
-                  <tr><td>{{ credit.fee_type }}</td><td>{{ credit.amount }}</td></tr>
-                {% endfor %}
-                {% for fee in payout.fees %}
-                  <tr><td>{{ fee.fee_type }}</td><td>({{ fee.amount }})</td></tr>
-                {% endfor %}
-                <tr><td>Final payout</td><td>{{ payout.charge_amount }}</td></tr>
+                <tr><td>Ask</td><td>{{ claim.ask  }}</td></tr>
+                <tr><td>Credits </td><td>{{ claim.sum_credits }}</td></tr>
+                <tr><td>Fees</td><td>({{ claim.sum_fees }})</td></tr>
+                <tr><td>Final payout</td><td>{{ claim.sum_payouts }}</td></tr>
               </tbody>
             </table>
           </div>
         </div>
-      {% endfor %}
 
     {% elif claim.status == "Requested" %}
        <h3>Payout for your claim is on the way</h3>

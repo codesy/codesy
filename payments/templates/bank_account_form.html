@@ -2,6 +2,9 @@
     <legend>Bank Account Information</legend>
     <form id="stripe-form" stripe-account-type="bankAccount" role="form" class="form-horizontal">
         {% csrf_token %}
+        {%if return_url %}
+            <input type="hidden" id="return_url" value="{{return_url}}">
+        {% endif %}
         <input type="hidden" data-stripe="country" value="US">
         <input type="hidden" data-stripe="currency" value="USD">
         <input type="hidden" id="account_holder_type" data-stripe="account_holder_type" value="individual">

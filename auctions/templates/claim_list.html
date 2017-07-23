@@ -20,7 +20,7 @@
                 <tr>
                     <td><span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" title="{{ claim.created|date:"r" }}">{{ claim.created|date:"M j" }}</span></td>
                     <td><a href="{% url 'claim-status' claim.id %}">{{claim.issue.title}}</a></td>
-                    <td>{% for payout in claim.payouts.all %}{{ payout.charge_amount }}{% endfor %}</td>
+                    <td>{{ claim.sum_payouts }}</td>
                     <td>{{ claim.status }}</td>
                 </tr>
             {% endfor %}

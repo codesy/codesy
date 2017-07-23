@@ -1,3 +1,5 @@
+import urllib
+
 from django.views.generic import View, TemplateView
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse_lazy
@@ -32,7 +34,8 @@ def stripe_debug_values():
                 'state': 'OK',
                 'ssn_last_4': '0000',
                 'ssn_full': '000000000',
-                'business_name': 'Howdy Dammit LLC'
+                'business_name': 'Howdy Dammit LLC',
+                'business_tax_id': '000000000'
             },
             'card': {
                 'cc_number': '4111111111111111',
@@ -55,14 +58,6 @@ class CSRFExemptMixin(object):
         return super(CSRFExemptMixin, self).dispatch(*args, **kwargs)
 
 
-class UserHasAcceptedTermsMixin(UserPassesTestMixin):
-    login_url = reverse_lazy('terms')
-    redirect_field_name = None
-
-    def test_func(self):
-        return self.request.user.accepted_terms()
-
-
 class UserIdentityVerifiedMixin(UserPassesTestMixin):
     login_url = reverse_lazy('identity')
     redirect_field_name = None
@@ -77,9 +72,11 @@ class BankAccountTestsMixin(UserPassesTestMixin):
     redirect_field_name = None
 
     def test_func(self):
+        # settting the login_url determines redirect if test returns false
         if self.request.user.accepted_terms():
-            self.login_url = reverse_lazy('identity')
+            self.login_url = self.reverse_lazy_with_param('identity')
         else:
+            self.login_url = self.reverse_lazy_with_param('terms')
             return False
 
         user_account = self.request.user.account()
@@ -95,7 +92,23 @@ class CreditCardView(TemplateView):
         return ctx
 
 
-class BankAccountView(BankAccountTestsMixin, TemplateView):
+class CodesyRedirectView(TemplateView):
+
+    def reverse_lazy_with_param(self, template_name):
+        request_dict = self.request.GET or self.request.POST
+        return_param = urllib.urlencode(request_dict)
+        return '%s?%s' % (reverse_lazy(template_name), return_param)
+
+    def get_context_data(self, **kwargs):
+        ctx = super(TemplateView, self).get_context_data(**kwargs)
+        ctx['return_url'] = self.request.GET.get('return_url', '')
+        return ctx
+
+    def post(self, *args, **kwargs):
+        return redirect(self.reverse_lazy_with_param('bank'))
+
+
+class BankAccountView(BankAccountTestsMixin, CodesyRedirectView):
     template_name = 'bank_account_page.html'
 
     def get_context_data(self, **kwargs):
@@ -104,7 +117,7 @@ class BankAccountView(BankAccountTestsMixin, TemplateView):
         return ctx
 
 
-class AcceptTermsView(TemplateView):
+class AcceptTermsView(CodesyRedirectView):
     template_name = "accept_terms.html"
 
     def get_client_ip(self, request):
@@ -123,13 +136,14 @@ class AcceptTermsView(TemplateView):
             user.save()
         except User.DoesNotExist:
             pass
-        return redirect('bank')
+        return super(AcceptTermsView, self).post(**kwargs)
 
 
-class VerifyIdentityView(TemplateView):
+class VerifyIdentityView(CodesyRedirectView):
     template_name = 'verify_identity.html'
     identity_fields = ('first_name', 'last_name', 'ssn_last_4',
-                       'personal_id_number', 'type', 'business_name')
+                       'personal_id_number', 'type', 'business_name',
+                       'business_tax_id')
     address_fields = ('line1', 'city', 'postal_code', 'state', )
     dob_fields = ('day', 'month', 'year',)
 
@@ -162,7 +176,7 @@ class VerifyIdentityView(TemplateView):
 
             stripe_acct.save()
 
-        return redirect('bank')
+        return super(VerifyIdentityView, self).post(**kwargs)
 
 
 class StripeHookView(CSRFExemptMixin, View):
