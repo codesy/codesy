@@ -1,7 +1,7 @@
 // create codesy object for ga analytics
 window.codesy = {};
 
-$(window).load(function () {
+$(window).on("load",function () {
     // start foundation js
     $(document).foundation();
 
