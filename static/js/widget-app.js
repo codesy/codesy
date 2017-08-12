@@ -80,7 +80,7 @@ class WidgetApp {
             },
             contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
             })
-            .error(function(data, textStatus, jqXHR) {
+            .fail(function(data, textStatus, jqXHR) {
                 $.each(data.responseJSON, function(key, value) {
                     this.error(value)
                 });
