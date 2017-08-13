@@ -44,12 +44,19 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
             logger.error("Bid.objects.get exception: %s" % e)
             return None
 
+    def _issue_exists(self, url):
+        try:
+            return True
+        except:
+            return False
+
     def _url_path_only(self, url):
         return urldefrag(url)[0]
 
     def get_context_data(self, **kwargs):
         url = self._url_path_only(self.request.GET['url'])
         bid = self._get_bid(url)
+        active_issue = self._issue_exists(url)
         if bid is None:
             return dict({'bid': bid, 'url': url})
 
@@ -70,7 +77,7 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
                 self.template_name = 'addon/bid_closed.html'
             return dict({'claims': claims})
         else:
-            return dict({'bid': bid, 'url': url})
+            return dict({'bid': bid, 'url': url, 'active_issue': active_issue})
 
     def post(self, *args, **kwargs):
         """

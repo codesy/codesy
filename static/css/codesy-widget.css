@@ -63,6 +63,10 @@ body {
   font-size: 14px;
 }
 
+#widget-header-invert {
+    filter: invert(75%);
+}
+
 .codesy_confirm{
     font-size: 0.75em;
     margin: 0.25em

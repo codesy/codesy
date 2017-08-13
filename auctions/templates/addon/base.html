@@ -33,7 +33,9 @@
 
          <div id="widget-input-header">
              <a href="https://{{current_site.domain}}" target="_blank">
-                 <img id="widget-header-logo" src="{% static "img/codesy_300dpi_323x80.png" %}" width="161" height="40"></img>
+                <img id={% if active_issue %} "widget-header-invert"{% else %}"widget-header-logo"{% endif %}
+                    src="{% static "img/codesy_300dpi_323x80.png" %}" width="161" height="40">
+                </img>
              </a>
          </div>
 
