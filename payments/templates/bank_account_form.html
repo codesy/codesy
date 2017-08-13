@@ -11,11 +11,11 @@
 
         <div class="form-group">
             <label for="name">Name on the account</label>
-            <input type="text" class="form-control" data-stripe="account_holder_name" autocomplete="off" value="{{ STRIPE_DEBUG.bank.name}}" maxlength="16" />
+            <input type="text" class="form-control" data-stripe="account_holder_name" autocomplete="off" value="{{ STRIPE_DEBUG.bank.name}}" maxlength="50" />
             <label for="routing_number">Routing Number</label>
-            <input type="text" class="form-control" data-stripe="routing_number" autocomplete="off" value="{{ STRIPE_DEBUG.bank.routing_number}}" maxlength="16" />
+            <input type="text" class="form-control" data-stripe="routing_number" autocomplete="off" value="{{ STRIPE_DEBUG.bank.routing_number}}" maxlength="50" />
             <label for="acct-number">Account Number</label>
-            <input type="text" class="form-control" data-stripe="account_number" autocomplete="off" value="{{ STRIPE_DEBUG.bank.account_number}}" maxlength="16" />
+            <input type="text" class="form-control" data-stripe="account_number" autocomplete="off" value="{{ STRIPE_DEBUG.bank.account_number}}" maxlength="50" />
             <div class="row">
                 <div class="small-12 columns">
                     <label class="text-middle">Account Type</label>
