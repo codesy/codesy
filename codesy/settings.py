@@ -85,7 +85,7 @@ TEMPLATES = [
             'context_processors': [
                 'codesy.context_processors.conf_settings',
                 'codesy.context_processors.current_site',
-                'django.core.context_processors.request',
+                'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages'
             ]
