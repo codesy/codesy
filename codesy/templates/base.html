@@ -55,6 +55,13 @@
                     <a href="{% url 'identity' %}"> bank account.</a>
                 </p>
             </div>
+        {% elif message.message == "stripe_account_error" %}
+            <div class="callout warning expanded" data-closable>
+                <button class="close-button" data-close>&times;</button>
+                <p class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                There is an error with your Stripe account. Please <a href="https://github.com/codesy/codesy/issues/new">contact codesy</a> for support.
+                </p>
+            </div>
         {% else %}
             <div class="callout warning expanded" data-closable>
                <button class="close-button" data-close>&times;</button>
