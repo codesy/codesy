@@ -76,17 +76,22 @@ MIDDLEWARE_CLASSES = (
 )
 
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'codesy.context_processors.conf_settings',
-    'codesy.context_processors.current_site',
-    'django.core.context_processors.request',
-    'django.contrib.auth.context_processors.auth',
-    'django.contrib.messages.context_processors.messages',
-)
-
-TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'codesy/templates'),
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'DIRS': [os.path.join(BASE_DIR, 'codesy/templates'), ],
+        'OPTIONS': {
+            'context_processors': [
+                'codesy.context_processors.conf_settings',
+                'codesy.context_processors.current_site',
+                'django.core.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages'
+            ]
+        }
+    }
+]
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
