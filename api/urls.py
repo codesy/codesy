@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url, include
+from django.conf.urls import url, include
 
 from rest_framework import routers
 
@@ -14,11 +14,10 @@ router.register(r'users', views.UserViewSet)
 router.register(r'payouts', views.UserViewSet)
 
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^', include(router.urls)),
     url(
         r'^api-auth/',
         include('rest_framework.urls', namespace='rest_framework')
     )
-)
+]
