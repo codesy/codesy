@@ -88,12 +88,11 @@ class WidgetApp {
         function append(msg){
             let $div= $(`
                 <div class="callout warning expanded" data-closable>
-                    <button class="close-button" data-close>&times;</button>
-                    <p class="alert alert-error">
-                    </p>
+                    <button id="close-button" class="close-button" data-close>&times;</button>
+                    <p class="alert"></p>
                 </div>`)
             $div.find('p').text(msg)
-            $form.prepend($div)
+            $form.parent().prepend($div)
         }
         return function (data, textStatus, jqXHR){
             data.responseJSON.evidence.forEach((e)=>append(e))
