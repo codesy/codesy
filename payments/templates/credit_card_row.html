@@ -1,0 +1,35 @@
+{% load staticfiles %}
+{% block content %}
+    <div class="row">
+        <div class="column medium-4 medium-offset-4 text-left">
+            {% if request.user.stripe_customer %}
+                We saved your <b> {{request.user.card_brand}}</b> card ending in <b> {{ request.user.card_last4}} </b> with Stripe.
+
+                <div class="reveal" id="credit_card_form" data-reveal>
+
+                    {% include "credit_card_form.html" %}
+
+                    <button class="close-button" data-close aria-label="Close modal" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <p><a data-open="credit_card_form">Change this card.</a></p>
+
+            {% else %}
+                You need to register a credit card to be able to make offers.
+                We use Stripe to handle this information and it is never stored in codesy's database.
+
+                {% include "credit_card_form.html" %}
+
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="column medium-4 medium-offset-4 text-left">
+            <a href="https://stripe.com" target="_blank">
+                <img src="{% static 'img/stripe/powered_by_stripe.png' %}" alt="" />
+            </a>
+        </div>
+    </div>
+{% endblock %}
