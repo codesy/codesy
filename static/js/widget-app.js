@@ -75,32 +75,28 @@ class WidgetApp {
             method: form.attr("method"),
             data: form.serialize(),
             processData: false,
-            headers: {
-              'X-CSRFToken': csrf_token
-            },
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
-            })
-            .fail(function(data, textStatus, jqXHR) {
-                $.each(data.responseJSON, function(key, value) {
-                    this.error(value)
-                });
-            })
-            .done(function(data, textStatus, jqXHR) {
-                window.location.reload()
-            })
+            headers: {'X-CSRFToken': csrf_token},
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            success: window.location.reload
+        })
+        .fail(this.ajax_fail(this.$form))
     }
     reload() {
         window.location.reload()
     }
-    error(message){
-        $div= $(`
-            <div class="callout warning expanded" data-closable>
-                <button class="close-button" data-close>&times;</button>
-                <p class="alert alert-error">
-                </p>
-            </div>`)
-        $div.find('p').text(message)
-        return $div
+    ajax_fail($form) {
+        function append(msg){
+            let $div= $(`
+                <div class="callout warning expanded" data-closable>
+                    <button id="close-button" class="close-button" data-close>&times;</button>
+                    <p class="alert"></p>
+                </div>`)
+            $div.find('p').text(msg)
+            $form.parent().prepend($div)
+        }
+        return function (data, textStatus, jqXHR){
+            data.responseJSON.evidence.forEach((e)=>append(e))
+        }
     }
 }//end class
 
