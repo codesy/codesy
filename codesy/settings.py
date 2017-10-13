@@ -76,17 +76,22 @@ MIDDLEWARE_CLASSES = (
 )
 
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'codesy.context_processors.conf_settings',
-    'codesy.context_processors.current_site',
-    'django.core.context_processors.request',
-    'django.contrib.auth.context_processors.auth',
-    'django.contrib.messages.context_processors.messages',
-)
-
-TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'codesy/templates'),
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'DIRS': [os.path.join(BASE_DIR, 'codesy/templates'), ],
+        'OPTIONS': {
+            'context_processors': [
+                'codesy.context_processors.conf_settings',
+                'codesy.context_processors.current_site',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages'
+            ]
+        }
+    }
+]
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
@@ -190,6 +195,9 @@ USE_TZ = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_HOST = config('DJANGO_SECURE_SSL_HOST', None)
 SECURE_SSL_REDIRECT = config('DJANGO_SECURE_SSL_REDIRECT', False)
+SECURE_HSTS_SECONDS = config('DJANGO_SECURE_HSTS_SECONDS', None)
+SECURE_CONTENT_TYPE_NOSNIFF = config('DJANGO_SECURE_CONTENT_TYPE_NOSNIFF',
+                                     False)
 
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
