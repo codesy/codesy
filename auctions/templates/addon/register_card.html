@@ -3,11 +3,14 @@
 {% load staticfiles %}
 
 {% block widget_content %}
-    Thanks for installing the codesy addon. You need to register a credit card to start bidding.
-
-    <a class="button success expanded"
-    href="{% url 'card' %}"
-    target="_blank">
-    Save a Credit Card &raquo;</a>
-
+    <div id="widget-input">
+        <p>
+            Thanks for installing the codesy addon. You need to register a credit card to start bidding.
+        </p>
+        <a class="button success expanded"
+            href="{% url 'card' %}"
+            target="_blank">
+            Save a Credit Card &raquo;
+        </a>
+    </div>
 {% endblock %}
