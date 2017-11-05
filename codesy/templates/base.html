@@ -27,9 +27,10 @@
                     <li>
                     <a href="#"><img id="top-bar-gravatar" src="{{ user.get_gravatar_url }}">{{ user.username }}</a>
                         <ul class="menu">
-                            <li><a href="/bid-list">Bids</a></li>
-                            <li><a href="/claim-list">Claims</a></li>
-                            <li><a href="/vote-list">Votes</a></li>
+                            <li><a href="/activity-list">Active Issues</a></li>
+                            <li><a href="/bid-list">Your Bids</a></li>
+                            <li><a href="/claim-list">Your Claims</a></li>
+                            <li><a href="/vote-list">Your Votes</a></li>
                             <hr/>
                             <li><a href="{% url 'card' %}">Credit Card</a></li>
                             <li><a href="{% url 'bank' %}">Bank Account</a></li>

@@ -1,6 +1,7 @@
 from django.views.generic import TemplateView
 from django.conf import settings
 
+from auctions.models import Bid, Claim, Vote
 
 class LegalInfo(TemplateView):
     template_name = 'legal.html'
@@ -16,6 +17,7 @@ class Home(TemplateView):
                 'HTTP_USER_AGENT' in self.request.META):
             browser = self.get_browser()
         ctx['browser'] = browser
+        ctx['bids'] = Bid.objects.order_by('-modified')[:3]
         return ctx
 
     def get_browser(self):

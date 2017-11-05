@@ -209,3 +209,17 @@ class VoteList(LoginRequiredMixin, TemplateView):
             votes = []
 
         return dict({'votes': votes})
+
+
+class ActivityList(LoginRequiredMixin, TemplateView):
+    """List of all bids
+    """
+    template_name = 'activity_list.html'
+
+    def get_context_data(self, **kwargs):
+        try:
+            bids = (Bid.objects.order_by('-modified'))
+        except:
+            bids = []
+
+        return dict({'bids': bids}, )

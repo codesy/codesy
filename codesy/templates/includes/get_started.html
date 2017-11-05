@@ -40,11 +40,29 @@
 
         {% if request.user.stripe_customer%}
             <h3>You are ready to bid</h3>
-            <p>Try checking out GitHub issues with the most +1 votes.</p>
-            <a class="button gh-button track-btn" data-category="top+1" data-label="Created by You" href="https://github.com/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+author%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Created by You</a>
-            <a class="button gh-button track-btn" data-category="top+1" data-label="Assigned to You" href="https://github.com/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+assignee%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Assigned to You</a>
-            <a class="button gh-button track-btn" data-category="top+1" data-label="Mentioning You" href="https://github.com/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+mentions%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Mentioning You</a><br/>
-            <a class="button gh-button track-btn" data-category="top+1" data-label="Global" href="https://github.com/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+"><i class="fi-social fi-social-github medium"></i> Global Top +1 Issues</a><br/>
+            <p>Check out the most recent codesy activity:</p>
+
+            <div class="row">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="100">Created</th>
+                        <th>Issue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bid in bids %}
+                    <tr>
+                        <td>
+                            <span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" title="{{ bid.created|date:"c" }}">{{ bid.created|date:"M j" }}</span></td>
+                        <td><a href="{{bid.url}}"{% if target %} target="{{ target }}"{% endif %}>{{bid.issue.title}}</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+
+            <p>Go here to see the full list <a href="/activity-list">Active Issues</a></p>
         {% else %}
             <h3>Browser Extension Installed</h3>
             <p>Add credit card.</p>
