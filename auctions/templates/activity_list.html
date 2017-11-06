@@ -16,9 +16,8 @@
         </thead>
         <tbody>
             {% for bid in bids %}
-            <tr>
-                <td>
-                    <span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" title="{{ bid.created|date:"c" }}">{{ bid.created|date:"M j" }}</span></td>
+            <tr c>
+                <td>{{ bid.activity }}</td>
                 <td><a href="{{bid.url}}"{% if target %} target="{{ target }}"{% endif %}>{{bid.issue.title}}</a></td>
             </tr>
             {% endfor %}

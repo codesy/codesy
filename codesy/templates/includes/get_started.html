@@ -46,23 +46,24 @@
             <table>
                 <thead>
                     <tr>
-                        <th width="100">Created</th>
+                        <th width="100">Activity</th>
                         <th>Issue</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for bid in bids %}
                     <tr>
-                        <td>
-                            <span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" title="{{ bid.created|date:"c" }}">{{ bid.created|date:"M j" }}</span></td>
-                        <td><a href="{{bid.url}}"{% if target %} target="{{ target }}"{% endif %}>{{bid.issue.title}}</a></td>
+                        <td>{{ bid.activity }}</td>
+                        <td><p class="text-left">
+                            <a href="{{bid.url}}"{% if target %} target="{{ target }}"{% endif %}>{{bid.issue.title}}</a></td>
+                        </p>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
             </div>
 
-            <p>Go here to see the full list <a href="/activity-list">Active Issues</a></p>
+            <p>Go here to see the full list of <a href="/activity-list">Active Issues</a></p>
         {% else %}
             <h3>Browser Extension Installed</h3>
             <p>Add credit card.</p>
