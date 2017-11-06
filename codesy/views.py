@@ -1,7 +1,8 @@
 from django.views.generic import TemplateView
 from django.conf import settings
 
-from auctions.models import Bid, Claim, Vote
+from auctions.models import Bid
+
 
 class LegalInfo(TemplateView):
     template_name = 'legal.html'
