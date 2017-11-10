@@ -1,11 +1,15 @@
-import json
 from decimal import Decimal
-from django.utils import timezone
+import logging
+import json
+import sys
+
+import stripe
 
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
-import stripe
+logger = logging.getLogger(__name__)
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
@@ -171,9 +175,11 @@ webhooks['balance.available'] = BalanceAvailableProcessor
 class ChargeUpdatedProcessor(WebHookProcessor):
     def process(self):
         try:
-            pass
+            logger.error("Unhandled charge.updated web-hook call")
         except:
-            pass
+            e = sys.exc_info()[0]
+            logger.error("exception in unhandled charge.updated web-hook call:"
+                         "%s" % e)
 
 
 webhooks['charge.updated'] = ChargeUpdatedProcessor
@@ -182,10 +188,11 @@ webhooks['charge.updated'] = ChargeUpdatedProcessor
 class PaymentCreatedProcessor(WebHookProcessor):
     def process(self):
         try:
-            print "a payment was created"
-            pass
+            logger.error("Unhandled payment.created webhook call")
         except:
-            pass
+            e = sys.exc_info()[0]
+            logger.error("exception in unhandled payment.created webhook call:"
+                         "%s" % e)
 
 
 webhooks['payment.created'] = PaymentCreatedProcessor

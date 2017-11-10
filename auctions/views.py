@@ -1,5 +1,7 @@
+import logging
 from decimal import Decimal
 from urlparse import urldefrag
+import sys
 
 from django.shortcuts import redirect, get_object_or_404
 from django.core.urlresolvers import reverse
@@ -9,6 +11,8 @@ from auctions.models import Bid, Claim, Vote
 
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
+logger = logging.getLogger(__name__)
 
 
 class AddonLogin (TemplateView):
@@ -36,6 +40,8 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
         try:
             return Bid.objects.get(user=self.request.user, url=url)
         except:
+            e = sys.exc_info()[0]
+            logger.error("Bid.objects.get exception: %s" % e)
             return None
 
     def _url_path_only(self, url):
@@ -114,6 +120,8 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
         try:
             vote = Vote.objects.get(claim=claim, user=self.request.user)
         except:
+            e = sys.exc_info()[0]
+            logger.error("Vote.objects.get exception: %s" % e)
             pass
         context = dict({
             'return_url': self.request.path,
@@ -158,6 +166,8 @@ class BidList(LoginRequiredMixin, TemplateView):
             bids = (Bid.objects.filter(user=self.request.user)
                     .order_by('-created'))
         except:
+            e = sys.exc_info()[0]
+            logger.error("Bid.objects.filter exception: %s" % e)
             bids = []
 
         return dict({'bids': bids}, )
@@ -175,6 +185,9 @@ class ClaimList(LoginRequiredMixin, TemplateView):
             voted_claims = (Claim.objects.voted_on_by_user(self.request.user)
                             .order_by('-created'))
         except:
+            e = sys.exc_info()[0]
+            logger.error("Claim.objects.filter|voted_on_by_user exception: "
+                         "%s" % e)
             claims = []
             voted_claims = []
 
@@ -191,6 +204,8 @@ class VoteList(LoginRequiredMixin, TemplateView):
             votes = (Vote.objects.filter(user=self.request.user)
                      .order_by('-created'))
         except:
+            e = sys.exc_info()[0]
+            logger.error("Vote.objects.filter exception: %s" % e)
             votes = []
 
         return dict({'votes': votes})

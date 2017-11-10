@@ -1,3 +1,6 @@
+import logging
+import sys
+
 import requests
 
 from django.contrib.auth.models import AbstractUser
@@ -8,6 +11,8 @@ from allauth.account.signals import user_signed_up
 from payments.models import StripeAccount, get_customer_token
 
 EMAIL_URL = 'https://api.github.com/user/emails'
+
+logger = logging.getLogger(__name__)
 
 
 class User(AbstractUser):
@@ -34,6 +39,8 @@ class User(AbstractUser):
             codesy_account = StripeAccount.objects.get(user=self)
             return codesy_account
         except:
+            e = sys.exc_info()[0]
+            logger.error("StripeAccount.objects.get exception: %s" % e)
             return StripeAccount(user=self)
 
     def save(self, *args, **kwargs):
