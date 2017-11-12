@@ -6,8 +6,7 @@
 Welcome
 =======
 
-`codesy <http://codesy.io>`_ is a pay-what-you-want market for the open source community to encourage
-coders to fix important bugs.
+`codesy <http://codesy.io>`_ is a platform for fixing and funding open source software..
 
 The code for codesy's API backend combines:
 
