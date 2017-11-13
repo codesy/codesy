@@ -39,7 +39,8 @@
         <div id="payment-errors"></div>
 
         {% if request.user.stripe_customer%}
-            <h4 class="text-left" >You are ready to start bidding.  You can can bid on your own github issues or check out some of the latest activity on codesy:</h4>
+            <h4 class="text-center" >You are ready to start bidding.</h4>
+            <p>You can can bid on <a href="https://github.com/issues" target="_blank">your own github issues</a> or check out some of the latest activity on codesy:</p>
             <div class="row">
             <table>
                 <thead>
@@ -61,7 +62,7 @@
             </table>
             </div>
 
-            <p>Go here to see the full list of <a href="/activity-list">activity.</a></p>
+            <p><a href="/activity-list">See all codesy activity</a></p>
         {% else %}
             <h3>Browser Extension Installed</h3>
             <p>Add credit card.</p>
