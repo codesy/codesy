@@ -1,4 +1,6 @@
+import logging
 import json
+import sys
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
@@ -11,6 +13,7 @@ import stripe
 
 from ...models import StripeAccount
 
+logger = logging.getLogger(__name__)
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 email_template = get_template('../templates/email/need_validation.html')
@@ -38,4 +41,5 @@ class Command(BaseCommand):
                             [account.user.email]
                         )
             except:
-                pass
+                e = sys.exc_info()[0]
+                logger.error("Error during check_validation: %s" % e)
