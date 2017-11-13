@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load auctions_extras %}
+{% load staticfiles %}
+
+{% block content %}
+    <div class="row">
+        <h2>Recent Activity</h2>
+    </div>
+    <div class="row">
+    <table>
+        <thead>
+            <tr>
+                <th width="100">Activity</th>
+                <th>Issue</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bid in bids %}
+            <tr c>
+                <td>{{ bid.activity }}</td>
+                <td><a href="{{bid.url}}"{% if target %} target="{{ target }}"{% endif %}>{{bid.issue.title}}</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+{% endblock %}
+{% block scripts %}
+   {% if request.user.is_authenticated %}
+      <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+   {% endif %}
+{% endblock %}

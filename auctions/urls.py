@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^bid-list', views.BidList.as_view()),
     url(r'^claim-list', views.ClaimList.as_view()),
     url(r'^vote-list', views.VoteList.as_view()),
+    url(r'^activity-list', views.ActivityList.as_view()),
 ]

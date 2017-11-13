@@ -6,7 +6,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <meta name="description" content="{% block description %}codesy is a pay-what-you-want market for the open source community where we can tip each other to fix important bugs.{% endblock %}">
+        <meta name="description" content="{% block description %}Codesy is a platform for fixing and funding open source software.{% endblock %}">
         <title>{% if request.user.is_authenticated %}{{ request.user.username }} | {% endif %}codesy.io</title>
         <link rel="shortcut icon" href="{% static "img/favicon.png" %}">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/foundation/6.2.4/foundation.min.css">
@@ -27,9 +27,10 @@
                     <li>
                     <a href="#"><img id="top-bar-gravatar" src="{{ user.get_gravatar_url }}">{{ user.username }}</a>
                         <ul class="menu">
-                            <li><a href="/bid-list">Bids</a></li>
-                            <li><a href="/claim-list">Claims</a></li>
-                            <li><a href="/vote-list">Votes</a></li>
+                            <li><a href="/activity-list">Active Issues</a></li>
+                            <li><a href="/bid-list">Your Bids</a></li>
+                            <li><a href="/claim-list">Your Claims</a></li>
+                            <li><a href="/vote-list">Your Votes</a></li>
                             <hr/>
                             <li><a href="{% url 'card' %}">Credit Card</a></li>
                             <li><a href="{% url 'bank' %}">Bank Account</a></li>
