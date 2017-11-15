@@ -5,6 +5,7 @@ class WidgetApp {
         $form.submit(this.submit.bind(this))
         $form.find('button#ShowSubmit').click(this.show.bind(this))
         $form.find('input#cancelSubmit').click(this.reload.bind(this))
+
     }
     show(e) {
         e.preventDefault()
@@ -21,22 +22,22 @@ class WidgetApp {
         var new_value = $input.val()
         var diff = new_value - original_value
         var input_type = $input.attr('id')
-        const $message = $(`<label id="${input_type}-confirm" class="callout small codesy_confirm" ></label>`)
         var validated = true
         var offer_notice = ''
         var direction = ''
-        var introduction = ''
+
+        const $message = $(`<label id="${input_type}-confirm" class="callout small codesy_confirm" ></label>`)
 
         this.$form.parent().prepend($message)
 
         if (new_value>0 && new_value<1){
-            $message.text('Sorry, bids cannot be less than $1.')
+            $message.text(`Sorry, your ${input_type} cannot be less than $1.`)
             $input.val(original_value)
             return false
         }
 
         if (new_value<0){
-            $message.text('Sorry, bids cannot be negative.')
+            $message.text(`Sorry, your ${input_type} cannot be negative.`)
             $input.val(original_value)
             return false
         }
@@ -51,19 +52,17 @@ class WidgetApp {
             direction = `decreasing`
         }
 
-        introduction = `You are ${direction} your ${input_type}.`
-
         if (input_type === "offer"){
             if (diff < 0) {
-                introduction =''
-                offer_notice = "Sorry, you can't decrease your offer."
+                offer_notice = "Sorry, you can't decrease your funding."
                 $input.val(original_value)
                 validated = false
             } else if (diff>0){
                 offer_notice =`Your credit card will be authorized for $${new_value}.`
             }
         }
-        $message.text([introduction,offer_notice].join(' '))
+        $message.text(`You are ${direction} your ${input_type} amount. ${offer_notice}`)
+
         return validated
     }
     submit(e){

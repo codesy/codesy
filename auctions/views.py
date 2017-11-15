@@ -30,11 +30,7 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
     template_name = "addon/bidders.html"
 
     def test_func(self):
-        if self.request.user.is_active:
-            if not self.request.user.stripe_customer:
-                self.template_name = "addon/register_card.html"
-            return True
-        return False
+        return self.request.user.is_active
 
     def _get_bid(self, url):
         try:
@@ -83,6 +79,7 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
         """
         Save changes to bid and get payment for offer
         """
+
         url = self._url_path_only(self.request.POST['url'])
         ask_amount = self.request.POST['ask']
         offer_amount = self.request.POST['offer']
