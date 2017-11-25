@@ -34,9 +34,19 @@ class GithubQuery(object):
         request = requests.post(
             GITHUB_ROOT, json=query_with_arg, headers=headers)
         if request.status_code == 200:
-            return gql_object(request.json()['data'])
+            response = request.json()
+            if 'errors' in response.keys():
+                for error in response['errors']:
+                    raise Exception("""
+                        Error: {} At: {}
+                    """.format(error['message'], error['locations'])
+                    )
+            else:
+                return gql_object(response['data'])
         else:
-            raise Exception("Query failed to run by returning code of {}. {}".format(request.status_code, query))
+            raise Exception("""
+                Query failed to run by returning code of {}. {}
+            """.format(request.status_code, self.query_string))
 
 
 user_info = """
@@ -50,6 +60,10 @@ query{
         node{
           id
           name
+          primaryLanguage{
+            id
+            name
+          }
           languages(first:5){
             edges{
                 node{
@@ -65,6 +79,10 @@ query{
         node {
           id
           name
+          primaryLanguage{
+            id
+            name
+          }
           languages (first:5) {
             edges {
               node {
@@ -80,6 +98,10 @@ query{
         node {
           id
           name
+          primaryLanguage{
+            id
+            name
+          }
           languages (first:5) {
             edges {
               node {
