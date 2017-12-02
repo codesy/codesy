@@ -24,12 +24,11 @@ dt {
 }
 
 .home-tagline {
-  text-transform: uppercase;
-  text-align: center;
+  text-align: left;
 }
 
 .home-section {
-  padding-top: 6rem;
+  padding-top: 1rem;
   padding-bottom: 6rem;
 }
 

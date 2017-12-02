@@ -15,6 +15,16 @@ body {
   border-radius: 3px;
 }
 
+.widget-icon {
+    float: left;
+    margin-left: -64px;
+    border-radius: 3px;
+    color: green;
+    font-size:56px;
+    -webkit-mask-image: -webkit-radial-gradient(10% 40%, circle cover, rgba(0,0,0,.3), rgba(0,0,0,7));
+    text-shadow: 3px 2px 4px rgba(0,0,0,.6);
+}
+
 #widget-input-header::before, #widget-input-header::after {
   position: absolute;
   top: 16px;
