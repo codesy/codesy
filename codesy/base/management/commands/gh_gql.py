@@ -29,8 +29,10 @@ class GithubQuery(object):
     def __init__(self, gql_query):
         self.query_string = gql_query
 
-    def get(self, arg):
-        query_with_arg = {'query': self.query_string % arg}
+    def get(self, username):
+        query_with_arg = {
+            'query': self.query_string % username
+        }
         request = requests.post(
             GITHUB_ROOT, json=query_with_arg, headers=headers)
         if request.status_code == 200:
@@ -55,7 +57,7 @@ query{
     id
     name
     email
-    starredRepositories(last:20){
+    starredRepositories(last:100){
       edges{
         node{
           id
@@ -74,7 +76,7 @@ query{
         }
       }
     }
-    contributedRepositories (last:20) {
+    contributedRepositories (last:100) {
       edges {
         node {
           id
@@ -93,7 +95,7 @@ query{
         }
       }
     }
-    repositories (last:20) {
+    repositories (last:100) {
       edges {
         node {
           id
