@@ -40,25 +40,30 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
             logger.error("Bid.objects.get exception: %s" % e)
             return None
 
-    def _issue_exists(self, url):
-        try:
-            return True
-        except:
-            return False
+    def _do_any_bids_exist(self, url):
+        return (
+            Bid.objects
+            .filter(url=url)
+            .exclude(user=self.request.user)
+            .count() > 0
+        )
 
     def _url_path_only(self, url):
         return urldefrag(url)[0]
 
     def get_context_data(self, **kwargs):
+        ctx = {}
         url = self._url_path_only(self.request.GET['url'])
         bid = self._get_bid(url)
-        active_issue = self._issue_exists(url)
+        any_bids_exist = self._do_any_bids_exist(url)
+        ctx.update({'url': url, 'bid': bid, 'active_issue': any_bids_exist})
         if bid is None:
-            return dict({'bid': bid, 'url': url})
+            return dict(ctx)
 
         # rejected claims should be ignored so new claims can be made
         claims = (
-            Claim.objects.filter(issue=bid.issue).exclude(status='Rejected'))
+            Claim.objects.filter(issue=bid.issue).exclude(status='Rejected')
+        )
 
         users_claims = claims.filter(
             user=self.request.user).order_by('modified')
@@ -73,7 +78,7 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
                 self.template_name = 'addon/bid_closed.html'
             return dict({'claims': claims})
         else:
-            return dict({'bid': bid, 'url': url, 'active_issue': active_issue})
+            return dict(ctx)
 
     def post(self, *args, **kwargs):
         """
