@@ -13,10 +13,9 @@ logger = logging.getLogger(__name__)
 
 
 def neo4j_merge_user(user, session):
-    statement = """
-        MERGE (u:User {id:{id}})
-        SET u.name={name}, u.email={email}, u.login={login}
-    """
+    # neo4j statement requires a name parameter; set if empty
+    user.setdefault('name', '')
+    statement = "MERGE (u:User {name: {name}, id: {id}, email: {email}})"
     session.run(statement, user)
     session.sync()
 
@@ -69,7 +68,9 @@ class Command(BaseCommand):
 
         # TODO: Figure out a way to not delete the whole graph db every time
         session.run("MATCH (n) DETACH DELETE n")
-        test_logins = ['jgmize', 'aprilchomp', 'jdungan', 'jsatt', 'mrmakeit',
+        test_users = User.objects.all().values_list('username')
+
+        test_users = ['aprilchomp', 'jdungan', 'jsatt', 'mrmakeit', 'jgmize',
                       'groovecoder']
 
         repo_types = {
@@ -79,6 +80,9 @@ class Command(BaseCommand):
         }
 
         for username in test_users:
+            if (username == (u'admin',)):
+                continue
+
             try:
                 gh_user = GithubUser.get(login=username)['user']
                 neo4j_merge_user(gh_user, session)
