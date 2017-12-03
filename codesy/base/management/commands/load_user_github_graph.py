@@ -1,3 +1,5 @@
+import logging
+
 from neo4j.v1 import GraphDatabase, basic_auth
 
 from django.core.management.base import BaseCommand
@@ -5,6 +7,9 @@ from django.conf import settings
 
 from ...models import User
 from gh_gql import User as GithubUser, RepoList
+
+
+logger = logging.getLogger(__name__)
 
 
 def neo4j_merge_user(user, session):
@@ -66,25 +71,28 @@ class Command(BaseCommand):
         session.run("MATCH (n) DETACH DELETE n")
         test_logins = ['jgmize', 'aprilchomp', 'jdungan', 'jsatt', 'mrmakeit',
                       'groovecoder']
-        repo_types = {
-            'repositories': 'OWNER',
-            'starredRepositories': 'STARRED',
-            'contributedRepositories': "CONTRIBUTED"
-        }
-        for username in test_logins:
-            gh_user = GithubUser.get(login=username)['user']
-            neo4j_merge_user(gh_user, session)
-            for repo_type in repo_types.keys():
-                x = 0
-                repos = RepoList(type=repo_type, login=username)
-                for repo in repos:
-                    repo_values = repo['node']
-                    x += 1
-                    neo4j_merge_repo(repo_values, session)
-                    neo4j_match_repo_relationship(gh_user['id'], repo_values['id'], repo_types[repo_type], session)
-                print "%s %s : %s " % (username, repo_type, x)
 
-            # neo4j_merge_languages(gh_user, 'contributedRepositories', session)
+        repo_types = {
+          'repositories': 'OWNER',
+          'starredRepositories': 'STARRED',
+          'contributedRepositories': "CONTRIBUTED"
+        }
+
+        for username in test_users:
+            try:
+                gh_user = GithubUser.get(login=username)['user']
+                neo4j_merge_user(gh_user, session)
+                for repo_type in repo_types.keys():
+                    x = 0
+                    repos = RepoList(type=repo_type, login=username)
+                    for repo in repos:
+                        repo_values = repo['node']
+                        x += 1
+                        neo4j_merge_repo(repo_values, session)
+                        neo4j_match_repo_relationship(gh_user['id'], repo_values['id'], repo_types[repo_type], session)
+                    print "%s %s : %s " % (username, repo_type, x)
+            except Exception as e:
+                logger.error("load_user_github_graph, error: %s" % e)
 
         session.close()
 
