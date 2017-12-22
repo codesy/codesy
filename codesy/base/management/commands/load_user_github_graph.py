@@ -4,11 +4,14 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 
 from ...models import User
-from gh_gql import user as github_user
+from gh_gql import User as GithubUser, RepoList
 
 
 def neo4j_merge_user(user, session):
-    statement = "MERGE (u:User {name: {name}, id: {id}, email: {email}})"
+    statement = """
+        MERGE (u:User {id:{id}})
+        SET u.name={name}, u.email={email}, u.login={login}
+    """
     session.run(statement, user)
     session.sync()
 
@@ -16,25 +19,23 @@ def neo4j_merge_user(user, session):
 def neo4j_merge_repo(repo, session):
     statement = """
       MERGE (r:Repo {id:{id}})
-      SET r.name={name}, r.primaryLanguage={language}
+      SET r.name={name}, r.primaryLanguage={language}, r.owner={owner}
     """
     if 'primaryLanguage' in repo.keys():
-        language = repo['primaryLanguage']['name']
+        language = repo['primaryLanguage']['name'] if repo['primaryLanguage'] else ""
     else:
         language = u'none'
     session.run(statement, repo, language=language)
     session.sync()
 
 
-def neo4j_merge_repo_list(user, repos, relationship, session):
-    for repo in user[repos]:
-        neo4j_merge_repo(repo, session)
-        statement = """
-           MATCH (u:User),(r:Repo) WHERE u.id ='{user}' AND r.id='{repo}'
-           CREATE (u)-[:{relation}]->(r)
-        """.format(user=user['id'], repo=repo['id'], relation=relationship)
-        session.run(statement)
-        session.sync()
+def neo4j_match_repo_relationship(user_id, repo_id, relationship, session):
+    statement = """
+       MATCH (u:User),(r:Repo) WHERE u.id ='{user}' AND r.id='{repo}'
+       CREATE (u)-[:{relation}]->(r)
+    """.format(user=user_id, repo=repo_id, relation=relationship)
+    session.run(statement)
+    session.sync()
 
 
 def neo4j_merge_languages(user, repos, session):
@@ -63,18 +64,30 @@ class Command(BaseCommand):
 
         # TODO: Figure out a way to not delete the whole graph db every time
         session.run("MATCH (n) DETACH DELETE n")
-        test_users = ['aprilchomp', 'jdungan', 'jsatt', 'mrmakeit', 'jgmize',
+        test_logins = ['jgmize', 'aprilchomp', 'jdungan', 'jsatt', 'mrmakeit',
                       'groovecoder']
+        repo_types = {
+            'repositories': 'OWNER',
+            'starredRepositories': 'STARRED',
+            'contributedRepositories': "CONTRIBUTED"
+        }
+        for username in test_logins:
+            gh_user = GithubUser.get(login=username)['user']
+            neo4j_merge_user(gh_user, session)
+            for repo_type in repo_types.keys():
+                x = 0
+                repos = RepoList(type=repo_type, login=username)
+                for repo in repos:
+                    repo_values = repo['node']
+                    x += 1
+                    neo4j_merge_repo(repo_values, session)
+                    neo4j_match_repo_relationship(gh_user['id'], repo_values['id'], repo_types[repo_type], session)
+                print "%s %s : %s " % (username, repo_type, x)
 
-        for username in test_users:
-            gh_user = github_user.get(username)['user']
-            neo4j_user = neo4j_merge_user(gh_user, session)
-            neo4j_merge_repo_list(gh_user, u'repositories', u'OWNER', session)
-            neo4j_merge_repo_list(gh_user, 'starredRepositories', 'STARRED', session)
-            neo4j_merge_repo_list(gh_user, 'contributedRepositories', 'CONTRIBUTED', session)
             # neo4j_merge_languages(gh_user, 'contributedRepositories', session)
 
         session.close()
+
 
 '''
 Recommend repos to a user: i.e., repos that have been starred the most by the users who share stars with this user:
