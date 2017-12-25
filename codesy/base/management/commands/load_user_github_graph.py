@@ -8,9 +8,9 @@ from django.conf import settings
 from ...models import User
 from gh_gql import User as GithubUser, RepoList
 
+logging.basicConfig()
 
 logger = logging.getLogger(__name__)
-
 
 def neo4j_merge_user(user, session):
     # neo4j statement requires a name parameter; set if empty
@@ -21,15 +21,17 @@ def neo4j_merge_user(user, session):
 
 
 def neo4j_merge_repo(repo, session):
-    statement = """
-      MERGE (r:Repo {id:{id}})
-      SET r.name={name}, r.primaryLanguage={language}, r.owner={owner}
+    template = """
+      MERGE (r:Repo {{id:'{}'}})
+      SET r.name='{}', r.primaryLanguage='{}', r.owner='{}'
     """
     if 'primaryLanguage' in repo.keys():
         language = repo['primaryLanguage']['name'] if repo['primaryLanguage'] else ""
     else:
         language = u'none'
-    session.run(statement, repo, language=language)
+    statement = template.format(repo['id'], repo['name'], language, repo['owner'])
+    # print statement
+    session.run(statement)
     session.sync()
 
 
