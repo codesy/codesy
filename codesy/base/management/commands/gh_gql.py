@@ -1,29 +1,10 @@
 import requests
-import json
 
 from django.conf import settings
 
 GITHUB_ROOT = 'https://api.github.com/graphql'
 GITHUB_API_KEY = settings.GITHUB_API_KEY
 headers = {"Authorization": 'bearer %s' % GITHUB_API_KEY}
-
-
-def response_obj(data):
-    data_type = type(data)
-    if data_type == dict:
-        new_obj = {}
-        for key in data.keys():
-            if key == 'node' or key == 'edges':
-                return response_obj(data[key])
-            else:
-                new_obj[key] = response_obj(data[key])
-        return new_obj
-    if data_type == list:
-        new_list = []
-        for node in data:
-            new_list.append(response_obj(node))
-        return new_list
-    return data
 
 
 class GithubQuery(object):
@@ -67,17 +48,17 @@ class RepoList(object):
     def __iter__(self):
         for r in self.repositories:
             yield r
-        if self.nextPage:
+        if self.hasNextPage:
             self.request()
             for r in self.__iter__():
                 yield r
 
     def request(self):
         self.response = self.gh_query.get(**self.kwargs)
-        self.repositories = self.response['user'][self.type]['edges']
-        self.nextPage = self.response['user'][self.type]['pageInfo']['hasNextPage']
-        self.kwargs['after'] = self.response['user'][self.type]['pageInfo']['endCursor']
-
+        list_info = self.response['user'][self.type]
+        self.repositories = list_info['edges']
+        self.hasNextPage = list_info['pageInfo']['hasNextPage']
+        self.kwargs['after'] = list_info['pageInfo']['endCursor']
 
 
 user_query = """
