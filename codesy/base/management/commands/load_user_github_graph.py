@@ -19,7 +19,7 @@ def neo4j_merge_user(user, session):
     statement = """
         MERGE (u:User {{id:'{}'}})
         SET u.name='{}', u.email='{}', u.login='{}'
-    """.format(user['id'], user['name'], user['email'],user['login'])
+    """.format(user['id'], user['name'], user['email'], user['login'])
     session.run(statement)
     session.sync()
 
