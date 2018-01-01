@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 
 from ...models import User
-from gh_gql import User as GithubUser, RepoList
+from gh_gql import User as ghUser, RepoList
 
 logging.basicConfig()
 
@@ -80,7 +80,7 @@ class Command(BaseCommand):
                 continue
 
             try:
-                gh_user = GithubUser.get(login=username)['user']
+                gh_user = ghUser.get(login=username)['user']
                 neo4j_merge_user(gh_user, session)
                 for repo_type in repo_types.keys():
                     repos = RepoList(type=repo_type, login=username)

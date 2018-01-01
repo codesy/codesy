@@ -7,7 +7,7 @@ GITHUB_API_KEY = settings.GITHUB_API_KEY
 headers = {"Authorization": 'bearer %s' % GITHUB_API_KEY}
 
 
-class GithubQuery(object):
+class ghQuery(object):
     """generic graphql query. must supply query string"""
     def __init__(self, query_string):
         self.template = query_string
@@ -40,7 +40,7 @@ class RepoList(object):
     """returns a iterator of repos."""
     def __init__(self, **kwargs):
         self.type = kwargs['type']
-        self.gh_query = GithubQuery(repo_query % self.type)
+        self.gh_query = ghQuery(repo_query % self.type)
         self.repositories = []
         self.kwargs = kwargs
         self.request()
@@ -106,4 +106,18 @@ query UserRepos($login: String!, $after: String) {
 }
 """
 
-User = GithubQuery(user_query)
+User = ghQuery(user_query)
+
+issue_query = """
+query findIssue($url: URI!) {
+  resource(url: $url) {
+    __typename
+    ... on Issue {
+      state
+    }
+
+  }
+}
+"""
+
+Issue = ghQuery(issue_query)
