@@ -45,7 +45,7 @@ def neo4j_merge_repo(repo, session):
 def neo4j_match_repo_relationship(user_id, repo_id, relationship, session):
     statement = """
        MATCH (u:User),(r:Repo) WHERE u.id ='{}' AND r.id='{}'
-       CREATE (u)-[:{}]->(r)
+       MERGE (u)-[:{}]->(r)
     """.format(user_id, repo_id, relationship)
     session.run(statement)
     session.sync()
