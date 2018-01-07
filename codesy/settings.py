@@ -266,3 +266,8 @@ EXTENSION_SETTINGS = {
         'img': 'img/opera.png',
     },
 }
+
+NEO4J_BOLT_URL = config('NEO4J_BOLT_URL', default='')
+NEO4J_USER = config('NEO4J_USER', default='')
+NEO4J_PASSWORD = config('NEO4J_PASSWORD', default='')
+GITHUB_API_KEY = config('GITHUB_API_KEY', default='')
