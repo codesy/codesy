@@ -24,6 +24,9 @@ urlpatterns = [
     # stripe
     url(r'^payments/', include('payments.urls')),
 
+    # stripe
+    url(r'^recommend/', include('recommend.urls')),
+
     # API docs
     url(r'^api/docs/', include('rest_framework_swagger.urls')),
 

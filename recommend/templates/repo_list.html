@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+    <div class="row">
+        <h2>Because you liked ... </h2>
+    </div>
+    <div class="row">
+        <table>
+            <thead>
+                <tr>
+                    <th width="200">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for rec in recommendations%}
+                <tr>
+                    <td></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
