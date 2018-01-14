@@ -1,57 +1,89 @@
 {% load staticfiles %}
 {% load socialaccount %}
-
 <div class="text-center">
   {% if not request.user.is_authenticated %}
-
-    <a class="button gh-button track-btn" data-category="sign-in" href="{% provider_login_url "github" %}"><i class="fi-social fi-social-github medium"></i> Sign in with GitHub to get started</a>
-
+    <a class="button gh-button track-btn"
+        data-category="sign-in"
+        href="{% provider_login_url "github" %}">
+        <i class="fi-social fi-social-github medium"></i>
+        Sign in with GitHub to get started
+    </a>
   {% else %}
+      <div class="row install-step">
+          <div class="medium-6 columns medium-offset-3">
+              <h4>Welcome to codesy</h4>
+              <p class="home-tagline">
+                  Right now, you can only see active issues.  If you want to start fixing and funding, you'll need to install the codesy addon:</p>
+              </p>
+              {% if browser.name == 'unknown' %}
+                  <p id="unknown-browser">Unknown browser. The codesy widgets are <a href="https://wiki.mozilla.org/WebExtensions" target="_blank">WebExtensions</a> that work with Firefox, Chrome, and Opera. We want to add it to others soon. Want to help?
+                      <a href="https://github.com/codesy/widgets">Check the widgets code on GitHub</a>.
+                  </p>
+              {% else %}
+                  <p id="add-extension">
+                      <a class="button download-button large track-btn"
+                          data-category="Download"
+                          data-label="{{ browser.name }}"
+                          href="{{ browser.href}}"
+                          role="button"
+                          target="_blank">
+                          <img class="browser-install-icon"install
+                              src="{% static browser.img %}"
+                              width="32" height="32"
+                          />
+                          Download for {{ browser.name }}
+                      </a>
+                  </p>
+            {% endif %} {# end 'browser' if #}
+          </div>
+      </div>
 
-    <div class="install-step">
-        <h3>Install the codesy extension.</h3>
-        {% if browser.name == 'unknown' %}
-            <p id="unknown-browser">Unknown browser. The codesy widgets are <a href="https://wiki.mozilla.org/WebExtensions" target="_blank">WebExtensions</a> that work with Firefox, Chrome, and Opera. We want to add it to others soon. Want to help?
-                <a href="https://github.com/codesy/widgets">Check the widgets code on GitHub</a>.
+    <div class="row installed">
+        <div class="medium-6 columns medium-offset-3">
+            <h4>Congratulations, the addon is installed.</h4>
+            <p class='text-left'>
+                Now when you go to an issue, you'll see the codesy addon in the bottom right corner.
+                {% if not request.user.stripe_customer%}
+                    When you're ready to fund an issue, you'll need to <a href="{% url 'card' %}">register a credit card.</a>
+                    {% endif %}
             </p>
-        {% else %}
-            <p id="add-extension">
-                <a class="button download-button large track-btn"
-                    data-category="Download"
-                    data-label="{{ browser.name }}"
-                    href="{{ browser.href}}"
-                    role="button"
-                    target="_blank">
-                    <img class="browser-install-icon"install
-                        src="{% static browser.img %}"
-                        width="32" height="32"
-                    />
-                    Download for {{ browser.name }}
-                </a>
-            </p>
-
-      {% endif %} {# end 'browser' if #}
+        </div>
     </div>
 
+    <div class="row">
+        <div class="medium-6 columns medium-offset-3">
+            <h4>Here are a few issues with recent codesy activity:</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="100">Activity</th>
+                        <th>Issue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bid in bids %}
+                        <tr>
+                            <td>{{ bid.activity }}</td>
+                            <td><p class="text-left">
+                                <a href="{{bid.url}}"{% if target %} target="{{ target }}"{% endif %}>{{bid.issue.title}}</a></td>
+                            </p>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p>Go here to see the full list of <a href="/activity-list">active issues.</a></p>
+        </div>
+    </div>
 
-    <div class="installed">
-
-        <div id="payment-errors"></div>
-
-        {% if request.user.stripe_customer%}
-            <h3>You are ready to bid</h3>
-            <p>Try checking out GitHub issues with the most +1 votes.</p>
+    <div class="row">
+        <div class="medium-6 columns medium-offset-3">
+            <h4>Try checking out GitHub issues with the most +1 votes:</h4>
             <a class="button gh-button track-btn" data-category="top+1" data-label="Created by You" href="https://github.com/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+author%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Created by You</a>
             <a class="button gh-button track-btn" data-category="top+1" data-label="Assigned to You" href="https://github.com/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+assignee%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Assigned to You</a>
             <a class="button gh-button track-btn" data-category="top+1" data-label="Mentioning You" href="https://github.com/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+mentions%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Mentioning You</a><br/>
             <a class="button gh-button track-btn" data-category="top+1" data-label="Global" href="https://github.com/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+"><i class="fi-social fi-social-github medium"></i> Global Top +1 Issues</a><br/>
-        {% else %}
-            <h3>Browser Extension Installed</h3>
-            <p>Add credit card.</p>
-            {% include "credit_card_row.html" %}
-        {% endif %}
-
+        </div>
     </div>
 
-  {% endif %} {# end request.user.is_authenticated if #}
+ {% endif %} {# end request.user.is_authenticated if #}
 </div>

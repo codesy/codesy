@@ -56,6 +56,7 @@ $(window).on("load",function () {
         const return_url = $('#return_url').val()
         const button_text = $('#stripe-submit').text()
         const success_msg = "Account information successfully submitted"
+        const redirect_url = "/"
 
         function complete_submit (message) {
             $('#stripe-response').remove();
@@ -73,6 +74,7 @@ $(window).on("load",function () {
                 redirect(return_url)
             } else {
                 complete_submit(success_msg)
+                redirect(redirect_url)
             };
         }
 

@@ -5,23 +5,23 @@
             <input name="url" type="hidden" value="{{ url }}">
 
             <label class="codesy_hide" >
-            {% if bid.offer > 0 %}You have offered:{% else %}Offer:{% endif %}
+            {% if bid.offer > 0 %}You have offered:{% else %}Fund it for:{% endif %}
               <input id="offer"
                   name="offer"
                   type="text"
-                  placeholder="What you'd pay."
+                  placeholder="Amount you'd fund"
                   data-original-value="{{bid.offer}}"
                   value="{% if bid.offer > 0 %}{{bid.offer}}{% endif %}"
               />
             </label>
 
             <label class="codesy_hide" >
-            {% if bid.ask > 0 %}You have asked for:{% else %}Ask for:{% endif %}
+            {% if bid.ask > 0 %}You have asked for:{% else %}Fix it for:{% endif %}
               <input id="ask"
                   name="ask"
                   type="text"
                   class="codesy_hide"
-                  placeholder="What you'd want."
+                  placeholder="Amount you'd want"
                   data-original-value="{{bid.ask}}"
                   value="{% if bid.ask > 0 %}{{bid.ask}}{% endif %}"
               />
@@ -44,7 +44,7 @@
               type="button"
               id="ShowSubmit"
               class="button expanded success codesy_hide">
-                {%  if bid.offer > 0 or bid.ask > 0 %}Change your Bid{% else %}Make a bid{% endif %}
+                Save changes
             </button>
 
         </form>

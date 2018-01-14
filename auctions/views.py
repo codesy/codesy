@@ -1,5 +1,7 @@
+import logging
 from decimal import Decimal
 from urlparse import urldefrag
+import sys
 
 from django.shortcuts import redirect, get_object_or_404
 from django.core.urlresolvers import reverse
@@ -9,6 +11,8 @@ from auctions.models import Bid, Claim, Vote
 
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
+logger = logging.getLogger(__name__)
 
 
 class AddonLogin (TemplateView):
@@ -26,30 +30,40 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
     template_name = "addon/bidders.html"
 
     def test_func(self):
-        if self.request.user.is_active:
-            if not self.request.user.stripe_customer:
-                self.template_name = "addon/register_card.html"
-            return True
-        return False
+        return self.request.user.is_active
 
     def _get_bid(self, url):
         try:
             return Bid.objects.get(user=self.request.user, url=url)
         except:
+            e = sys.exc_info()[0]
+            logger.error("Bid.objects.get exception: %s" % e)
             return None
+
+    def _do_any_bids_exist(self, url):
+        return (
+            Bid.objects
+            .filter(url=url)
+            .exclude(user=self.request.user)
+            .count() > 0
+        )
 
     def _url_path_only(self, url):
         return urldefrag(url)[0]
 
     def get_context_data(self, **kwargs):
+        ctx = {}
         url = self._url_path_only(self.request.GET['url'])
         bid = self._get_bid(url)
+        any_bids_exist = self._do_any_bids_exist(url)
+        ctx.update({'url': url, 'bid': bid, 'active_issue': any_bids_exist})
         if bid is None:
-            return dict({'bid': bid, 'url': url})
+            return dict(ctx)
 
         # rejected claims should be ignored so new claims can be made
         claims = (
-            Claim.objects.filter(issue=bid.issue).exclude(status='Rejected'))
+            Claim.objects.filter(issue=bid.issue).exclude(status='Rejected')
+        )
 
         users_claims = claims.filter(
             user=self.request.user).order_by('modified')
@@ -64,12 +78,13 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
                 self.template_name = 'addon/bid_closed.html'
             return dict({'claims': claims})
         else:
-            return dict({'bid': bid, 'url': url})
+            return dict(ctx)
 
     def post(self, *args, **kwargs):
         """
         Save changes to bid and get payment for offer
         """
+
         url = self._url_path_only(self.request.POST['url'])
         ask_amount = self.request.POST['ask']
         offer_amount = self.request.POST['offer']
@@ -114,6 +129,8 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
         try:
             vote = Vote.objects.get(claim=claim, user=self.request.user)
         except:
+            e = sys.exc_info()[0]
+            logger.error("Vote.objects.get exception: %s" % e)
             pass
         context = dict({
             'return_url': self.request.path,
@@ -158,6 +175,8 @@ class BidList(LoginRequiredMixin, TemplateView):
             bids = (Bid.objects.filter(user=self.request.user)
                     .order_by('-created'))
         except:
+            e = sys.exc_info()[0]
+            logger.error("Bid.objects.filter exception: %s" % e)
             bids = []
 
         return dict({'bids': bids}, )
@@ -175,6 +194,9 @@ class ClaimList(LoginRequiredMixin, TemplateView):
             voted_claims = (Claim.objects.voted_on_by_user(self.request.user)
                             .order_by('-created'))
         except:
+            e = sys.exc_info()[0]
+            logger.error("Claim.objects.filter|voted_on_by_user exception: "
+                         "%s" % e)
             claims = []
             voted_claims = []
 
@@ -191,6 +213,22 @@ class VoteList(LoginRequiredMixin, TemplateView):
             votes = (Vote.objects.filter(user=self.request.user)
                      .order_by('-created'))
         except:
+            e = sys.exc_info()[0]
+            logger.error("Vote.objects.filter exception: %s" % e)
             votes = []
 
         return dict({'votes': votes})
+
+
+class ActivityList(LoginRequiredMixin, TemplateView):
+    """List of all bids
+    """
+    template_name = 'activity_list.html'
+
+    def get_context_data(self, **kwargs):
+        try:
+            bids = (Bid.objects.order_by('-modified'))
+        except:
+            bids = []
+
+        return dict({'bids': bids}, )

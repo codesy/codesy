@@ -6,7 +6,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <meta name="description" content="{% block description %}codesy is a pay-what-you-want market for the open source community where we can tip each other to fix important bugs.{% endblock %}">
+        <meta name="description" content="{% block description %}Codesy is a platform for fixing and funding open source software.{% endblock %}">
         <title>{% if request.user.is_authenticated %}{{ request.user.username }} | {% endif %}codesy.io</title>
         <link rel="shortcut icon" href="{% static "img/favicon.png" %}">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/foundation/6.2.4/foundation.min.css">
@@ -27,9 +27,10 @@
                     <li>
                     <a href="#"><img id="top-bar-gravatar" src="{{ user.get_gravatar_url }}">{{ user.username }}</a>
                         <ul class="menu">
-                            <li><a href="/bid-list">Bids</a></li>
-                            <li><a href="/claim-list">Claims</a></li>
-                            <li><a href="/vote-list">Votes</a></li>
+                            <li><a href="/activity-list">Active Issues</a></li>
+                            <li><a href="/bid-list">Your Bids</a></li>
+                            <li><a href="/claim-list">Your Claims</a></li>
+                            <li><a href="/vote-list">Your Votes</a></li>
                             <hr/>
                             <li><a href="{% url 'card' %}">Credit Card</a></li>
                             <li><a href="{% url 'bank' %}">Bank Account</a></li>
@@ -55,6 +56,13 @@
                     <a href="{% url 'identity' %}"> bank account.</a>
                 </p>
             </div>
+        {% elif message.message == "stripe_account_error" %}
+            <div class="callout warning expanded" data-closable>
+                <button class="close-button" data-close>&times;</button>
+                <p class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                There is an error with your Stripe account. Please <a href="https://github.com/codesy/codesy/issues/new">contact codesy</a> for support.
+                </p>
+            </div>
         {% else %}
             <div class="callout warning expanded" data-closable>
                <button class="close-button" data-close>&times;</button>
@@ -71,18 +79,18 @@
     <footer class="footer">
         <div class="row">
             <div class="medium-6 columns">
-            <p>
-            <i class="fi-web"></i>
-                <a href="/legal-info#terms">Terms of Service</a>
-            <i class="fi-web"></i>
-                <a href="/legal-info#privacy">Privacy Policy</a>
-            <i class="fi-social-github"></i> <a href="https://github.com/codesy/codesy">Source Code</a>
-            </p>
+                <p>
+                <i class="fi-web"></i>
+                    <a href="/legal-info#terms">Terms of Service</a>
+                <i class="fi-web"></i>
+                    <a href="/legal-info#privacy">Privacy Policy</a>
+                <i class="fi-social-github"></i> <a href="https://github.com/codesy/codesy">Source Code</a>
+                </p>
             </div>
             <div class="medium-6 columns">
-            <p>
-                <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" src="https://licensebuttons.net/l/by-sa/4.0/80x15.png" /></a> codesy.io llc; Git Logo <a rel="license" href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" src="https://licensebuttons.net/l/by/3.0/80x15.png" /></a> <a href="http://www.jasonlong.me/">Jason Long</a>
-            </p>
+                <p>
+                    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" src="https://licensebuttons.net/l/by-sa/4.0/80x15.png" /></a> codesy.io llc; Git Logo <a rel="license" href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" src="https://licensebuttons.net/l/by/3.0/80x15.png" /></a> <a href="http://www.jasonlong.me/">Jason Long</a>
+                </p>
             </div>
         </div>
     </footer>
@@ -96,5 +104,5 @@
     <script src="{% static "js/analytics.js" %}" ></script>
     {% block scripts %}
     {% endblock %}
-  </body>
+</body>
 </html>

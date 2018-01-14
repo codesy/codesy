@@ -74,6 +74,14 @@ class Bid(models.Model):
     def offers(self):
         return Offer.objects.filter(bid=self)
 
+    @property
+    def activity(self):
+        if self.offer > 0:
+            return "OFFER"
+        if self.ask > 0:
+            return "ASK"
+        return "NADA"
+
     def set_offer(self, offer_amount):
         offer_amount = Decimal(offer_amount)
         # refund any previous offers

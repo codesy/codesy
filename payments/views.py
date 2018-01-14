@@ -3,6 +3,7 @@ import urllib
 from django.views.generic import View, TemplateView
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse_lazy
+from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.http import HttpResponse
 from django.conf import settings
@@ -64,7 +65,13 @@ class UserIdentityVerifiedMixin(UserPassesTestMixin):
 
     def test_func(self):
         user_account = self.request.user.account()
-        return user_account.identity_verified()
+        try:
+            identity_verified = user_account.identity_verified()
+        except stripe.error.StripeError as e:
+            if "that account does not exist" in e.message:
+                messages.warning(self.request, 'stripe_account_error')
+            return None
+        return identity_verified
 
 
 class BankAccountTestsMixin(UserPassesTestMixin):
@@ -80,7 +87,13 @@ class BankAccountTestsMixin(UserPassesTestMixin):
             return False
 
         user_account = self.request.user.account()
-        return user_account.identity_verified()
+        try:
+            identity_verified = user_account.identity_verified()
+        except stripe.error.StripeError as e:
+            if "that account does not exist" in e.message:
+                messages.warning(self.request, 'stripe_account_error')
+            return None
+        return identity_verified
 
 
 class CreditCardView(TemplateView):
