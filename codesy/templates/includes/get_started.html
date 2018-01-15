@@ -40,12 +40,12 @@
 
     <div class="row installed">
         <div class="medium-6 columns medium-offset-3">
-            <h4>Congratulations, the addon is installed.</h4>
+            <h3>Congratulations, you are free to go.</h4>
             <p class='text-left'>
-                Now when you go to an issue, you'll see the codesy addon in the bottom right corner.
+                Keep your normal github routine except now when you go to an issue you'll see the codesy addon in the bottom right corner.  You can asking for funding to <strong>fix</strong> an issue.
                 {% if not request.user.stripe_customer%}
-                    When you're ready to fund an issue, you'll need to <a href="{% url 'card' %}">register a credit card.</a>
-                    {% endif %}
+                    If you want offer to  <strong>fund</strong> an issue, you'll need to <a href="{% url 'card' %}">register a credit card.</a>
+                {% endif %}
             </p>
         </div>
     </div>
