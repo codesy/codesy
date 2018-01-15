@@ -150,7 +150,6 @@ CSP_STYLE_SRC = (
 )
 CSP_SCRIPT_SRC = (
     "'self'",
-    'https://cdn.jsdelivr.net',
     '*.stripe.com',
     'www.google-analytics.com',
 )
