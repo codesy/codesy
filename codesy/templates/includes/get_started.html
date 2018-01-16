@@ -42,9 +42,9 @@
         <div class="medium-6 columns medium-offset-3">
             <h3>Congratulations, you are free to go.</h4>
             <p class='text-left'>
-                Keep your normal github routine except now when you go to an issue you'll see the codesy addon in the bottom right corner.  You can asking for funding to <strong>fix</strong> an issue.
+                Use GitHub as normal and when you go to an issue you'll see the codesy addon in the bottom right corner.  You can use it to fund the issue, fix the issue, or both.
                 {% if not request.user.stripe_customer%}
-                    If you want offer to  <strong>fund</strong> an issue, you'll need to <a href="{% url 'card' %}">register a credit card.</a>
+                    <a href="{% url 'card' %}">Register a credit card</a> to <strong>fund</strong> issues
                 {% endif %}
             </p>
         </div>
