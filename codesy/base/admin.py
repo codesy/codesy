@@ -27,6 +27,10 @@ class CodesyUserAdmin(UserAdmin):
          ),
 
     )
+    list_display = ('username', 'email', 'is_active', 'date_joined',
+                    'is_staff', 'stripe_customer', 'stripe_bank_account')
+    list_filter = ('date_joined', 'is_active', 'is_staff', 'stripe_customer',
+                   'stripe_bank_account')
 
 
 admin.site.register(User, CodesyUserAdmin)
