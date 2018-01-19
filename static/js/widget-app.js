@@ -76,7 +76,7 @@ class WidgetApp {
             processData: false,
             headers: {'X-CSRFToken': csrf_token},
             contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            success: window.location.reload
+            success: window.location.reload.bind(window.location)
         })
         .fail(this.ajax_fail(this.$form))
     }
