@@ -40,11 +40,12 @@
 
     <div class="row installed">
         <div class="medium-6 columns medium-offset-3">
-            <h3>Congratulations, you are free to go.</h4>
+            <h3>Congratulations, you are ready to go.</h4>
             <p class='text-left'>
-                Use GitHub as normal and when you go to an issue you'll see the codesy addon in the bottom right corner.  You can use it to fund the issue, fix the issue, or both.
+                Use GitHub as normal and when you go to an issue you'll see the codesy addon in the bottom right corner.  You can use it to <strong>fund</strong>  the issue, <strong>fix</strong>  the issue, or both.
                 {% if not request.user.stripe_customer%}
-                    <a href="{% url 'card' %}">Register a credit card</a> to <strong>fund</strong> issues
+                    You'll need to
+                    <a href="{% url 'card' %}">register a credit card</a> if you want to fund issues
                 {% endif %}
             </p>
         </div>
