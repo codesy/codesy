@@ -11,10 +11,10 @@
   {% else %}
       <div class="row install-step">
           <div class="medium-6 columns medium-offset-3">
-              <h4>Welcome to codesy</h4>
-              <p class="home-tagline">
-                  Right now, you can only see active issues.  If you want to start fixing and funding, you'll need to install the codesy addon:</p>
-              </p>
+              <h3>Welcome to codesy!</h3>
+              <h4>
+                Your next step is to install the codesy extension:</p>
+            </h4>
               {% if browser.name == 'unknown' %}
                   <p id="unknown-browser">Unknown browser. The codesy widgets are <a href="https://wiki.mozilla.org/WebExtensions" target="_blank">WebExtensions</a> that work with Firefox, Chrome, and Opera. We want to add it to others soon. Want to help?
                       <a href="https://github.com/codesy/widgets">Check the widgets code on GitHub</a>.
@@ -40,18 +40,19 @@
 
     <div class="row installed">
         <div class="medium-6 columns medium-offset-3">
-            <h3>Congratulations, you are free to go.</h4>
+            <h3>Congratulations, you are ready to go.</h4>
             <p class='text-left'>
-                Use GitHub as normal and when you go to an issue you'll see the codesy addon in the bottom right corner.  You can use it to fund the issue, fix the issue, or both.
+                Use GitHub as normal and when you go to an issue you'll see the codesy addon in the bottom right corner.  You can use it to <strong>fund</strong>  the issue, <strong>fix</strong>  the issue, or both.
                 {% if not request.user.stripe_customer%}
-                    <a href="{% url 'card' %}">Register a credit card</a> to <strong>fund</strong> issues
+                    You'll need to
+                    <a href="{% url 'card' %}">register a credit card</a> if you want to fund issues
                 {% endif %}
             </p>
         </div>
     </div>
 
     <div class="row">
-        <div class="medium-6 columns medium-offset-3">
+        <div class="medium-6 columns medium-offset-3 installed ">
             <h4>Here are a few issues with recent codesy activity:</h4>
             <table>
                 <thead>
@@ -72,16 +73,6 @@
                 </tbody>
             </table>
             <p>Go here to see the full list of <a href="/activity-list">active issues.</a></p>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="medium-6 columns medium-offset-3">
-            <h4>Try checking out GitHub issues with the most +1 votes:</h4>
-            <a class="button gh-button track-btn" data-category="top+1" data-label="Created by You" href="https://github.com/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+author%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Created by You</a>
-            <a class="button gh-button track-btn" data-category="top+1" data-label="Assigned to You" href="https://github.com/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+assignee%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Assigned to You</a>
-            <a class="button gh-button track-btn" data-category="top+1" data-label="Mentioning You" href="https://github.com/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+mentions%3A{{ request.user.username }}"><i class="fi-social fi-social-github medium"></i> Top +1 Issues Mentioning You</a><br/>
-            <a class="button gh-button track-btn" data-category="top+1" data-label="Global" href="https://github.com/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+"><i class="fi-social fi-social-github medium"></i> Global Top +1 Issues</a><br/>
         </div>
     </div>
 

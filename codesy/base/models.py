@@ -62,7 +62,7 @@ class User(AbstractUser):
 
 @receiver(user_signed_up)
 def add_signup_email_and_start_inactive(sender, request, user, **kwargs):
-    user.is_active = False
+    user.is_active = True
     params = {'access_token': kwargs['sociallogin'].token}
     email_data = requests.get(EMAIL_URL, params=params).json()
     if email_data:
