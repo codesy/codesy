@@ -5,14 +5,22 @@
             <input name="url" type="hidden" value="{{ url }}">
 
             <label class="codesy_hide" >
-            {% if bid.offer > 0 %}You have offered:{% else %}Fund it for:{% endif %}
-              <input id="offer"
-                  name="offer"
-                  type="text"
-                  placeholder="Amount you'd fund"
-                  data-original-value="{{bid.offer}}"
-                  value="{% if bid.offer > 0 %}{{bid.offer}}{% endif %}"
-              />
+              {% if not user.stripe_customer %}
+              <a class="button expanded success codesy_hide" id="add-cc" type="button" title="You must add a credit card to fund issues." href="//{{current_site.domain}}{% url 'card' %}" target="_blank">Add Credit Card</a>
+              {% else %}
+                {% if bid.offer > 0 %}
+                  You have offered:
+                {% else %}
+                  Fund it for:
+                {% endif %}
+                  <input id="offer"
+                      name="offer"
+                      type="text"
+                      placeholder="Amount you'd fund"
+                      data-original-value="{{bid.offer}}"
+                      value="{% if bid.offer > 0 %}{{bid.offer}}{% endif %}"
+                  />
+              {% endif %}
             </label>
 
             <label class="codesy_hide" >
