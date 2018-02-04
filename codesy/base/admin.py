@@ -1,8 +1,30 @@
+import csv
+
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserChangeForm
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
 
 from .models import User
+
+
+def download_user_csv(modeladmin, request, queryset):
+    if not request.user.is_staff:
+        raise PermissionDenied
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment;filename=users.csv'
+
+    writer = csv.writer(response)
+    field_names = ['username', 'first_name', 'last_name', 'email']
+    writer.writerow(field_names)
+    for obj in queryset:
+        writer.writerow([getattr(obj, field) for field in field_names])
+    return response
+
+
+download_user_csv.short_description = "Download CSV"
 
 
 class CodesyUserChangeForm(UserChangeForm):
@@ -11,6 +33,7 @@ class CodesyUserChangeForm(UserChangeForm):
 
 
 class CodesyUserAdmin(UserAdmin):
+    actions = [download_user_csv]
     form = CodesyUserChangeForm
     fieldsets = UserAdmin.fieldsets + (
         ('Accepted Terms',
