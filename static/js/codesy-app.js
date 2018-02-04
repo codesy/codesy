@@ -20,6 +20,7 @@ $(window).on("load",function () {
         return function (e) {
             e.preventDefault();
             form = $(this)
+            form.find('input[type="submit"]').prop('disabled', true);
             $.ajax( {
                     url: form.attr('action'),
                     method: form.data("method"),
