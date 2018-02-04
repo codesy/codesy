@@ -117,6 +117,7 @@ $(window).on("load",function () {
             e.preventDefault();
             set_holder_type($('#account_holder_type'))
             $('#stripe-submit').text('Submitting ... ');
+            $('#stripe-submit').prop('disabled', true);
             Stripe[stripe_account_type].createToken($stripe_form, handleResponse);
         });
     })
