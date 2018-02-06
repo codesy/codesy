@@ -42,7 +42,7 @@ class WidgetApp {
             return false
         }
 
-        if (diff === 0){
+        if (diff === 0 || diff === NaN){
             direction = 'not changing'
             validated = false
         }

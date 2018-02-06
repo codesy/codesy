@@ -86,8 +86,8 @@ class BidStatusView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
         """
 
         url = self._url_path_only(self.request.POST['url'])
-        ask_amount = self.request.POST['ask']
-        offer_amount = self.request.POST['offer']
+        ask_amount = self.request.POST.get('ask')
+        offer_amount = self.request.POST.get('offer')
 
         bid = self._get_bid(url)
         if bid is None:
