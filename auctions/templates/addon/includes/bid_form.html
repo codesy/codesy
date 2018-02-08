@@ -7,6 +7,11 @@
             <label class="codesy_hide" >
               {% if not user.stripe_customer %}
               <a class="button expanded success codesy_hide" id="add-cc" type="button" title="You must add a credit card to fund issues." href="//{{current_site.domain}}{% url 'card' %}" target="_blank">Add Credit Card</a>
+              <input id="offer"
+                  name="offer"
+                  type="hidden"
+              />
+
               {% else %}
                 {% if bid.offer > 0 %}
                   You have offered:

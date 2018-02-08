@@ -20,6 +20,7 @@ $(window).on("load",function () {
         return function (e) {
             e.preventDefault();
             form = $(this)
+            form.find('input[type="submit"]').prop('disabled', true);
             $.ajax( {
                     url: form.attr('action'),
                     method: form.data("method"),
@@ -117,6 +118,7 @@ $(window).on("load",function () {
             e.preventDefault();
             set_holder_type($('#account_holder_type'))
             $('#stripe-submit').text('Submitting ... ');
+            $('#stripe-submit').prop('disabled', true);
             Stripe[stripe_account_type].createToken($stripe_form, handleResponse);
         });
     })

@@ -42,7 +42,7 @@ class WidgetApp {
             return false
         }
 
-        if (diff === 0){
+        if (diff === 0 || isNaN(diff)){
             direction = 'not changing'
             validated = false
         }
@@ -68,6 +68,8 @@ class WidgetApp {
     submit(e){
         e.preventDefault()
         var form = this.$form
+        form.find('input[type="submit"]').prop('value', "Submitting ...")
+        form.find('input[type="submit"]').prop('disabled', true)
         var csrf_token = form.find('input[name=csrfmiddlewaretoken]').val()
         var api_call = $.ajax({
             url: form.attr('action'),

@@ -38,6 +38,19 @@ class BidStatusTestCase(TestCase):
         self.assertIsNone(context['bid'])
 
     @fudge.patch('auctions.views.messages')
+    def test_post_no_offer_value(self, mock_messages):
+        mock_messages.is_a_stub()
+        self.view.request = (fudge.Fake().has_attr(
+            POST={
+                'url': self.url,
+                'ask': 4.20,
+            })
+            .has_attr(user=self.user1))
+        self.view.post()
+        retreive_bid = Bid.objects.get(pk=self.bid1.id)
+        self.assertEqual(retreive_bid.ask, Decimal('4.20'))
+
+    @fudge.patch('auctions.views.messages')
     def test_post_new_offer(self, mock_messages):
         mock_messages.is_a_stub()
         self.view.request = (fudge.Fake().has_attr(
@@ -64,6 +77,19 @@ class BidStatusTestCase(TestCase):
                 'https://github.com/codesy/codesy/issues/380'
             )
         )
+
+    @fudge.patch('auctions.views.messages')
+    def test_post_no_ask_value(self, mock_messages):
+        mock_messages.is_a_stub()
+        self.view.request = (fudge.Fake().has_attr(
+            POST={
+                'url': self.url,
+                'offer': 4.20,
+            })
+            .has_attr(user=self.user1))
+        self.view.post()
+        retreive_bid = Bid.objects.get(pk=self.bid1.id)
+        self.assertEqual(retreive_bid.offer, Decimal('4.20'))
 
     @fudge.patch('auctions.views.messages')
     def test_post_new_ask_with_0_offer(self, mock_messages):
