@@ -6,7 +6,12 @@
 
             <label class="codesy_hide" >
               {% if not user.stripe_customer %}
-              <a class="button expanded success codesy_hide" id="add-cc" type="button" title="You must add a credit card to fund issues." href="//{{current_site.domain}}{% url 'card' %}" target="_blank">Add Credit Card</a>
+              <a class="button expanded success codesy_hide"
+                    id="add-cc"
+                    type="button"
+                    title="You must add a credit card to fund issues."
+                    href="//{{current_site.domain}}{% url 'card' %}"
+                    target="_blank">Add Credit Card</a>
               <input id="offer"
                   name="offer"
                   type="hidden"
@@ -14,14 +19,14 @@
 
               {% else %}
                 {% if bid.offer > 0 %}
-                  You have offered:
+                  You funded this for:
                 {% else %}
-                  Fund it for:
+                  I can fund this for:
                 {% endif %}
                   <input id="offer"
                       name="offer"
                       type="text"
-                      placeholder="Amount you'd fund"
+                      placeholder="$"
                       data-original-value="{{bid.offer}}"
                       value="{% if bid.offer > 0 %}{{bid.offer}}{% endif %}"
                   />
@@ -29,12 +34,16 @@
             </label>
 
             <label class="codesy_hide" >
-            {% if bid.ask > 0 %}You have asked for:{% else %}Fix it for:{% endif %}
+                {% if bid.ask > 0 %}
+                    You have asked for:
+                {% else %}
+                    I'd fix this for:
+                {% endif %}
               <input id="ask"
                   name="ask"
                   type="text"
                   class="codesy_hide"
-                  placeholder="Amount you'd want"
+                  placeholder="$"
                   data-original-value="{{bid.ask}}"
                   value="{% if bid.ask > 0 %}{{bid.ask}}{% endif %}"
               />

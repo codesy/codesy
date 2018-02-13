@@ -17,6 +17,18 @@ class WidgetApp {
             this.$form.find('input[type="submit"]').removeClass('hide')
         }
     }
+    input_descriptor(input_type){
+        let descriptor ="";
+        switch (input_type) {
+            case "offer":
+                descriptor="fund"
+                break;
+            case "ask":
+                descriptor="fix"
+                break;
+        }
+        return descriptor
+    }
     validate($input){
         var original_value = $input.data("original-value")
         var new_value = $input.val()
@@ -26,18 +38,18 @@ class WidgetApp {
         var offer_notice = ''
         var direction = ''
 
-        const $message = $(`<label id="${input_type}-confirm" class="callout small codesy_confirm" ></label>`)
+        const $message = $(`<label id="${this.input_descriptor(input_type)}-confirm" class="callout small codesy_confirm" ></label>`)
 
         this.$form.parent().prepend($message)
 
         if (new_value>0 && new_value<1){
-            $message.text(`Sorry, your ${input_type} cannot be less than $1.`)
+            $message.text(`Sorry, your ${this.input_descriptor(input_type)} amount cannot be less than $1.`)
             $input.val(original_value)
             return false
         }
 
         if (new_value<0){
-            $message.text(`Sorry, your ${input_type} cannot be negative.`)
+            $message.text(`Sorry, your ${this.input_descriptor(input_type)} amount cannot be negative.`)
             $input.val(original_value)
             return false
         }
@@ -61,7 +73,7 @@ class WidgetApp {
                 offer_notice =`Your credit card will be authorized for $${new_value}.`
             }
         }
-        $message.text(`You are ${direction} your ${input_type} amount. ${offer_notice}`)
+        $message.text(`You are ${direction} your ${this.input_descriptor(input_type)} amount. ${offer_notice}`)
 
         return validated
     }
