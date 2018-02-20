@@ -73,6 +73,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'payments.middleware.IdentityVerificationMiddleware',
+    'codesy.base.middleware.AuthChangedMiddleware'
 )
 
 
