@@ -1,6 +1,5 @@
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.contrib.auth.views import LogoutView
 
 from . import views
 
@@ -12,7 +11,6 @@ urlpatterns = [
     url(r'^$', views.Home.as_view(), name='home'),
     url(r'^legal-info$', views.LegalInfo.as_view(), name='legal-info'),
     # allauth
-    url(r'^accounts/logout/$', LogoutView.as_view(), {'next_page': '/'}),
     url(r'^accounts/', include('allauth.urls')),
 
     # admin site
