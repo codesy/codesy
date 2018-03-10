@@ -1,4 +1,4 @@
-AUTH_CHANGING_PATHS = ['/accounts/logout/', '/accounts/github/login/callback/']
+from django.contrib import messages
 
 
 class AuthChangedMiddleware(object):
@@ -7,6 +7,14 @@ class AuthChangedMiddleware(object):
     """
 
     def process_response(self, request, response):
-        if request.path in AUTH_CHANGING_PATHS:
-            response['x-codesy-auth-changed'] = 'true'
+        for message in messages.get_messages(request):
+            if (
+                response.status_code == 200 and
+                (
+                    "Successfully signed in" in message.message or
+                    "You have signed out" in message.message
+                )
+            ):
+                response['x-codesy-auth-changed'] = 'true'
+
         return response
