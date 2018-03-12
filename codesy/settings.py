@@ -71,6 +71,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'codesy.base.middleware.AuthChangedMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'payments.middleware.IdentityVerificationMiddleware',
 )
@@ -106,6 +107,7 @@ AUTH_USER_MODEL = 'base.User'
 # OAuth2View uses this for the callback_url protocol
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = config(
     'ACCOUNT_DEFAULT_HTTP_PROTOCOL', default='http')
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL = '/'
 SOCIALACCOUNT_ADAPTER = 'codesy.adapters.CodesySocialAccountAdapter'
 SOCIALACCOUNT_QUERY_EMAIL = True

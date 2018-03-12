@@ -82,6 +82,10 @@ tr.total {
   background-color: #F5F5F5;
 }
 
+.top-bar-dropdown-signout {
+  margin: 0 1rem 1rem;
+}
+
 img {
     border-width:0;
 }
