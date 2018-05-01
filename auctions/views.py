@@ -6,6 +6,7 @@ import sys
 from django.shortcuts import redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from django.http import HttpResponseNotFound
 
 from auctions.models import Bid, Claim, Vote
 
@@ -122,6 +123,20 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
 
     template_name = 'claim_status.html'
 
+    def get(self, request, *args, **kwargs):
+        claim = get_object_or_404(Claim, pk=self.kwargs['pk'])
+        if not self._can_request_user_see_claim(claim):
+            return HttpResponseNotFound()
+        return super(ClaimStatusView, self).get(request, *args, **kwargs)
+
+    def _can_request_user_see_claim(self, claim):
+        if (
+            self.request.user == claim.user or
+            self.request.user.id in claim.user_ids_who_can_vote()
+        ):
+            return True
+        return False
+
     def get_context_data(self, **kwargs):
         claim = None
         vote = None
@@ -131,7 +146,6 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
         except:
             e = sys.exc_info()[0]
             logger.error("Vote.objects.get exception: %s" % e)
-            pass
         context = dict({
             'return_url': self.request.path,
             'claim': claim,

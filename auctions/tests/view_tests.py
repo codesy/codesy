@@ -153,10 +153,21 @@ class ClaimStatusTestCase(TestCase):
         self.view = ClaimStatusView()
         self.url = 'http://github.com/codesy/codesy/issues/37'
         self.issue = mommy.make(Issue, url=self.url)
-        self.user1 = mommy.make(settings.AUTH_USER_MODEL,
-                                email='user1@test.com')
-        self.user2 = mommy.make(settings.AUTH_USER_MODEL,
-                                email='user1@test.com')
+        self.user1 = mommy.make(
+            settings.AUTH_USER_MODEL, email='user1@test.com'
+        )
+        self.bid1 = mommy.make(
+            Bid, user=self.user1, url=self.url, issue=self.issue, offer=0
+        )
+        self.user2 = mommy.make(
+            settings.AUTH_USER_MODEL, email='user2@test.com'
+        )
+        self.bid2 = mommy.make(
+            Bid, user=self.user2, url=self.url, issue=self.issue, offer=10
+        )
+        self.user3 = mommy.make(
+            settings.AUTH_USER_MODEL, email='user3@test.com'
+        )
 
         self.claim = mommy.make(Claim, user=self.user1, issue=self.issue)
 
@@ -174,12 +185,30 @@ class ClaimStatusTestCase(TestCase):
         context = self.view.get_context_data()
         self.assertEqual(self.claim, context['claim'])
 
-    def test_get_by_non_claimaint_returns_context(self):
+    def test_get_by_claimaint_returns_200_and_context(self):
+        self.view.request = (fudge.Fake()
+                             .has_attr(user=self.user1, path=""))
+        self.view.kwargs = {'pk': self.claim.id}
+        response = self.view.get(self.view.request)
+        self.assertEqual(200, response.status_code)
+        context = self.view.get_context_data()
+        self.assertEqual(self.claim, context['claim'])
+
+    def test_get_by_bidder_returns_200(self):
         self.view.request = (fudge.Fake()
                              .has_attr(user=self.user2, path=""))
         self.view.kwargs = {'pk': self.claim.id}
+        response = self.view.get(self.view.request)
+        self.assertEqual(200, response.status_code)
         context = self.view.get_context_data()
         self.assertEqual(self.claim, context['claim'])
+
+    def test_get_by_non_bidding_user_returns_404(self):
+        self.view.request = (fudge.Fake()
+                             .has_attr(user=self.user3, path=""))
+        self.view.kwargs = {'pk': self.claim.id}
+        response = self.view.get(self.view.request)
+        self.assertEqual(404, response.status_code)
 
     @fudge.patch('auctions.models.Claim.payout')
     @fudge.patch('auctions.views.messages')

@@ -353,6 +353,12 @@ class Claim(models.Model):
     def get_absolute_url(self):
         return reverse('claim-status', kwargs={'pk': self.id})
 
+    def user_ids_who_can_vote(self):
+        return Bid.objects.select_related('user').filter(
+            issue=self.issue,
+            offer__gt=0
+        ).values_list('user__id', flat=True)
+
 
 @receiver(post_save, sender=Claim)
 def notify_matching_offerers(sender, instance, created, **kwargs):
