@@ -185,12 +185,30 @@ class ClaimStatusTestCase(TestCase):
         context = self.view.get_context_data()
         self.assertEqual(self.claim, context['claim'])
 
-    def test_get_by_non_claimaint_returns_context(self):
+    def test_get_by_claimaint_returns_200_and_context(self):
+        self.view.request = (fudge.Fake()
+                             .has_attr(user=self.user1, path=""))
+        self.view.kwargs = {'pk': self.claim.id}
+        response = self.view.get(self.view.request)
+        self.assertEqual(200, response.status_code)
+        context = self.view.get_context_data()
+        self.assertEqual(self.claim, context['claim'])
+
+    def test_get_by_bidder_returns_200(self):
         self.view.request = (fudge.Fake()
                              .has_attr(user=self.user2, path=""))
         self.view.kwargs = {'pk': self.claim.id}
+        response = self.view.get(self.view.request)
+        self.assertEqual(200, response.status_code)
         context = self.view.get_context_data()
         self.assertEqual(self.claim, context['claim'])
+
+    def test_get_by_non_bidding_user_returns_404(self):
+        self.view.request = (fudge.Fake()
+                             .has_attr(user=self.user3, path=""))
+        self.view.kwargs = {'pk': self.claim.id}
+        response = self.view.get(self.view.request)
+        self.assertEqual(404, response.status_code)
 
     @fudge.patch('auctions.models.Claim.payout')
     @fudge.patch('auctions.views.messages')
@@ -210,13 +228,6 @@ class ClaimStatusTestCase(TestCase):
     def test_post_fail_by_other_user(self, mock_messages):
         mock_messages.expects('error')
         self.payout_post(self.user2)
-
-    def test_get_by_non_bidding_user_returns_404(self):
-        self.view.request = (fudge.Fake()
-                             .has_attr(user=self.user3, path=""))
-        self.view.kwargs = {'pk': self.claim.id}
-        response = self.view.get(self.view.request)
-        self.assertEqual(404, response.status_code)
 
 
 class BidListViewTest(TestCase):

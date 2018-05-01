@@ -125,12 +125,15 @@ class ClaimStatusView(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         claim = get_object_or_404(Claim, pk=self.kwargs['pk'])
-        if not self._can_request_user_vote(claim):
+        if not self._can_request_user_see_claim(claim):
             return HttpResponseNotFound()
         return super(ClaimStatusView, self).get(request, *args, **kwargs)
 
-    def _can_request_user_vote(self, claim):
-        if self.request.user.id in claim.user_ids_who_can_vote():
+    def _can_request_user_see_claim(self, claim):
+        if (
+            self.request.user == claim.user or
+            self.request.user.id in claim.user_ids_who_can_vote()
+        ):
             return True
         return False
 
