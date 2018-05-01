@@ -153,10 +153,21 @@ class ClaimStatusTestCase(TestCase):
         self.view = ClaimStatusView()
         self.url = 'http://github.com/codesy/codesy/issues/37'
         self.issue = mommy.make(Issue, url=self.url)
-        self.user1 = mommy.make(settings.AUTH_USER_MODEL,
-                                email='user1@test.com')
-        self.user2 = mommy.make(settings.AUTH_USER_MODEL,
-                                email='user1@test.com')
+        self.user1 = mommy.make(
+            settings.AUTH_USER_MODEL, email='user1@test.com'
+        )
+        self.bid1 = mommy.make(
+            Bid, user=self.user1, url=self.url, issue=self.issue, offer=0
+        )
+        self.user2 = mommy.make(
+            settings.AUTH_USER_MODEL, email='user2@test.com'
+        )
+        self.bid2 = mommy.make(
+            Bid, user=self.user2, url=self.url, issue=self.issue, offer=10
+        )
+        self.user3 = mommy.make(
+            settings.AUTH_USER_MODEL, email='user3@test.com'
+        )
 
         self.claim = mommy.make(Claim, user=self.user1, issue=self.issue)
 
@@ -199,6 +210,13 @@ class ClaimStatusTestCase(TestCase):
     def test_post_fail_by_other_user(self, mock_messages):
         mock_messages.expects('error')
         self.payout_post(self.user2)
+
+    def test_get_by_non_bidding_user_returns_404(self):
+        self.view.request = (fudge.Fake()
+                             .has_attr(user=self.user3, path=""))
+        self.view.kwargs = {'pk': self.claim.id}
+        response = self.view.get(self.view.request)
+        self.assertEqual(404, response.status_code)
 
 
 class BidListViewTest(TestCase):
