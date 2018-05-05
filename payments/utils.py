@@ -2,11 +2,11 @@ from decimal import Decimal, ROUND_HALF_UP
 from django.conf import settings
 
 import stripe
-stripe.api_key = settings.STRIPE_SECRET_KEY
+#stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # codesy fee of 2.5% charged to offer and payout
-#codesy_pct = Decimal('0.025')
 codesy_pct = Decimal('0.05')
+#codesy_pct = Decimal('0.05')
 
 # stripe charge of 2.9% for credit card payments
 stripe_pct = Decimal('0.029')
@@ -32,89 +32,80 @@ def calculate_offer_stripe_fee(offer_charge):
     )
 
 
-def calculate_payout_stripe_fee(amount):
+def calculate_payout_stripe_fee(payout_amount):
     return round_penny(
-        amount * stripe_transfer_pct
+        payout_amount * stripe_transfer_pct
     )
 
-
-#def calculate_charge_amount(goal):
-#Not used
-#    return round_penny(
-#        (goal + stripe_transaction) / (1 - stripe_pct)
-#    )
-
-
-def calculate_offer_charge(goal):
-#   total amount that will be charged to bidder/offerer
-    return round_penny(
-        (goal*(2 + codesy_pct*2 + stripe_transfer_pct)+ stripe_transaction)/
-        (2-stripe_pct)
-#        (goal + (stripe_transaction / 2))
-#        / (1 - ((stripe_pct + stripe_transfer_pct) / 2))
-    )
-
-def calculate_payout_amount(goal, offer_charge):
-#   Amount that will end up in the fixers/claimants bank account
-    return round_penny(
-        (goal*(1 - codesy_pct*2 - stripe_transfer_pct) + offer_charge*stripe_pct + stripe_transaction)/
-        (2)
-    )
 
 def transaction_amounts(amount):
-    half_codesy_fee_amount = calculate_codesy_fee(amount)
+    if amount <= 0:
+        raise ValueError('Zeros and negatives are not allowed')
+    charge_guess = 0
+    payout_guess = 0
+    fees = charge_guess*stripe_pct + stripe_transaction + amount*codesy_pct + payout_guess*stripe_transfer_pct
+    calc_charge = round_penny(amount + fees / 2)
+    calc_payout = round_penny(amount - fees / 2)
+    while (charge_guess < calc_charge):
+        #breaks out when guess and calc are equal
+        charge_guess = calc_charge
+        payout_guess = calc_payout
+        fees = charge_guess*stripe_pct + stripe_transaction + amount*codesy_pct + payout_guess*stripe_transfer_pct
+        calc_charge = round_penny(amount + fees / 2)
+        calc_payout = round_penny(amount - fees / 2)
 
-    charge_amount = calculate_offer_charge(
-        amount
+
+    charge_amount = charge_guess
+    #Amount charged to the bidder/offerer's card or account
+    #information given to Stripe
+
+    payout_amount = payout_guess
+    #Amount that ends up in the asker/fixer's bank account
+
+
+    codesy_fee_amount = calculate_codesy_fee(amount)
+    #Codesy's total 5% fee.
+
+    charge_stripe_fee = calculate_offer_stripe_fee(charge_amount)
+    #Stripe's actual fee on the charged amount--should equal Stripe's info.
+
+    transfer_stripe_fee = calculate_payout_stripe_fee(payout_amount)
+    #Stripe's actual fee on the payout amount--should equal Stripe's info.
+
+    offer_fee = round_penny((charge_stripe_fee + transfer_stripe_fee + codesy_fee_amount)/2)
+    #part of the fee-split added on to offer. Note: when total fees are uneven, offer gets the extra penny
+
+    payout_fee = charge_stripe_fee + transfer_stripe_fee + codesy_fee_amount - offer_fee
+    #part of the fee-split taken out of payout. Note: when total fees are uneven, offer gets the extra penny
+
+    #total_stripe_fee = offer_stripe_fee + payout_stripe_fee
+
+    application_fee = codesy_fee_amount + charge_stripe_fee + transfer_stripe_fee
+    #total fees taken out
+    #Information given to Stripe
+
+    payout_alt_calc = (
+        charge_amount - application_fee
     )
+    #back calculating payout to compare
 
-    offer_stripe_fee = (
-        charge_amount
-        - amount
-        - half_codesy_fee_amount
-    )
-
-    offer_stripe_fee = calculate_offer_stripe_fee(charge_amount)
-
-    payout_amount = calculate_payout_amount(
-        amount, charge_amount
-    )
-
-    payout_stripe_fee = calculate_payout_stripe_fee(
-        payout_amount
-    )
-
-    total_stripe_fee = offer_stripe_fee + payout_stripe_fee
-
-    application_fee = (
-        offer_stripe_fee
-        + payout_stripe_fee
-        + (half_codesy_fee_amount * 2)
-    )
-
-    gross_transfer_fee = calculate_payout_stripe_fee(
-        amount - application_fee
-    )
-
-    actual_transfer_fee = payout_stripe_fee
-
-    transfer_overage = (
-        gross_transfer_fee
-        - actual_transfer_fee
+    payout_overage = (
+        payout_alt_calc
+        - payout_amount
     )
 
     return {
         'amount': amount,
-        'charge_amount': round_penny(charge_amount),
+        'charge_amount': charge_amount,
         'payout_amount': payout_amount,
-        'codesy_fee': half_codesy_fee_amount,
-        'total_stripe_fee': total_stripe_fee,
-        'offer_stripe_fee': offer_stripe_fee,
-        'payout_stripe_fee': payout_stripe_fee,
+        'codesy_fee': codesy_fee_amount,
+        'charge_stripe_fee': charge_stripe_fee,
+        'transfer_stripe_fee': transfer_stripe_fee,
+        'offer_fee': offer_fee,
+        'payout_fee': payout_fee,
         'application_fee': application_fee,
-        'gross_transfer_fee': gross_transfer_fee,
-        'actual_transfer_fee': actual_transfer_fee,
-        'transfer_overage': transfer_overage
+        'payout_alt_calc': payout_alt_calc,
+        'payout_overage': payout_overage
     }
 
 
