@@ -26,13 +26,13 @@ def calculate_codesy_fee(amount):
     return round_penny(amount * codesy_pct)
 
 
-def calculate_offer_stripe_fee(offer_charge):
+def calculate_charge_stripe_fee(offer_charge):
     return round_penny(
         offer_charge * stripe_pct + stripe_transaction
     )
 
 
-def calculate_payout_stripe_fee(payout_amount):
+def calculate_transfer_stripe_fee(payout_amount):
     return round_penny(
         payout_amount * stripe_transfer_pct
     )
@@ -45,15 +45,25 @@ def transaction_amounts(amount):
     payout_guess = 0
     fees = charge_guess*stripe_pct + stripe_transaction + amount*codesy_pct + payout_guess*stripe_transfer_pct
     calc_charge = round_penny(amount + fees / 2)
-    calc_payout = round_penny(amount - fees / 2)
-    while (charge_guess < calc_charge):
+    calc_payout = round_penny(calc_charge - fees)
+    iteration = 0
+    while True:
         #breaks out when guess and calc are equal
         charge_guess = calc_charge
         payout_guess = calc_payout
-        fees = charge_guess*stripe_pct + stripe_transaction + amount*codesy_pct + payout_guess*stripe_transfer_pct
-        calc_charge = round_penny(amount + fees / 2)
-        calc_payout = round_penny(amount - fees / 2)
 
+        fees = (round_penny(charge_guess*stripe_pct + stripe_transaction) + 
+                    round_penny(amount*codesy_pct) + 
+                    round_penny(payout_guess*stripe_transfer_pct))
+        calc_charge = round_penny(amount + fees / 2)
+        calc_payout = round_penny(calc_charge - fees)
+        iteration = iteration+1
+        if (charge_guess == calc_charge) and (payout_guess == calc_payout):
+            break
+        if iteration == 10:
+            break
+
+        #Note: when total fees are uneven, charge gets the extra penny
 
     charge_amount = charge_guess
     #Amount charged to the bidder/offerer's card or account
@@ -66,10 +76,10 @@ def transaction_amounts(amount):
     codesy_fee_amount = calculate_codesy_fee(amount)
     #Codesy's total 5% fee.
 
-    charge_stripe_fee = calculate_offer_stripe_fee(charge_amount)
+    charge_stripe_fee = calculate_charge_stripe_fee(charge_amount)
     #Stripe's actual fee on the charged amount--should equal Stripe's info.
 
-    transfer_stripe_fee = calculate_payout_stripe_fee(payout_amount)
+    transfer_stripe_fee = calculate_transfer_stripe_fee(payout_amount)
     #Stripe's actual fee on the payout amount--should equal Stripe's info.
 
     offer_fee = round_penny((charge_stripe_fee + transfer_stripe_fee + codesy_fee_amount)/2)
@@ -94,18 +104,24 @@ def transaction_amounts(amount):
         - payout_amount
     )
 
+    total_stripe_fee = charge_stripe_fee + transfer_stripe_fee
+
     return {
         'amount': amount,
         'charge_amount': charge_amount,
         'payout_amount': payout_amount,
         'codesy_fee': codesy_fee_amount,
+        'total_stripe_fee': total_stripe_fee,
         'charge_stripe_fee': charge_stripe_fee,
-        'transfer_stripe_fee': transfer_stripe_fee,
+        'gross_transfer_fee': calculate_transfer_stripe_fee(payout_alt_calc),
+        'actual_transfer_fee': transfer_stripe_fee,
         'offer_fee': offer_fee,
         'payout_fee': payout_fee,
         'application_fee': application_fee,
         'payout_alt_calc': payout_alt_calc,
-        'payout_overage': payout_overage
+        'payout_overage': payout_overage,
+        'miscalculation_of_total_stripe_fee': total_stripe_fee - charge_stripe_fee - transfer_stripe_fee,
+        'iterations': iteration
     }
 
 
