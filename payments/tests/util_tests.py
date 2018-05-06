@@ -14,6 +14,9 @@ class PaymentAmountTest(TestCase):
             fieldnames = 'amount', 'charge_amount', 'payout_amount', 'codesy_fee', 'total_stripe_fee', 'offer_fee', 'payout_fee', 'application_fee', 'gross_transfer_fee', 'actual_transfer_fee', 'charge_stripe_fee','payout_alt_calc', 'payout_overage', 'miscalculation_of_total_stripe_fee', 'iterations'
             test_writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             test_writer.writeheader()
+            unsolveable_count=0
+            unsolveable_rate=0
+            amount_count=0
             
             for amount in amounts:
                 print "---"
@@ -43,13 +46,38 @@ class PaymentAmountTest(TestCase):
                     offer_values['application_fee']
                 )
 
-'''                self.assertEqual(
-                    (offer_values['payout_amount'] + offer_values['application_fee']),
-                    offer_values['charge_amount']
+                self.assertEqual(
+                    amount,
+                    offer_values['charge_amount'] - offer_values['offer_fee']
                 )
 
-                #assert that charge/payout +/- charge_fee/payout_fee are within 1 penny of amount.
+                payout_test = abs(offer_values['payout_amount'] + offer_values['payout_fee'] - amount) <= 0.01
 
+                self.assertEqual(
+                    True,
+                    payout_test
+                )
+
+                application_fee_test = abs(offer_values['payout_amount'] + offer_values['application_fee'] - offer_values['charge_amount']) <= 0.01
+
+                self.assertEqual(
+                    True,
+                    application_fee_test
+                )
+
+                amount_count += 1
+                if not(payout_test and application_fee_test):
+                    unsolveable_count += 1
+
+                unsolveable_rate = unsolveable_count/amount_count
+
+                self.assertEqual(
+                    True,
+                    unsolveable_rate < (1.0/350)
+                )
+
+
+'''
     def test_fixed_amounts(self):
             values = utils.transaction_amounts(10)
             self.assertEqual(values['total_stripe_fee'], Decimal('0.66'))

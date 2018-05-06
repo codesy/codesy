@@ -43,27 +43,34 @@ def transaction_amounts(amount):
         raise ValueError('Zeros and negatives are not allowed')
     charge_guess = 0
     payout_guess = 0
-    fees = charge_guess*stripe_pct + stripe_transaction + amount*codesy_pct + payout_guess*stripe_transfer_pct
-    calc_charge = round_penny(amount + fees / 2)
-    calc_payout = round_penny(calc_charge - fees)
+    codesy_fee_amount = 0
+    #Codesy's total 5% fee.
+    charge_stripe_fee = 0
+    #Stripe's actual fee on the charged amount--should equal Stripe's info.
+    transfer_stripe_fee = 0
+    #Stripe's actual fee on the payout amount--should equal Stripe's info.
+    application_fee = 0
+    #total fees taken out
+    #Information given to Stripe
     iteration = 0
-    while True:
-        #breaks out when guess and calc are equal
+    calc_charge = 0
+    calc_payout = 0
+
+    for iteration in range(0,11):
+        #used a while originally, but sometimes the while gets stuck
         charge_guess = calc_charge
         payout_guess = calc_payout
-
-        fees = (round_penny(charge_guess*stripe_pct + stripe_transaction) + 
-                    round_penny(amount*codesy_pct) + 
-                    round_penny(payout_guess*stripe_transfer_pct))
-        calc_charge = round_penny(amount + fees / 2)
-        calc_payout = round_penny(calc_charge - fees)
-        iteration = iteration+1
-        if (charge_guess == calc_charge) and (payout_guess == calc_payout):
-            break
-        if iteration == 10:
-            break
-
+        codesy_fee_amount = calculate_codesy_fee(amount)
+        charge_stripe_fee = calculate_charge_stripe_fee(charge_guess)
+        transfer_stripe_fee = calculate_transfer_stripe_fee(payout_guess)
+        application_fee = codesy_fee_amount + charge_stripe_fee + transfer_stripe_fee
+        calc_charge = round_penny(amount + application_fee / 2)
+        calc_payout = round_penny(calc_charge - application_fee)  
         #Note: when total fees are uneven, charge gets the extra penny
+        if (charge_guess == calc_charge) and (payout_guess == calc_payout):
+        #breaks out when guess and calc are equal
+            break
+
 
     charge_amount = charge_guess
     #Amount charged to the bidder/offerer's card or account
@@ -72,32 +79,16 @@ def transaction_amounts(amount):
     payout_amount = payout_guess
     #Amount that ends up in the asker/fixer's bank account
 
+    offer_fee = round_penny(application_fee/2)
+    # Part of the fee-split added on to offer. Calculated for testing purposes. Note: when total fees are uneven, offer gets the extra penny
 
-    codesy_fee_amount = calculate_codesy_fee(amount)
-    #Codesy's total 5% fee.
-
-    charge_stripe_fee = calculate_charge_stripe_fee(charge_amount)
-    #Stripe's actual fee on the charged amount--should equal Stripe's info.
-
-    transfer_stripe_fee = calculate_transfer_stripe_fee(payout_amount)
-    #Stripe's actual fee on the payout amount--should equal Stripe's info.
-
-    offer_fee = round_penny((charge_stripe_fee + transfer_stripe_fee + codesy_fee_amount)/2)
-    #part of the fee-split added on to offer. Note: when total fees are uneven, offer gets the extra penny
-
-    payout_fee = charge_stripe_fee + transfer_stripe_fee + codesy_fee_amount - offer_fee
-    #part of the fee-split taken out of payout. Note: when total fees are uneven, offer gets the extra penny
-
-    #total_stripe_fee = offer_stripe_fee + payout_stripe_fee
-
-    application_fee = codesy_fee_amount + charge_stripe_fee + transfer_stripe_fee
-    #total fees taken out
-    #Information given to Stripe
+    payout_fee = application_fee - offer_fee
+    #part of the fee-split taken out of payout. Calculated for testing purposes. Note: when total fees are uneven, offer gets the extra penny
 
     payout_alt_calc = (
         charge_amount - application_fee
     )
-    #back calculating payout to compare
+    #back calculating payout for testing
 
     payout_overage = (
         payout_alt_calc
