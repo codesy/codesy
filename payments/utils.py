@@ -71,6 +71,19 @@ def transaction_amounts(amount):
         #breaks out when guess and calc are equal
             break
 
+    #               |--F--|
+    # -+------------+--+--+----
+    #  0            P  A  C 
+    #  
+    #   A = agreed amount
+    #   C = charge = A + 1/2*F
+    #   P = payout = A - 1/2*F
+    #   F = Fees = rp(C*r_sc + f_sc) + rp(A*r_c) + rp(P*r_sp)
+    #   r_sc = stripe rate for charges
+    #   f_sc = stripe flat fee for charges
+    #   r_sp = stripe rate for payouts   
+    #   r_c = codesy rate
+    #   rp = round_penny function rounds to the nearest penney
 
     charge_amount = charge_guess
     #Amount charged to the bidder/offerer's card or account
