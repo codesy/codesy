@@ -94,7 +94,7 @@ class PaymentAmountTest(TestCase):
                 )
 
 
-'''
+
     def test_fixed_amounts(self):
             values = utils.transaction_amounts(10)
             self.assertEqual(values['total_stripe_fee'], Decimal('0.66'))
@@ -107,11 +107,11 @@ class PaymentAmountTest(TestCase):
             self.assertEqual(values['actual_transfer_fee'], Decimal('0.05'))
 
             values = utils.transaction_amounts(50)
-            self.assertEqual(values['total_stripe_fee'], Decimal('2.08'))
-            self.assertEqual(values['application_fee'], Decimal('4.58'))
+            self.assertEqual(values['total_stripe_fee'], Decimal('2.06'))
+            self.assertEqual(values['application_fee'], Decimal('4.56'))
             self.assertEqual(values['codesy_fee'], Decimal('1.25'))
-            self.assertEqual(values['charge_amount'], Decimal('52.29'))
-            self.assertEqual(values['offer_stripe_fee'], Decimal('1.04'))
-            self.assertEqual(values['payout_amount'], Decimal('47.71'))
-            self.assertEqual(values['payout_stripe_fee'], Decimal('1.04'))
-            self.assertEqual(values['actual_transfer_fee'], Decimal('0.24'))'''
+            self.assertEqual(values['charge_amount'], Decimal('52.28'))
+            self.assertEqual(values['offer_stripe_fee'], Decimal('1.03'))
+            self.assertEqual(values['payout_amount'], Decimal('47.72'))
+            self.assertEqual(values['payout_stripe_fee'], Decimal('1.03'))
+            self.assertEqual(values['actual_transfer_fee'], Decimal('0.24'))
