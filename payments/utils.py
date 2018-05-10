@@ -39,8 +39,8 @@ def calculate_transfer_stripe_fee(payout_amount):
 
 
 def transaction_amounts(amount):
-    if amount <= 0:
-        raise ValueError('Zeros and negatives are not allowed')
+    #if amount <= 0:
+    #    raise ValueError('Zeros and negatives are not allowed')
     charge_guess = 0
     payout_guess = 0
     half_codesy_fee_amount = calculate_half_codesy_fee(amount)
