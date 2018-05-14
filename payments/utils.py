@@ -21,86 +21,129 @@ def round_penny(amount):
     return amount.quantize(Decimal('.01'), rounding=ROUND_HALF_UP)
 
 
-def calculate_codesy_fee(amount):
+def calculate_half_codesy_fee(amount):
     return round_penny(amount * codesy_pct)
 
 
-def calculate_stripe_fee(amount):
+def calculate_charge_stripe_fee(offer_charge):
     return round_penny(
-        (amount * (stripe_pct + stripe_transfer_pct)) + stripe_transaction
+        offer_charge * stripe_pct + stripe_transaction
     )
 
 
-def calculate_stripe_transfer(amount):
-    return round_penny(amount * stripe_transfer_pct)
-
-
-def calculate_charge_amount(goal):
+def calculate_transfer_stripe_fee(payout_amount):
     return round_penny(
-        (goal + stripe_transaction) / (1 - stripe_pct)
-    )
-
-
-def calculate_offer_charge(goal):
-    return round_penny(
-        (goal + (stripe_transaction / 2))
-        / (1 - ((stripe_pct + stripe_transfer_pct) / 2))
+        payout_amount * stripe_transfer_pct
     )
 
 
 def transaction_amounts(amount):
-    codesy_fee_amount = calculate_codesy_fee(amount)
+    # if amount <= 0:
+    #    raise ValueError('Zeros and negatives are not allowed')
+    charge_guess = 0
+    payout_guess = 0
+    half_codesy_fee_amount = calculate_half_codesy_fee(amount)
+    # Codesy's total 5% fee.
+    charge_stripe_fee = 0
+    # Stripe's actual fee on the charged amount--should equal Stripe's info.
+    transfer_stripe_fee = 0
+    # Stripe's actual fee on the payout amount--should equal Stripe's info.
+    application_fee = 0
+    # total fees taken out
+    # Information given to Stripe
+    iteration = 0
+    calc_charge = 0
+    calc_payout = 0
 
-    charge_amount = calculate_offer_charge(
-        amount
-        + codesy_fee_amount
+    #               |--F--|
+    # -+------------+--+--+----
+    #  0            T  A  C
+    #
+    #   A = agreed amount
+    #   C = charge = A + 1/2*F
+    #   T = payout transfer = A - 1/2*F
+    #   F = Fees = rp(C*r_sc + f_sc) + rp(A*r_c) + rp(T*r_st)
+    #   r_sc = stripe rate for charges
+    #   f_sc = stripe flat fee for charges
+    #   r_st = stripe rate for payout transfers
+    #   r_c = codesy rate
+    #   rp = round_penny function rounds to the nearest penney
+
+    for iteration in range(0, 11):
+        # used a while originally, but sometimes the while gets stuck
+        charge_guess = calc_charge
+        payout_guess = calc_payout
+        charge_stripe_fee = calculate_charge_stripe_fee(charge_guess)
+        transfer_stripe_fee = calculate_transfer_stripe_fee(payout_guess)
+        application_fee = (
+            2 * half_codesy_fee_amount + charge_stripe_fee +
+            transfer_stripe_fee
+        )
+        calc_charge = round_penny(amount + application_fee / 2)
+        calc_payout = round_penny(calc_charge - application_fee)
+        # Note: when total fees are uneven, charge gets the extra penny
+        if (charge_guess == calc_charge) and (payout_guess == calc_payout):
+            # breaks out when guess and calc are equal
+            break
+
+    charge_amount = charge_guess
+    # Amount charged to the bidder/offerer's card or account
+    # information given to Stripe
+
+    payout_amount = payout_guess
+    # Amount that ends up in the asker/fixer's bank account
+
+    offer_fee = round_penny(application_fee / 2)
+    # Part of the fee-split added on to offer. Calculated for testing purposes.
+    # Note: when total fees are uneven, offer gets the extra penny
+
+    offer_stripe_fee = offer_fee - half_codesy_fee_amount
+
+    payout_fee = application_fee - offer_fee
+    # part of the fee-split taken out of payout. Calculated for testing
+    # purposes. Note: when total fees are uneven, offer gets the extra penny
+
+    payout_stripe_fee = payout_fee - half_codesy_fee_amount
+
+    payout_alt_calc = (
+        charge_amount - application_fee
+    )
+    # back calculating payout for testing
+
+    payout_overage = (
+        payout_alt_calc
+        - payout_amount
     )
 
-    offer_stripe_fee = (
-        charge_amount
-        - amount
-        - codesy_fee_amount
-    )
-
-    total_stripe_fee = calculate_stripe_fee(charge_amount)
-
-    payout_stripe_fee = total_stripe_fee - offer_stripe_fee
-
-    payout_amount = (
-        amount
-        - codesy_fee_amount
-        - payout_stripe_fee
-    )
-
-    application_fee = (
-        offer_stripe_fee
-        + payout_stripe_fee
-        + (codesy_fee_amount * 2)
-    )
-
-    gross_transfer_fee = calculate_stripe_transfer(amount)
-
-    actual_transfer_fee = (
-        calculate_stripe_transfer(payout_amount)
-    )
-
-    transfer_overage = (
-        gross_transfer_fee
-        - actual_transfer_fee
-    )
+    total_stripe_fee = charge_stripe_fee + transfer_stripe_fee
 
     return {
         'amount': amount,
-        'charge_amount': round_penny(charge_amount),
+        'charge_amount': charge_amount,
         'payout_amount': payout_amount,
-        'codesy_fee': codesy_fee_amount,
+        'codesy_fee': half_codesy_fee_amount,
         'total_stripe_fee': total_stripe_fee,
         'offer_stripe_fee': offer_stripe_fee,
+        # offer's half of total stripe fees
         'payout_stripe_fee': payout_stripe_fee,
+        # payout's half of total stripe fees
+        'charge_stripe_fee': charge_stripe_fee,
+        # Stripe's fee on the credit card charge
+        'gross_transfer_fee': calculate_transfer_stripe_fee(payout_alt_calc),
+        'actual_transfer_fee': transfer_stripe_fee,
+        # Stripe's fee on the payout transfer
+        'offer_fee': offer_fee,
+        # total fees given to offer
+        'payout_fee': payout_fee,
+        # total fees given to payout
         'application_fee': application_fee,
-        'gross_transfer_fee': gross_transfer_fee,
-        'actual_transfer_fee': actual_transfer_fee,
-        'transfer_overage': transfer_overage
+        'payout_alt_calc': payout_alt_calc,
+        'payout_overage': payout_overage,
+        'miscalculation_of_total_stripe_fee': (
+            total_stripe_fee - charge_stripe_fee -
+            transfer_stripe_fee
+        ),
+        'iterations': iteration
     }
 
 
