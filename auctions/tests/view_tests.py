@@ -43,7 +43,7 @@ class BidStatusTestCase(TestCase):
         self.view.request = (fudge.Fake().has_attr(
             POST={
                 'url': self.url,
-                'ask': 4.20,
+                'ask': '4.20',
             })
             .has_attr(user=self.user1))
         self.view.post()
@@ -56,13 +56,28 @@ class BidStatusTestCase(TestCase):
         self.view.request = (fudge.Fake().has_attr(
             POST={
                 'url': self.url,
-                'ask': 0,
-                'offer': 44.3,
+                'ask': '0',
+                'offer': '44.3',
             })
             .has_attr(user=self.user1))
         self.view.post()
         retreive_bid = Bid.objects.get(pk=self.bid1.id)
         self.assertEqual(retreive_bid.offer, Decimal('44.30'))
+
+    @fudge.patch('auctions.views.messages')
+    def test_post_with_dollar_signs(self, mock_messages):
+        mock_messages.is_a_stub()
+        self.view.request = (fudge.Fake().has_attr(
+            POST={
+                'url': self.url,
+                'ask': '$100',
+                'offer': '$5',
+            })
+            .has_attr(user=self.user1))
+        self.view.post()
+        retreive_bid = Bid.objects.get(pk=self.bid1.id)
+        self.assertEqual(retreive_bid.offer, Decimal('5.00'))
+        self.assertEqual(retreive_bid.ask, Decimal('100.00'))
 
     def test_url_path_only(self):
         self.assertEqual(
@@ -84,7 +99,7 @@ class BidStatusTestCase(TestCase):
         self.view.request = (fudge.Fake().has_attr(
             POST={
                 'url': self.url,
-                'offer': 4.20,
+                'offer': '4.20',
             })
             .has_attr(user=self.user1))
         self.view.post()
@@ -97,8 +112,8 @@ class BidStatusTestCase(TestCase):
         self.view.request = (fudge.Fake().has_attr(
             POST={
                 'url': self.url,
-                'ask': 5,
-                'offer': 0,
+                'ask': '5',
+                'offer': '0',
             })
             .has_attr(user=self.user1))
         self.view.post()
@@ -112,8 +127,8 @@ class BidStatusTestCase(TestCase):
         self.view.request = (fudge.Fake().has_attr(
             POST={
                 'url': self.url,
-                'ask': 50,
-                'offer': 5,
+                'ask': '50',
+                'offer': '5',
             })
             .has_attr(user=self.user1))
         self.view.post()
@@ -129,8 +144,8 @@ class BidStatusTestCase(TestCase):
         self.view.request = (fudge.Fake().has_attr(
             POST={
                 'url': url_with_frag,
-                'ask': 5,
-                'offer': 0,
+                'ask': '5',
+                'offer': '0',
             })
             .has_attr(user=self.user1))
         self.view.post()
