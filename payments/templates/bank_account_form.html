@@ -12,6 +12,20 @@
         <div class="form-group">
             <label for="name">Name on the account</label>
             <input type="text" class="form-control" data-stripe="account_holder_name" autocomplete="off" value="{{ STRIPE_DEBUG.bank.name}}" maxlength="50" />
+            <label for="first_name">First Name</label>
+            <input name="first_name" type="text" class="form-control" autocomplete="off" maxlength="16" value="{{ STRIPE_DEBUG.identity.first_name}}"/>
+            <label for="last_name">Last Name</label>
+            <input name="last_name" type="text" class="form-control" autocomplete="off" maxlength="16" value="{{ STRIPE_DEBUG.identity.last_name}}"/>
+            <fieldset >
+                <legend>Birthdate</legend>
+                <label for="month">Month</label>
+                <input name="month" type="text" class="form-control" autocomplete="off" maxlength="2" value="{{ STRIPE_DEBUG.identity.month}}"/>
+                <label for="day">Day</label>
+                <input name="day" type="text" class="form-control" autocomplete="off" maxlength="2" value="{{ STRIPE_DEBUG.identity.day}}"/>
+                <label for="year">Year</label>
+                <input name="year" type="text" class="form-control" autocomplete="off" maxlength="4" value="{{ STRIPE_DEBUG.identity.year}}"/>
+            </fieldset>
+
             <label for="routing_number">Routing Number</label>
             <input type="text" class="form-control" data-stripe="routing_number" autocomplete="off" value="{{ STRIPE_DEBUG.bank.routing_number}}" maxlength="50" />
             <label for="acct-number">Account Number</label>
