@@ -1,0 +1,128 @@
+// Utilities
+// Custom & helper classes
+// =================================================================================
+
+// CLEARFIX: http://nicolasgallagher.com/micro-clearfix-hack/
+//  -------------------------
+%clearfix:before,
+%clearfix:after {
+    content: '';
+    display: table;
+}
+
+%clearfix:after {
+    clear: both;
+}
+
+//  CLEAR ELEMENT
+//  -------------------------
+%clear {
+    clear: both;
+    display: block;
+    overflow: hidden;
+    visibility: hidden;
+    width: 0;
+    height: 0;
+}
+
+//  IMAGE REPLACEMENT
+//  -------------------------
+%ir {
+    border: 0;
+    font: 0/0 a;
+    text-shadow: none;
+    color: transparent;
+    background-color: transparent;
+}
+
+//  HIDE/SHOW ELEMENT
+//  -------------------------
+%hide {
+    display: none;
+}
+
+%show {
+    display: block;
+    visibility: visible;
+}
+
+%invisible {
+    visibility: hidden;
+}
+
+%visuallyhidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+%visuallyhidden.focusable {
+    &:active,
+    &:focus {
+        clip: auto;
+        height: auto;
+        margin: 0;
+        overflow: visible;
+        position: static;
+        width: auto;
+    }
+}
+
+// Move element offscreen;
+%hidden {
+    // scss-lint:disable ImportantRule
+    position: absolute !important;
+    z-index: 999;
+    top: -999em;
+    left: -999em;
+    height: auto;
+    display: block;
+}
+
+//  HR/STANDALONE BORDER
+//  -------------------------
+%hr {
+    border-top: 1px solid $borderColor;
+    border-bottom: 0;
+    border-right: 0;
+    border-left: 0;
+    clear: both;
+    height: 1px;
+    margin: rhythm() 0;
+    min-height: 0;
+
+    &.dotted {
+        border-style: dotted;
+    }
+
+    &.dashed {
+        border-style: dashed;
+    }
+
+    &.darkborder {
+        border-color: $black;
+    }
+
+    &.lightborder {
+        border-color: $white;
+    }
+}
+
+%reset-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+//  Text meant only for screen readers
+//  -------------------------
+%assistive-text {
+    // scss-lint:disable ImportantRule
+    clip: rect(1px, 1px, 1px, 1px);
+    position: absolute !important;
+}

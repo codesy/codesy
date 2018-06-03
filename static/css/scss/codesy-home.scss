@@ -1,0 +1,35 @@
+// sass --watch scss/codesy-home.scss:codesy-home.css
+/*
+    ===========================
+    Libs
+    ===========================
+*/
+@import "libs/normalize";
+/*
+    ===========================
+    Settings/Config/Mixins
+    ===========================
+*/
+@import "config/variables";
+@import "config/settings";
+@import "config/utils";
+@import "config/mixins";
+@import "config/fonts";
+
+/*
+    ===========================
+    Main CSS
+    ===========================
+*/
+
+@import "partials/legacy";
+// @import "partials/header";
+// @import "partials/forms";
+// @import "partials/footer";
+// @import "partials/webkit";
+
+/*
+    ===========================
+    CDN Imports
+    ===========================
+*/
