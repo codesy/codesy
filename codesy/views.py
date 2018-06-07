@@ -1,7 +1,13 @@
-from django.views.generic import TemplateView
+import json
+
+from dateutil import parser
+
 from django.conf import settings
+from django.http import HttpResponse
+from django.views.generic import TemplateView, View
 
 from auctions.models import Bid
+from codesy.base.mixins import CSRFExemptMixin
 
 
 class LegalInfo(TemplateView):
@@ -31,3 +37,13 @@ class Home(TemplateView):
         elif 'Chrome' in agent:
             browser = settings.EXTENSION_SETTINGS['chrome']
         return browser
+
+
+class SetTimezone(CSRFExemptMixin, View):
+    def post(self, *args, **kwargs):
+        body_unicode = self.request.body.decode('utf-8')
+        body_data = json.loads(body_unicode)
+        client_date = parser.parse(body_data['clientDateString'])
+        client_utc_offset = client_date.utcoffset().seconds
+        self.request.session['client_utc_offset'] = client_utc_offset
+        return HttpResponse(status=201)

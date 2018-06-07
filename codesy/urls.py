@@ -10,6 +10,9 @@ urlpatterns = [
     # Static home/ explanation pages
     url(r'^$', views.Home.as_view(), name='home'),
     url(r'^legal-info$', views.LegalInfo.as_view(), name='legal-info'),
+
+    url(r'^set-timezone$', views.SetTimezone.as_view(), name='set-timezone'),
+
     # allauth
     url(r'^accounts/', include('allauth.urls')),
 

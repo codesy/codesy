@@ -2,6 +2,14 @@
 window.codesy = {};
 
 $(window).on("load",function () {
+    // get timezone and POST to server
+    const clientDateString = new Date().toString();
+    console.log('clientDateString: ', clientDateString);
+    fetch('/set-timezone', {
+      body: JSON.stringify({clientDateString}),
+      method: 'POST',
+    }).then( resp => console.log(resp));
+
     // start foundation js
     $(document).foundation();
 

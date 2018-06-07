@@ -1,6 +1,9 @@
+import datetime
+
 from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponseRedirect
+from django.utils import timezone
 
 
 class AuthChangedMiddleware(object):
@@ -41,3 +44,17 @@ class AlwaysWWW(object):
                 request.get_host() +
                 request.get_full_path()
             )
+
+
+class Timezone(object):
+    """
+    Get client utc offset from session variable and activate its timezone
+    """
+    def process_request(self, request):
+        client_utc_offset = request.session.get('client_utc_offset')
+        tz = datetime.timezone(datetime.timedelta(seconds=client_utc_offset))
+        print "tz: %s" % tz
+        if tz:
+            timezone.activate(tz)
+        else:
+            timezone.deactivate

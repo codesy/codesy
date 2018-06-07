@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load auctions_extras %}
 {% load staticfiles %}
+{% load tz %}
 
 {% block content %}
     <div class="row">
@@ -21,7 +22,7 @@
             {% actionable_claims_for_bid_for_user bid=bid user=request.user as actionable_claims %}
             <tr>
                 <td>
-                    <span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" title="{{ bid.created|date:"c" }}">{{ bid.created|date:"M j" }}</span></td>
+                    <span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" title="{{ bid.created|localtime }}">{{ bid.created|localtime }}</span></td>
                 <td><a href="{{bid.url}}"{% if target %} target="{{ target }}"{% endif %}>{{bid.issue.title}}</a></td>
                 <td>
                     {{ bid.ask }}

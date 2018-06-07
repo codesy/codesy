@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load tz %}
 
 {% block content %}
     <div class="row">
@@ -19,7 +20,7 @@
             {% for vote in votes %}
             <tr>
                 <td>
-                    <span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" title="{{ vote.created|date:"r" }}">{{ vote.created|date:"M j" }}</span></td>
+                    <span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" title="{{ vote.created|localtime }}">{{ vote.created|localtime }}</span></td>
                 <td><a href="{% url 'claim-status' vote.claim.id %}">{{ vote.claim.issue.title }}</a></td>
                 <td>{% if vote.approved %}Approved{% else %}Rejected{% endif %}</td>
             </tr>
