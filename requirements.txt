@@ -3,13 +3,16 @@ PyGithub==1.26.0
 dj-database-url==0.4.0
 dj-static==0.0.6
 django-allauth==0.32.0
-django-csp==3.1
+django-compressor==2.2
 django-cors-headers==1.1.0
+django-csp==3.1
 django-mailer==1.2.2
 django-toolbelt==0.0.1
 django-rest-swagger==0.3.10
+django-sass-processor==0.7
 djangorestframework==3.5.4
 gunicorn==19.4.5
+libsass==0.14.5
 neo4j-driver==1.5.0
 newrelic==2.60.0.46
 oauthlib==1.0.3

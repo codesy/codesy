@@ -16,3 +16,4 @@ docs/html
 .tox
 htmlcov
 .sass-cache
+static/css/scss/*.css

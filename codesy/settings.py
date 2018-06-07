@@ -52,6 +52,7 @@ THIRD_PARTY_APPS = (
     'mailer',
     'rest_framework',
     'rest_framework_swagger',
+    'sass_processor',
 )
 
 LOCAL_APPS = (
@@ -211,6 +212,12 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'sass_processor.finders.CssFinder',
+]
 
 SITE_ID = 1
 
