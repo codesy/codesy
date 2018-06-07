@@ -15,3 +15,4 @@ stunnel/stunnel.pem
 docs/html
 .tox
 htmlcov
+.sass-cache

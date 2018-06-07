@@ -151,6 +151,22 @@ Read the beautiful docs::
     open html/index.html
 
 
+Editing the Website Theme via SASS
+----------------------------------
+
+The theme is built and compiled using [SASS](https://sass-lang.com/ruby-sass). The SCSS files only compile the Codesy website CSS file. To edit the Widget or the iFrame, edit their CSS files directly.
+
+Install requirements::
+
+    gem install sass
+
+To compile the assets::
+
+    cd static/css
+    sass --watch scss/codesy-home.scss:codesy-home.css
+
+.. note:: Add the flag, `--watch`, to recompile assets when any assosiated files are saved.
+
 What to work on
 ---------------
 

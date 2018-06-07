@@ -1,0 +1,79 @@
+@mixin mq-at-least($device-width) {
+     @media screen and (min-width: $device-width){
+        @content;
+    }
+}
+@mixin mq-until($device-width) {
+     @media screen and (max-width: $device-width - 1){
+        @content;
+    }
+}
+
+// Remove units from digits (px, em, rem, ch, etc...)
+// ---------------------------------------------------------------------------
+@function strip-unit($number) {
+    @return $number / ($number * 0 + 1);
+}
+
+// INCREASE value from min to max between min & max dimensions
+// ---------------------------------------------------------------------------
+@function fluid-increase($min-vw, $max-vw, $min-value, $max-value) {
+    @return calc(#{$min-value} + #{strip-unit($max-value - $min-value)} * (100vw - #{$max-vw}) / #{strip-unit($min-vw - $max-vw)});
+}
+
+// DECREASE value from min to max between min & max dimensions
+// ---------------------------------------------------------------------------
+@function fluid-decrease($min-vw, $max-vw, $min-value, $max-value) {
+    @return calc(#{$min-value} + #{strip-unit($max-value - $min-value)} * (100vw - #{$min-vw}) / #{strip-unit($max-vw - $min-vw)});
+}
+
+// ---------------------------------------------------------------------------
+@mixin fluid-type($properties, $min-vw, $max-vw, $min-value, $max-value, $dir: 'decrease') {
+    & {
+        @each $property in $properties {
+            #{$property}: if($dir == 'increase', $max-value, $min-value);
+        }
+
+        @media screen and (min-width: $min-vw) {
+            @each $property in $properties {
+                $scale: fluid-decrease($min-vw, $max-vw, $min-value, $max-value);
+
+                @if $dir == 'increase' {
+                    $scale: fluid-increase($min-vw, $max-vw, $min-value, $max-value);
+                }
+
+                #{$property}: $scale;
+            }
+        }
+
+        @media screen and (min-width: $max-vw) {
+            @each $property in $properties {
+                #{$property}: if($dir == 'increase', $min-value, $max-value);
+            }
+        }
+    }
+}
+
+//generic transform
+@mixin transform($transforms) {
+       -moz-transform: $transforms;
+         -o-transform: $transforms;
+        -ms-transform: $transforms;
+    -webkit-transform: $transforms;
+          transform: $transforms;
+}
+
+// translate
+@mixin translate ($x, $y) {
+   @include transform(translate($x, $y));
+}
+
+// flexbox
+
+%flexbox {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+}
