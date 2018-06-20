@@ -31,7 +31,7 @@ class WidgetApp {
     }
     validate($input){
         var original_value = $input.data("original-value")
-        var new_value = $input.val()
+        var new_value = $input.val().replace('$', '');
         var diff = new_value - original_value
         var input_type = $input.attr('id')
         var validated = true

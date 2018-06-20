@@ -43,7 +43,7 @@ class BidStatusTestCase(TestCase):
         self.view.request = (fudge.Fake().has_attr(
             POST={
                 'url': self.url,
-                'ask': 4.20,
+                'ask': '4.20',
             })
             .has_attr(user=self.user1))
         self.view.post()
@@ -56,13 +56,28 @@ class BidStatusTestCase(TestCase):
         self.view.request = (fudge.Fake().has_attr(
             POST={
                 'url': self.url,
-                'ask': 0,
-                'offer': 44.3,
+                'ask': '0',
+                'offer': '44.3',
             })
             .has_attr(user=self.user1))
         self.view.post()
         retreive_bid = Bid.objects.get(pk=self.bid1.id)
         self.assertEqual(retreive_bid.offer, Decimal('44.30'))
+
+    @fudge.patch('auctions.views.messages')
+    def test_post_with_dollar_signs(self, mock_messages):
+        mock_messages.is_a_stub()
+        self.view.request = (fudge.Fake().has_attr(
+            POST={
+                'url': self.url,
+                'ask': '$100',
+                'offer': '$5',
+            })
+            .has_attr(user=self.user1))
+        self.view.post()
+        retreive_bid = Bid.objects.get(pk=self.bid1.id)
+        self.assertEqual(retreive_bid.offer, Decimal('5.00'))
+        self.assertEqual(retreive_bid.ask, Decimal('100.00'))
 
     def test_url_path_only(self):
         self.assertEqual(
@@ -84,7 +99,7 @@ class BidStatusTestCase(TestCase):
         self.view.request = (fudge.Fake().has_attr(
             POST={
                 'url': self.url,
-                'offer': 4.20,
+                'offer': '4.20',
             })
             .has_attr(user=self.user1))
         self.view.post()
@@ -97,8 +112,8 @@ class BidStatusTestCase(TestCase):
         self.view.request = (fudge.Fake().has_attr(
             POST={
                 'url': self.url,
-                'ask': 5,
-                'offer': 0,
+                'ask': '5',
+                'offer': '0',
             })
             .has_attr(user=self.user1))
         self.view.post()
@@ -112,8 +127,8 @@ class BidStatusTestCase(TestCase):
         self.view.request = (fudge.Fake().has_attr(
             POST={
                 'url': self.url,
-                'ask': 50,
-                'offer': 5,
+                'ask': '50',
+                'offer': '5',
             })
             .has_attr(user=self.user1))
         self.view.post()
@@ -129,8 +144,8 @@ class BidStatusTestCase(TestCase):
         self.view.request = (fudge.Fake().has_attr(
             POST={
                 'url': url_with_frag,
-                'ask': 5,
-                'offer': 0,
+                'ask': '5',
+                'offer': '0',
             })
             .has_attr(user=self.user1))
         self.view.post()
@@ -153,10 +168,21 @@ class ClaimStatusTestCase(TestCase):
         self.view = ClaimStatusView()
         self.url = 'http://github.com/codesy/codesy/issues/37'
         self.issue = mommy.make(Issue, url=self.url)
-        self.user1 = mommy.make(settings.AUTH_USER_MODEL,
-                                email='user1@test.com')
-        self.user2 = mommy.make(settings.AUTH_USER_MODEL,
-                                email='user1@test.com')
+        self.user1 = mommy.make(
+            settings.AUTH_USER_MODEL, email='user1@test.com'
+        )
+        self.bid1 = mommy.make(
+            Bid, user=self.user1, url=self.url, issue=self.issue, offer=0
+        )
+        self.user2 = mommy.make(
+            settings.AUTH_USER_MODEL, email='user2@test.com'
+        )
+        self.bid2 = mommy.make(
+            Bid, user=self.user2, url=self.url, issue=self.issue, offer=10
+        )
+        self.user3 = mommy.make(
+            settings.AUTH_USER_MODEL, email='user3@test.com'
+        )
 
         self.claim = mommy.make(Claim, user=self.user1, issue=self.issue)
 
@@ -174,12 +200,30 @@ class ClaimStatusTestCase(TestCase):
         context = self.view.get_context_data()
         self.assertEqual(self.claim, context['claim'])
 
-    def test_get_by_non_claimaint_returns_context(self):
+    def test_get_by_claimaint_returns_200_and_context(self):
+        self.view.request = (fudge.Fake()
+                             .has_attr(user=self.user1, path=""))
+        self.view.kwargs = {'pk': self.claim.id}
+        response = self.view.get(self.view.request)
+        self.assertEqual(200, response.status_code)
+        context = self.view.get_context_data()
+        self.assertEqual(self.claim, context['claim'])
+
+    def test_get_by_bidder_returns_200(self):
         self.view.request = (fudge.Fake()
                              .has_attr(user=self.user2, path=""))
         self.view.kwargs = {'pk': self.claim.id}
+        response = self.view.get(self.view.request)
+        self.assertEqual(200, response.status_code)
         context = self.view.get_context_data()
         self.assertEqual(self.claim, context['claim'])
+
+    def test_get_by_non_bidding_user_returns_404(self):
+        self.view.request = (fudge.Fake()
+                             .has_attr(user=self.user3, path=""))
+        self.view.kwargs = {'pk': self.claim.id}
+        response = self.view.get(self.view.request)
+        self.assertEqual(404, response.status_code)
 
     @fudge.patch('auctions.models.Claim.payout')
     @fudge.patch('auctions.views.messages')

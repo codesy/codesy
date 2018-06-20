@@ -312,6 +312,15 @@ class ClaimTest(MarketWithClaimTestCase):
     def test_needs_from_user_with_bid_who_hasnt_voted_returns_true(self):
         self.assertTrue(self.claim.needs_vote_from_user(self.user3))
 
+    def test_user_ids_who_can_vote(self):
+        user4 = mommy.make(settings.AUTH_USER_MODEL)
+        self.assertTrue(
+            self.user2.id in self.claim.user_ids_who_can_vote()
+        )
+        self.assertFalse(
+            user4.id in self.claim.user_ids_who_can_vote()
+        )
+
 
 class NotifyMatchingOfferersTest(MarketWithBidsTestCase):
     def setUp(self):
