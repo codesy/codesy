@@ -1,0 +1,33 @@
+// Header
+
+.top-bar {
+    background: $white;
+    ul {
+        background: none;
+    }
+    li {
+        display: inline-block;
+        margin: 0 0 0 1em;
+        &:first-child {
+            margin-left: 0;
+        }
+    }
+    a {
+        text-transform: uppercase;
+        color: $clr-nav;
+        border-radius: 5px;
+        transition: color 0.2s ease-out, background 0.2s ease-out;
+        &:hover {
+            color: $clr-link;
+        }
+        // Registration Link 
+        &.highlight {
+            border: 1px $clr-link solid;
+            color: $clr-link;
+            &:hover {
+                background: $clr-link;
+                color: $white;
+            }
+        }
+    }
+}

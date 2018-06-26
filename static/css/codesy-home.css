@@ -12,6 +12,7 @@
  */
 /* Document
    ========================================================================== */
+@import "https://fonts.googleapis.com/css?family=Fredoka+One|Roboto+Condensed";
 html {
   font-family: sans-serif;
   /* 1 */
@@ -417,139 +418,31 @@ template {
     Main CSS
     ===========================
 */
-/* codesy site styles */
 body {
-  color: #444; }
+  font: normal 400 16px/24px "Roboto Condensed", "Helvetica Neue", Arial, Helvetica, sans-serif #002A46; }
 
-a {
-  color: #666;
-  text-decoration: underline;
-  border-width: 0; }
-
-ol {
-  padding: 2rem; }
-
-li {
-  margin-bottom: 1rem; }
-
-dt {
-  margin-bottom: .3rem;
-  font-weight: 700; }
-
-.home-tagline {
-  text-align: left; }
-
-.home-section {
-  padding-top: 1rem;
-  padding-bottom: 6rem; }
-
-tr.total {
-  border: solid 1px #000; }
-
-.gh-button {
-  background-color: #111;
-  text-decoration: none; }
-
-.gh-button:focus, .button:hover {
-  background-color: #222; }
-
-.button.success {
-  background-color: #60b044; }
-
-.button.alert {
-  background-color: #df3e3e; }
-
-.download-button {
-  background-color: #60b044; }
-
-.browser-install-icon {
-  margin-right: .25rem; }
-
-/* foundation icon styles */
-.fi-fast-forward {
-  color: red; }
-
-.fi-loop {
-  color: red; }
-
-/* top-bar */
 .top-bar {
-  margin-bottom: 1.25em;
-  border-bottom: 1px solid #0a0a0a; }
-
-.top-bar, .top-bar ul {
-  background-color: #F5F5F5; }
-
-.top-bar-dropdown-signout {
-  margin: 0 1rem 1rem; }
-
-img {
-  border-width: 0; }
-
-img#top-bar-gravatar {
-  height: 1em; }
-
-.spin {
-  -webkit-animation: spin 2s infinite linear;
-  animation: spin 2s infinite linear; }
-
-@-webkit-keyframes spin {
-  from {
-    -webkit-transform: rotate(0deg); }
-  to {
-    -webkit-transform: rotate(360deg); } }
-@keyframes spin {
-  from {
-    transform: rotate(0deg); }
-  to {
-    transform: rotate(360deg); } }
-.installed {
-  display: none; }
-
-.fi-social {
-  font-size: 2em;
-  vertical-align: middle;
-  margin-right: .25rem; }
-
-.twitter-button {
-  background-color: #1DA1F2; }
-
-.twitter-button:hover, .twitter-button:focus {
-  background-color: #2EB2F3; }
-
-.facebook-button {
-  background-color: #3b5998; }
-
-.facebook-button:hover, .facebook-button:focus {
-  background-color: #4c6aa9; }
-
-.menu-text {
-  padding: 0; }
-
-table {
-  width: 100%; }
-
-#claim-status-container {
-  padding-top: 1em;
-  text-align: center; }
-
-.date-label {
-  background: #F7F7F7;
-  padding: .5em 2em;
-  text-align: center;
-  margin-bottom: 0; }
-
-.date-details {
-  border: 1px solid #eeeeec;
-  text-align: center;
-  font-size: 2em; }
-
-.claim-status {
-  text-align: center;
-  font-size: 2em; }
-
-.payout {
-  text-align: left; }
+  background: #fff; }
+  .top-bar ul {
+    background: none; }
+  .top-bar li {
+    display: inline-block;
+    margin: 0 0 0 1em; }
+    .top-bar li:first-child {
+      margin-left: 0; }
+  .top-bar a {
+    text-transform: uppercase;
+    color: #898989;
+    border-radius: 5px;
+    transition: color 0.2s ease-out, background 0.2s ease-out; }
+    .top-bar a:hover {
+      color: #E12300; }
+    .top-bar a.highlight {
+      border: 1px #E12300 solid;
+      color: #E12300; }
+      .top-bar a.highlight:hover {
+        background: #E12300;
+        color: #fff; }
 
 /*
     ===========================

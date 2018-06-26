@@ -22,8 +22,9 @@
     ===========================
 */
 
-@import "partials/legacy";
-// @import "partials/header";
+@import "partials/global";
+@import "partials/header";
+// @import "partials/legacy";
 // @import "partials/forms";
 // @import "partials/footer";
 // @import "partials/webkit";
