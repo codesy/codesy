@@ -23,3 +23,4 @@ static==1.1.1
 wsgiref==0.1.2
 cffi==1.5.2
 stripe==1.62.0
+unicodecsv==0.14.1
