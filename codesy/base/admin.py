@@ -1,4 +1,5 @@
-import csv
+# TODO: in python 3.x use built-in unicode csv
+import unicodecsv as csv
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
@@ -16,7 +17,7 @@ def download_user_csv(modeladmin, request, queryset):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment;filename=users.csv'
 
-    writer = csv.writer(response)
+    writer = csv.writer(response, encoding='utf-8')
     field_names = ['username', 'first_name', 'last_name', 'email']
     writer.writerow(field_names)
     for obj in queryset:
