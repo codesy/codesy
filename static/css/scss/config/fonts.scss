@@ -1,4 +1,6 @@
 // Fonts
+// @import url('//fonts.googleapis.com/css?family=Fredoka+One|Roboto+Condensed');
+@import "https://fonts.googleapis.com/css?family=Fredoka+One|Roboto+Condensed";
 
-$news-cycle: 'News Cycle', $helvetica-font-stack;
-$roboto-slab: 'Roboto Slab', serif; 
+$fredoka: 'Roboto Condensed', $helvetica-font-stack;
+$roboto-condensed: 'Roboto Condensed', $helvetica-font-stack;
