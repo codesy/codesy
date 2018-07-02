@@ -1,0 +1,8 @@
+// Homepage
+
+.hero {
+	background: $clr-1 bottom center repeat-x;
+	background: url("../img/bg-triangle-texture-wide.svg") bottom center repeat-x $clr-1;
+	background: url("../img/bg-triangle-texture-wide.svg"), linear-gradient($clr-1, $clr-4);
+	background-size: auto 100%;
+}
