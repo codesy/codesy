@@ -1,8 +1,22 @@
 // Homepage
 
 .hero {
-	background: $clr-1 bottom center repeat-x;
-	background: url("../img/bg-triangle-texture-wide.svg") bottom center repeat-x $clr-1;
-	background: url("../img/bg-triangle-texture-wide.svg"), linear-gradient($clr-1, $clr-4);
+	background: $clr-4 bottom center repeat-x;
+	background: url("../img/bg-triangle-texture-wide.svg") bottom center repeat-x $clr-4;
+	background: url("../img/bg-triangle-texture-wide.svg"), linear-gradient($clr-4, $clr-1);
 	background-size: auto 100%;
+
+	h1 {
+		font-family: $fredoka;
+		color: $clr-2;
+	}
+
+	p {
+		color: $clr-2;
+	}
+
+	.flex-video {
+		box-shadow: 1rem 1rem 0 $clr-2;
+	}
+
 }

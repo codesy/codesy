@@ -466,6 +466,48 @@ body {
   font: normal 400 16px/24px "Roboto Condensed", "Helvetica Neue", Arial, Helvetica, sans-serif #002A46;
 }
 
+.o-btn {
+  background: #E12300;
+  border: 2px #E12300 solid;
+  border-radius: 5px;
+  transition: color 0.2s ease-out, background 0.2s ease-out, border 0.2s ease-out;
+  color: #fff;
+  text-decoration: none;
+  padding: 0.25em 1em;
+  display: inline-block;
+}
+.o-btn:hover {
+  background: #002A46;
+  border-color: #002A46;
+  color: #fff;
+}
+@media screen and (max-width: 599px) {
+  .o-btn {
+    display: block;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+}
+.o-btn + .o-btn {
+  margin-left: 0.5rem;
+}
+@media screen and (max-width: 599px) {
+  .o-btn + .o-btn {
+    margin-left: 0;
+  }
+}
+
+.o-btn--ghost {
+  background: transparent;
+  border: 2px #E12300 solid;
+  color: #E12300;
+}
+.o-btn--ghost:hover {
+  background: #E12300;
+  border-color: #E12300;
+  color: #fff;
+}
+
 .top-bar {
   background: #fff;
 }
@@ -498,10 +540,20 @@ body {
 }
 
 .hero {
-  background: #E12300 bottom center repeat-x;
-  background: url("../img/bg-triangle-texture-wide.svg") bottom center repeat-x #E12300;
-  background: url("../img/bg-triangle-texture-wide.svg"), linear-gradient(#E12300, #FFC660);
+  background: #FFC660 bottom center repeat-x;
+  background: url("../img/bg-triangle-texture-wide.svg") bottom center repeat-x #FFC660;
+  background: url("../img/bg-triangle-texture-wide.svg"), linear-gradient(#FFC660, #E12300);
   background-size: auto 100%;
+}
+.hero h1 {
+  font-family: "Fredoka One", "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace;
+  color: #002A46;
+}
+.hero p {
+  color: #002A46;
+}
+.hero .flex-video {
+  box-shadow: 1rem 1rem 0 #002A46;
 }
 
 /*

@@ -1,5 +1,48 @@
 // Header
 
 body {
-    font: normal 400 16px/24px $roboto-condensed $clr-text;
+	font: normal 400 16px/24px $roboto-condensed $clr-text;
+}
+
+.o-btn {
+	background: $clr-link;
+	border: 2px $clr-link solid;
+	border-radius: 5px;
+	transition: color .2s ease-out, background .2s ease-out, border .2s ease-out;
+	color: $white;
+	text-decoration: none;
+	padding: .25em 1em;
+	display: inline-block;
+
+	&:hover {
+		background: $clr-2;
+		border-color: $clr-2;
+		color: $white;
+	}
+
+	@include mq-until(600px) {
+		display: block;
+		text-align: center;
+		margin-bottom: .5rem;
+	}
+
+	& + .o-btn {
+		margin-left: .5rem;
+		@include mq-until(600px) {
+			margin-left: 0;
+		}
+	}
+
+}
+
+.o-btn--ghost {
+	background: transparent;
+	border: 2px $clr-link solid;
+	color: $clr-link;
+
+	&:hover {
+		background: $clr-link;
+		border-color: $clr-link;
+		color: $white;
+	}
 }
